@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">¡Días!</string>
+    <string name="proxima_alarma">Próxima alarma</string>
+    <string name="tiempo_estimado">Tiempo estimado</string>
+    <string name="encendida">¿Encendida?</string>
+    <string name="vibrar">¿Vibrar?</string>
+    <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
+</resources>
