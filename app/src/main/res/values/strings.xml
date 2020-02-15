@@ -5,4 +5,5 @@
     <string name="encendida">¿Encendida?</string>
     <string name="vibrar">¿Vibrar?</string>
     <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
+    <string name="sonido_predeterminado">Sonido predeterminado</string>
 </resources>
