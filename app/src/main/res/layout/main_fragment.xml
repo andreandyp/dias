@@ -47,10 +47,15 @@
             android:id="@+id/alarmas"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:transcriptMode="alwaysScroll"
             app:layout_constraintBottom_toTopOf="@+id/creditos"
+            android:divider="#A4C739"
+            android:dividerHeight="0.5dp"
+            android:indicatorStart="?android:attr/expandableListPreferredItemIndicatorRight"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fuente" />
+            app:layout_constraintTop_toBottomOf="@+id/fuente"
+            tools:listitem="@layout/alarma_item_parent" />
 
         <TextView
             android:id="@+id/creditos"
