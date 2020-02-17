@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 import java.time.Instant
 
 @Entity(tableName = "Tiempo")
-data class TiempoEntity(
+data class AmanecerEntity(
     @PrimaryKey(autoGenerate = true)
     val _id: Long = 0,
     @ColumnInfo(name = "amanecer")
-    val amanecer: Instant
+    val amanecerFechaHora: Instant
 )

@@ -4,12 +4,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class TiempoNetwork(
-    val results: ResultsNetwork,
-    val status: String
-)
-
-@JsonClass(generateAdapter = true)
 data class ResultsNetwork(
     val sunrise: String,
     val sunset: String,

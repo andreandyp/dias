@@ -2,10 +2,10 @@ package me.andreandyp.dias.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.Deferred
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 private const val API_URL = "https://api.sunrise-sunset.org"
 private val moshi: Moshi = Moshi.Builder().run {
@@ -19,8 +19,8 @@ private val retrofit: Retrofit = Retrofit.Builder().run {
 }
 
 interface SunriseSunsetService {
-    @GET("/json?lat={lat}&lng={long}&formatted=0&date=today")
-    fun obtenerAmanecerAsync(): Deferred<TiempoNetwork>
+    @GET("/json?formatted=0&date=today")
+    suspend fun obtenerAmanecer(@Query("lat")latitud: String, @Query("lng")longitud: String): AmanecerNetwork
 }
 
 object SunriseSunsetAPI {
