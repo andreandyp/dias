@@ -3,7 +3,7 @@ package me.andreandyp.dias.bd.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.Instant
+import org.threeten.bp.Instant
 
 @Entity(tableName = "Alarma_Pospuesta")
 data class AlarmaPospuestaEntity(

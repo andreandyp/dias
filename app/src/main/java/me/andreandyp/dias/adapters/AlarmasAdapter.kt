@@ -56,6 +56,16 @@ class AlarmasAdapter(var context: Context?) : RecyclerView.Adapter<RecyclerView.
                 }
 
             }
+
+            alarmaConstraint.setOnClickListener{
+                detalles.performClick()
+            }
+
+            encender.setOnCheckedChangeListener { buttonView, isChecked ->
+                if(isChecked) {
+                    
+                }
+            }
         }
     }
 

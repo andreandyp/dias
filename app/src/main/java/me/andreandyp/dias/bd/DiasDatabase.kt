@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import me.andreandyp.dias.bd.dao.AmanecerDAO
 import me.andreandyp.dias.bd.entities.AlarmaPospuestaEntity
 import me.andreandyp.dias.bd.entities.AmanecerEntity
@@ -13,8 +14,10 @@ import me.andreandyp.dias.bd.entities.AmanecerEntity
         AlarmaPospuestaEntity::class,
         AmanecerEntity::class
     ],
+    exportSchema = false,
     version = 0
 )
+@TypeConverters(Converters::class)
 abstract class DiasDatabase : RoomDatabase() {
     abstract fun tiempoDao(): AmanecerDAO
 

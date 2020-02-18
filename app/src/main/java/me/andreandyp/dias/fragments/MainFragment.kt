@@ -11,6 +11,7 @@ import me.andreandyp.dias.R
 import me.andreandyp.dias.adapters.AlarmasAdapter
 import me.andreandyp.dias.databinding.MainFragmentBinding
 import me.andreandyp.dias.viewmodels.MainViewModel
+import me.andreandyp.dias.viewmodels.MainViewModelFactory
 
 class MainFragment : Fragment() {
 
@@ -28,8 +29,8 @@ class MainFragment : Fragment() {
         val dias =
             listOf<String>("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
 
-        binding.alarmas.adapter = AlarmasAdapter(context).also {
-            it.lista = dias
+        binding.alarmas.adapter = AlarmasAdapter(context).apply {
+            lista = dias
         }
 
         return binding.root
@@ -37,7 +38,10 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModelFactory(activity!!.application)
+        )[MainViewModel::class.java]
     }
 
 }
