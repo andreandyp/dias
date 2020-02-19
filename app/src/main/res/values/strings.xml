@@ -7,7 +7,7 @@
     <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
     <string name="sonido_predeterminado">Sonido predeterminado</string>
     <string name="preference_file">me.andreandyp.dias.PREFERENCE_FILE_KEY</string>
-    
+
     <string name="lunes">Lunes</string>
     <string name="martes">Martes</string>
     <string name="miercoles">Miércoles</string>

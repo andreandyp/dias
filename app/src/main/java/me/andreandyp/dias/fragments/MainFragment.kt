@@ -27,21 +27,37 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         val dias =
-            listOf<String>("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+            listOf<String>(
+                getString(R.string.lunes),
+                getString(R.string.martes),
+                getString(R.string.miercoles),
+                getString(R.string.jueves),
+                getString(R.string.viernes),
+                getString(R.string.sabado),
+                getString(R.string.domingo)
+            )
 
-        binding.alarmas.adapter = AlarmasAdapter(context).apply {
-            lista = dias
-        }
-
-        return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(
             this,
-            MainViewModelFactory(activity!!.application)
+            MainViewModelFactory(activity!!.application, dias)
         )[MainViewModel::class.java]
+
+        binding.alarmas.adapter = AlarmasAdapter(context, viewModel).apply {
+            listaAlarmas = viewModel.alarmas
+        }
+
+        /*ArrayAdapter.createFromResource(
+            context!!,
+            R.array.dias,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
+            binding.alarmas.hora.adapter = adapter
+        }*/
+
+
+
+        return binding.root
     }
 
 }

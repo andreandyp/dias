@@ -9,11 +9,15 @@ import androidx.lifecycle.ViewModelProvider
  * @constructor Recibe la aplicación actual
  */
 @Suppress("UNCHECKED_CAST")
-class MainViewModelFactory(val app: Application) : ViewModelProvider.Factory {
+class MainViewModelFactory(val app: Application, val dias: List<String>) :
+    ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(app) as T // No sé cómo eliminar este unchecked cast sin la anotación @Suppress
+            return MainViewModel(
+                app,
+                dias
+            ) as T // No sé cómo eliminar este unchecked cast sin la anotación @Suppress
         }
 
         throw IllegalArgumentException("Unable to construct viewmodel")

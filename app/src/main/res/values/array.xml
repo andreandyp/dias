@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dias">
+        <item>@string/lunes</item>
+        <item>@string/martes</item>
+        <item>@string/miercoles</item>
+        <item>@string/jueves</item>
+        <item>@string/viernes</item>
+        <item>@string/sabado</item>
+        <item>@string/domingo</item>
+    </string-array>
+</resources>
