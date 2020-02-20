@@ -3,6 +3,7 @@ package me.andreandyp.dias.viewmodels
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import me.andreandyp.dias.R
 import me.andreandyp.dias.domain.Alarma
 
@@ -19,11 +20,11 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                 Alarma(
                     _id = i,
                     dia = dias[i],
-                    encendida = preferencias.getBoolean("${i}_on", false),
-                    vibrar = preferencias.getBoolean("${i}_vib", false),
-                    horas = preferencias.getInt("${i}_hr", 0),
-                    minutos = preferencias.getInt("${i}_min", 0),
-                    momento = preferencias.getInt("${i}_min", 0)
+                    _encendida = preferencias.getBoolean("${i}_on", false),
+                    _vibrar = preferencias.getBoolean("${i}_vib", false),
+                    _horas = preferencias.getInt("${i}_hr", 0),
+                    _minutos = preferencias.getInt("${i}_min", 0),
+                    _momento = preferencias.getInt("${i}_min", 0)
                 )
             )
         }

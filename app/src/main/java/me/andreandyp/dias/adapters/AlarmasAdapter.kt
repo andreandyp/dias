@@ -1,13 +1,16 @@
 package me.andreandyp.dias.adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import me.andreandyp.dias.R
 import me.andreandyp.dias.adapters.AlarmasAdapter.AlarmaViewHolder
 import me.andreandyp.dias.databinding.AlarmaItemBinding
@@ -20,7 +23,7 @@ import me.andreandyp.dias.viewmodels.MainViewModel
  * @param [context] el contexto para obtener recursos como los íconos y los colores
  * @param [viewModel] para acceder a las funciones del viewModel
  */
-class AlarmasAdapter(private var context: Context?, private val viewModel: MainViewModel) :
+class   AlarmasAdapter(private var context: Context?, private val viewModel: MainViewModel) :
     RecyclerView.Adapter<AlarmaViewHolder>() {
 
     /**
@@ -53,21 +56,63 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
      */
     override fun onBindViewHolder(holder: AlarmaViewHolder, position: Int) {
         holder.alarmaItemBinding.apply {
-            val alarma = listaAlarmas[position]
-
-            // Asignar textos y valores
-            dia.text = alarma.dia
-            encender.isChecked = alarma.encendida
-            vibrar.isChecked = alarma.vibrar
+            alarma = listaAlarmas[position]
 
             // Asignar listeners a encender y vibrar
             encender.setOnCheckedChangeListener { _, isChecked ->
                 // Obtenemos el viewModel que recibe el adapter al inicializarlo
-                this@AlarmasAdapter.viewModel.cambiarEstadoAlarma(alarma._id, isChecked)
+                viewModel.cambiarEstadoAlarma(alarma!!._id, isChecked)
             }
 
             vibrar.setOnCheckedChangeListener { _, isChecked ->
-                this@AlarmasAdapter.viewModel.cambiarVibrarAlarma(alarma._id, isChecked)
+                viewModel.cambiarVibrarAlarma(alarma!!._id, isChecked)
+            }
+
+            // Crear dialogo para mostrar los pickers de hora y minutis
+            val dialog = AlertDialog.Builder(context!!).create().apply {
+                val inflater =
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val dialogView = inflater.inflate(R.layout.hora_dialog, null)
+
+                // Establecer valores a los pickers y configuraciones
+                val antesDespues: NumberPicker = dialogView.findViewById(R.id.antes_despues)
+                antesDespues.displayedValues = arrayOf("-", "+")
+                antesDespues.maxValue = 1
+                antesDespues.value = alarma!!.momento
+                val hora: NumberPicker = dialogView.findViewById(R.id.hora)
+                hora.minValue = 0
+                hora.maxValue = 3
+                hora.value = alarma!!.horas
+
+                val minutos: NumberPicker = dialogView.findViewById(R.id.minutos)
+                val elementos = arrayOf("0", "15", "30", "45")
+                minutos.displayedValues = elementos
+                minutos.minValue = 0
+                minutos.maxValue = elementos.size - 1
+                minutos.value = elementos.indexOf(alarma!!.minutos.toString())
+
+                // Poner la vista y el título
+                setView(dialogView)
+                setTitle("Establece la hora antes o después del amanecer")
+
+                // Poner listeners a los botones
+                dialogView.findViewById<MaterialButton>(R.id.button_aceptar).setOnClickListener {
+                    alarma!!.horas = hora.value
+                    alarma!!.minutos = elementos[minutos.value].toInt()
+                    alarma!!.momento = hora.value
+                    viewModel.cambiarHorasAlarma(alarma!!._id, hora.value)
+                    viewModel.cambiarMinAlarma(alarma!!._id, elementos[minutos.value].toInt())
+                    viewModel.cambiarMinAlarma(alarma!!._id, hora.value)
+                    this.dismiss()
+                }
+                dialogView.findViewById<MaterialButton>(R.id.button_cancelar).setOnClickListener {
+                    this.cancel()
+                }
+            }
+
+            // Asignar listeners para hora y minutos de alarma
+            horaAntesDespues.setOnClickListener {
+                dialog.show()
             }
 
             // Asignar listener para abrir y cerrar la alarma

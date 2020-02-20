@@ -15,4 +15,7 @@
     <string name="viernes">Viernes</string>
     <string name="sabado">Sábado</string>
     <string name="domingo">Domingo</string>
+    <string name="sonar_a_las">Sonará a las <b>%d:%d</b></string>
+    <string name="al_amanecer">Sonará al amanecer</string>
+    <string name="hora_predeterminada">±0:00</string>
 </resources>

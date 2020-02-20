@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="alarma"
+            type="me.andreandyp.dias.domain.Alarma" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/alarma_constraint"
         android:layout_width="match_parent"
@@ -15,21 +22,26 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:text="@{alarma.dia}"
+            android:textColor="@android:color/black"
             android:textSize="@dimen/h5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Lunes" />
 
         <TextView
-            android:id="@+id/hora"
+            android:id="@+id/hora_antes_despues"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@{alarma.horas == 0 &amp;&amp; alarma.minutos == 0 ? @string/al_amanecer : String.format(@string/sonar_a_las, alarma.horas, alarma.minutos)}"
             android:textSize="@dimen/h6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dia"
-            tools:text="±0:00 desde el amanecer" />
+            tools:text="@string/sonar_a_las" />
 
         <Switch
             android:id="@+id/vibrar"
@@ -37,16 +49,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:checked="@={alarma.vibrar}"
             android:switchPadding="8dp"
             android:text="@string/vibrar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/encender" />
+            app:layout_constraintTop_toBottomOf="@+id/encender"
+            tools:checked="true" />
 
         <Switch
             android:id="@+id/encender"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:checked="@={alarma.encendida}"
             android:switchPadding="8dp"
             android:text="@string/encendida"
             app:layout_constraintBottom_toBottomOf="@+id/dia"
@@ -61,17 +76,8 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/hora"
+            app:layout_constraintTop_toBottomOf="@+id/hora_antes_despues"
             tools:visibility="visible">
-
-            <TextView
-                android:id="@+id/tiempo_estimado"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/tiempo_estimado" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tono"

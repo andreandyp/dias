@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -45,17 +46,6 @@ class MainFragment : Fragment() {
         binding.alarmas.adapter = AlarmasAdapter(context, viewModel).apply {
             listaAlarmas = viewModel.alarmas
         }
-
-        /*ArrayAdapter.createFromResource(
-            context!!,
-            R.array.dias,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
-            binding.alarmas.hora.adapter = adapter
-        }*/
-
-
 
         return binding.root
     }
