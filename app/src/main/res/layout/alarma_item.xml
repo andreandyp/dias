@@ -37,7 +37,7 @@
             android:layout_marginTop="8dp"
             android:clickable="true"
             android:focusable="true"
-            android:text="@{alarma.horas == 0 &amp;&amp; alarma.minutos == 0 ? @string/al_amanecer : String.format(@string/sonar_a_las, alarma.horas, alarma.minutos)}"
+            android:text="@{alarma.horaFormateada}"
             android:textSize="@dimen/h6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dia"

@@ -1,13 +1,14 @@
 <resources>
-    <string name="app_name">¡Días!</string>
+    <string name="app_name" translatable="false">¡Días!</string>
+    <string name="preference_file" translatable="false">me.andreandyp.dias.PREFERENCE_FILE_KEY</string>
+    <string name="channel_id" translatable="false">alarma_channel</string>
+
     <string name="proxima_alarma">Próxima alarma</string>
     <string name="tiempo_estimado">Tiempo estimado</string>
     <string name="encendida">¿Encendida?</string>
     <string name="vibrar">¿Vibrar?</string>
     <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
     <string name="sonido_predeterminado">Sonido predeterminado</string>
-    <string name="preference_file">me.andreandyp.dias.PREFERENCE_FILE_KEY</string>
-
     <string name="lunes">Lunes</string>
     <string name="martes">Martes</string>
     <string name="miercoles">Miércoles</string>
@@ -15,7 +16,9 @@
     <string name="viernes">Viernes</string>
     <string name="sabado">Sábado</string>
     <string name="domingo">Domingo</string>
-    <string name="sonar_a_las">Sonará a las <b>%d:%d</b></string>
+    <string name="sonar_a_las">Sonará a las <b>%d:%s</b></string>
     <string name="al_amanecer">Sonará al amanecer</string>
     <string name="hora_predeterminada">±0:00</string>
+    <string name="channel_nombre">Alarmas</string>
+    <string name="channel_descripcion">Recibe una notificación cuando suene la alarma</string>
 </resources>

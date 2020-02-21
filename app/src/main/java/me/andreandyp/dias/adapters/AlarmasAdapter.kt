@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.NumberPicker
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.Observable
+import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import me.andreandyp.dias.R
@@ -18,23 +20,23 @@ import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.viewmodels.MainViewModel
 
 /**
- * Adapter para la lista de alarmas
- * Hereda de [RecyclerView.Adapter] que necesita de un ViewHolder, en este caso [AlarmaViewHolder]
- * @param [context] el contexto para obtener recursos como los íconos y los colores
- * @param [viewModel] para acceder a las funciones del viewModel
+ * Adapter para la lista de alarmas.
+ * Hereda de [RecyclerView.Adapter] que necesita de un ViewHolder, en este caso, [AlarmaViewHolder].
+ * @property [context] El contexto para obtener recursos como los íconos y los colores.
+ * @property [viewModel] Para acceder a las funciones del viewModel.
  */
-class   AlarmasAdapter(private var context: Context?, private val viewModel: MainViewModel) :
+class AlarmasAdapter(private var context: Context?, private val viewModel: MainViewModel) :
     RecyclerView.Adapter<AlarmaViewHolder>() {
 
     /**
-     * Lista de [Alarma]
+     * [List] de [Alarma].
      * Cada alarma contiene los datos guardados en las shared preferences.
      */
     var listaAlarmas: List<Alarma> = emptyList()
 
     /**
-     * Crear toda la vista de las alarmas
-     * Inflamos el ViewHolder con [DataBindingUtil] en vez del [LayoutInflater] predeterminado
+     * Crear toda la vista de las alarmas.
+     * Inflamos el ViewHolder con [DataBindingUtil] en vez del [LayoutInflater] predeterminado.
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmaViewHolder =
         AlarmaViewHolder(
@@ -47,49 +49,56 @@ class   AlarmasAdapter(private var context: Context?, private val viewModel: Mai
         )
 
     /**
-     * Asignar el tamaño de la lista de alarmas para que el recycler view sepa cuántos elementos va a renderizar
+     * Asignar el tamaño de la lista de alarmas para que el recycler view sepa cuántos elementos va a renderizar.
      */
     override fun getItemCount(): Int = listaAlarmas.size
 
     /**
-     * Cada vez que hace scroll la pantalla, aquí se recicla la vista y se asignan valores y listeners
+     * Cada vez que hace scroll la pantalla, aquí se recicla la vista y se asignan valores y listeners.
      */
     override fun onBindViewHolder(holder: AlarmaViewHolder, position: Int) {
         holder.alarmaItemBinding.apply {
             alarma = listaAlarmas[position]
 
-            // Asignar listeners a encender y vibrar
-            encender.setOnCheckedChangeListener { _, isChecked ->
-                // Obtenemos el viewModel que recibe el adapter al inicializarlo
-                viewModel.cambiarEstadoAlarma(alarma!!._id, isChecked)
-            }
+            // Asignar listeners a las propiedades de la alarma para guardar los datos
+            alarma!!.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+                override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                    sender as Alarma
+                    when (propertyId) {
+                        BR.encendida -> viewModel.cambiarEstadoAlarma(sender)
+                        BR.vibrar -> viewModel.cambiarVibrarAlarma(sender)
+                        BR.horas -> viewModel.cambiarHorasAlarma(sender)
+                        BR.minutos -> viewModel.cambiarMinAlarma(sender)
+                        BR.momento -> viewModel.cambiarMomentoAlarma(sender)
+                    }
+                }
+            })
 
-            vibrar.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.cambiarVibrarAlarma(alarma!!._id, isChecked)
-            }
-
-            // Crear dialogo para mostrar los pickers de hora y minutis
+            // Crear diálogo para mostrar los pickers de hora y minutos
             val dialog = AlertDialog.Builder(context!!).create().apply {
-                val inflater =
-                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val dialogView = inflater.inflate(R.layout.hora_dialog, null)
+                val dialogView = View.inflate(context, R.layout.hora_dialog, null)
 
                 // Establecer valores a los pickers y configuraciones
                 val antesDespues: NumberPicker = dialogView.findViewById(R.id.antes_despues)
-                antesDespues.displayedValues = arrayOf("-", "+")
+                val masMenos = arrayOf("-", "+")
+                antesDespues.displayedValues = masMenos
                 antesDespues.maxValue = 1
-                antesDespues.value = alarma!!.momento
+                antesDespues.value = masMenos.indexOf(alarma!!.momento.toString())
                 val hora: NumberPicker = dialogView.findViewById(R.id.hora)
                 hora.minValue = 0
                 hora.maxValue = 3
                 hora.value = alarma!!.horas
 
                 val minutos: NumberPicker = dialogView.findViewById(R.id.minutos)
-                val elementos = arrayOf("0", "15", "30", "45")
+                val elementos = arrayOf("00", "15", "30", "45")
                 minutos.displayedValues = elementos
                 minutos.minValue = 0
                 minutos.maxValue = elementos.size - 1
-                minutos.value = elementos.indexOf(alarma!!.minutos.toString())
+                if (alarma!!.minutos == 0) {
+                    minutos.value = 0
+                } else {
+                    minutos.value = elementos.indexOf(alarma!!.minutos.toString())
+                }
 
                 // Poner la vista y el título
                 setView(dialogView)
@@ -97,12 +106,10 @@ class   AlarmasAdapter(private var context: Context?, private val viewModel: Mai
 
                 // Poner listeners a los botones
                 dialogView.findViewById<MaterialButton>(R.id.button_aceptar).setOnClickListener {
+                    // Actualizar los valores en alarma para guardarlos
                     alarma!!.horas = hora.value
                     alarma!!.minutos = elementos[minutos.value].toInt()
-                    alarma!!.momento = hora.value
-                    viewModel.cambiarHorasAlarma(alarma!!._id, hora.value)
-                    viewModel.cambiarMinAlarma(alarma!!._id, elementos[minutos.value].toInt())
-                    viewModel.cambiarMinAlarma(alarma!!._id, hora.value)
+                    alarma!!.momento = antesDespues.value
                     this.dismiss()
                 }
                 dialogView.findViewById<MaterialButton>(R.id.button_cancelar).setOnClickListener {
@@ -146,10 +153,10 @@ class   AlarmasAdapter(private var context: Context?, private val viewModel: Mai
     }
 
     /**
-     * ViewHolder para la alarma
-     * @param [alarmaItemBinding] el binding que inflamos en [AlarmasAdapter.onCreateViewHolder]
-     * Hereda de [RecyclerView.ViewHolder] y lo inicializamos esta clase con la vista del binding
-     * Con [LayoutRes] obtenemos más fácilmente el XML que representa a cada alarma
+     * ViewHolder para la alarma.
+     * @property [alarmaItemBinding] el binding que inflamos en [AlarmasAdapter.onCreateViewHolder].
+     * Hereda de [RecyclerView.ViewHolder] y lo inicializamos esta clase con la vista del binding.
+     * Con [LayoutRes] obtenemos más fácilmente el XML que representa a cada alarma.
      */
     class AlarmaViewHolder(var alarmaItemBinding: AlarmaItemBinding) :
         RecyclerView.ViewHolder(alarmaItemBinding.root) {

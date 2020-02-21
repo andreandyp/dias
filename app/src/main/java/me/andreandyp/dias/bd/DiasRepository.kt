@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.andreandyp.dias.bd.dao.AmanecerDAO
 import me.andreandyp.dias.bd.entities.AmanecerEntity
-import me.andreandyp.dias.network.SunriseSunsetAPI
 import me.andreandyp.dias.network.AmanecerNetwork
+import me.andreandyp.dias.network.SunriseSunsetAPI
 
 class DiasRepository(application: Application) {
     private val amanecerDAO: AmanecerDAO

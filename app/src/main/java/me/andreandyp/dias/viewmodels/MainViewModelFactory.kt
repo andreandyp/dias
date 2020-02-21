@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 /**
- * Clase para generar MainViewModel
- * @constructor Recibe la aplicación actual
+ * Clase para generar MainViewModel.
+ * @constructor Recibe la aplicación actual y la lista de días, ambos utilizados por el ViewModel.
+ * @property [app] La aplicación que utilizará el ViewModel.
+ * @property [dias] La lista de días de la semana que utilizará el ViewModel.
  */
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(val app: Application, val dias: List<String>) :
