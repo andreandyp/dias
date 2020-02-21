@@ -24,11 +24,10 @@ class DiasRepository(application: Application) {
     suspend fun insertarAmanecer(amanecerEntity: AmanecerEntity) {
         withContext(Dispatchers.IO) {
             val amaneceres = amanecerDAO.obtenerNumeroAmaneceres()
-            if(amaneceres >= 30) {
+            if (amaneceres >= 30) {
                 val masAntiguo = amanecerDAO.obtenerAmanecerMasAntiguo()
                 amanecerDAO.eliminarAmanecer(masAntiguo)
-            }
-            else {
+            } else {
                 amanecerDAO.insertarAmanecer(amanecerEntity)
             }
         }

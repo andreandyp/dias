@@ -68,11 +68,11 @@ data class Alarma(
     val horaFormateada: String
         @Bindable
         get() {
-            val masMenos = when(momento){
+            val masMenos = when (momento) {
                 0 -> "-"
                 1 -> "+"
                 else -> "±"
             }
-            return "${masMenos}${horas}:${if(minutos != 0) minutos.toString() else "00"}"
+            return "${masMenos}${horas}:${if (minutos != 0) minutos.toString() else "00"}"
         }
 }

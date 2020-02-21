@@ -9,5 +9,5 @@
         android:id="@+id/mainFragment"
         android:name="me.andreandyp.dias.fragments.MainFragment"
         android:label="MainFragment"
-        tools:layout="@layout/main_fragment"/>
+        tools:layout="@layout/main_fragment" />
 </navigation>
