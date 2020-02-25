@@ -21,4 +21,10 @@
     <string name="hora_predeterminada">±0:00</string>
     <string name="channel_nombre">Alarmas</string>
     <string name="channel_descripcion">Recibe una notificación cuando suene la alarma</string>
+    <string name="buenos_dias">¡Buenos días!</string>
+    <string name="apagar_alarma">Apagar alarma</string>
+    <string name="posponer_alarma">Posponer alarma</string>
+    <string name="hora_actual">Son las %s</string>
+    <string name="alarma_sonando">Alarma sonando</string>
+    <string name="posponer">Posponer</string>
 </resources>

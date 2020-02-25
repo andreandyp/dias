@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.MostrarAlarmaActivity">
+
+    <TextView
+        android:id="@+id/saludo_matutino"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/buenos_dias"
+        android:textAppearance="@style/MaterialAlertDialog.MaterialComponents.Title.Text"
+        android:textSize="@dimen/h2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/posponer_alarma"
+        android:layout_width="@dimen/iconos_despertar"
+        android:layout_height="@dimen/iconos_despertar"
+        android:contentDescription="@string/posponer_alarma"
+        android:tint="?attr/colorControlNormal"
+        app:layout_constraintBottom_toBottomOf="@+id/ic_alarma"
+        app:layout_constraintEnd_toStartOf="@+id/ic_alarma"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ic_alarma"
+        app:srcCompat="@drawable/baseline_airline_seat_individual_suite_black" />
+
+    <ImageView
+        android:id="@+id/ic_alarma"
+        android:layout_width="@dimen/iconos_despertar"
+        android:layout_height="@dimen/iconos_despertar"
+        android:contentDescription="@string/alarma_sonando"
+        android:tint="?attr/colorControlNormal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/apagar_alarma"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/posponer_alarma"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_alarm_black" />
+
+    <ImageView
+        android:id="@+id/apagar_alarma"
+        android:layout_width="@dimen/iconos_despertar"
+        android:layout_height="@dimen/iconos_despertar"
+        android:contentDescription="@string/apagar_alarma"
+        android:tint="?attr/colorControlNormal"
+        app:layout_constraintBottom_toBottomOf="@+id/ic_alarma"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ic_alarma"
+        app:layout_constraintTop_toTopOf="@+id/ic_alarma"
+        app:srcCompat="@drawable/baseline_alarm_off_black" />
+
+    <TextView
+        android:id="@+id/hora_actual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+        android:textSize="@dimen/h4"
+        app:layout_constraintBottom_toTopOf="@+id/ic_alarma"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/saludo_matutino"
+        tools:text="Son las 07:00" />
+</androidx.constraintlayout.widget.ConstraintLayout>

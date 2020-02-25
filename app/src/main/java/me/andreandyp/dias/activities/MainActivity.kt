@@ -1,7 +1,8 @@
-package me.andreandyp.dias
+package me.andreandyp.dias.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import me.andreandyp.dias.R
 
 class MainActivity : AppCompatActivity() {
 

@@ -2,6 +2,7 @@ package me.andreandyp.dias.adapters
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
@@ -57,6 +58,8 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
      * Cada vez que hace scroll la pantalla, aquí se recicla la vista y se asignan valores y listeners.
      */
     override fun onBindViewHolder(holder: AlarmaViewHolder, position: Int) {
+        val modoNocturno =
+            context!!.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         holder.alarmaItemBinding.apply {
             alarma = listaAlarmas[position]
 
@@ -131,7 +134,12 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                         null
                     )
                     detalles.setImageDrawable(flechaUp)
-                    alarmaConstraint.background = ColorDrawable(context!!.getColor(R.color.grey))
+                    alarmaConstraint.background =
+                        if (modoNocturno == Configuration.UI_MODE_NIGHT_YES) {
+                            ColorDrawable(context!!.getColor(R.color.greyInverse))
+                        } else {
+                            ColorDrawable(context!!.getColor(R.color.grey))
+                        }
                 } else {
                     containerLayout.visibility = View.GONE
                     val flechaDown = context!!.resources.getDrawable(
@@ -140,7 +148,11 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                     )
                     detalles.setImageDrawable(flechaDown)
                     alarmaConstraint.background =
-                        ColorDrawable(context!!.getColor(android.R.color.white))
+                        if (modoNocturno == Configuration.UI_MODE_NIGHT_YES) {
+                            ColorDrawable(context!!.getColor(android.R.color.transparent))
+                        } else {
+                            ColorDrawable(context!!.getColor(android.R.color.white))
+                        }
                 }
 
             }

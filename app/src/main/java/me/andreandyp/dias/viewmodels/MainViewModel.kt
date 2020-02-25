@@ -1,10 +1,18 @@
 package me.andreandyp.dias.viewmodels
 
+import android.app.AlarmManager
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import me.andreandyp.dias.R
 import me.andreandyp.dias.domain.Alarma
+import me.andreandyp.dias.receivers.AlarmaReceiver
+import me.andreandyp.dias.receivers.PosponerReceiver
+import org.threeten.bp.Instant
+import org.threeten.bp.temporal.ChronoUnit
 
 /**
  * ViewModel para la lista de alarmas.
@@ -56,8 +64,10 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     /**
      * Guarda el estado (on/off) de la alarma.
      */
-    fun cambiarEstadoAlarma(alarma: Alarma) =
+    fun cambiarEstadoAlarma(alarma: Alarma) {
+        establecerAlarma(alarma)
         guardarPreferencias("${alarma._id}_on", alarma.encendida)
+    }
 
     /**
      * Guarda la configuración de vibración de la alarma (sí/no).
@@ -82,4 +92,36 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
      */
     fun cambiarMomentoAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_momento", alarma.momento)
+
+    fun establecerAlarma(alarma: Alarma) {
+        val intent = Intent(app.applicationContext, AlarmaReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            app.applicationContext,
+            alarma._id,
+            intent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
+        val posponer = Intent(app.applicationContext, PosponerReceiver::class.java)
+        val posponerPendingIntent = PendingIntent.getBroadcast(
+            app.applicationContext,
+            -1,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        if (alarma.encendida) {
+            val fecha = Instant.now()
+                .plus(alarma.horas.toLong(), ChronoUnit.MINUTES)
+                .plus(alarma.minutos.toLong(), ChronoUnit.SECONDS)
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                fecha.toEpochMilli(),
+                pendingIntent
+            )
+        } else {
+            alarmManager.cancel(pendingIntent)
+            alarmManager.cancel(posponerPendingIntent)
+        }
+    }
 }
