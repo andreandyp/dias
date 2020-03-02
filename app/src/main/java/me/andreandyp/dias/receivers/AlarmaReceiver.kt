@@ -4,17 +4,25 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import me.andreandyp.dias.R
-import me.andreandyp.dias.utils.enviarAlarma
+import me.andreandyp.dias.utils.enviarNotificacionAlarma
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
+/**
+ * Receiver para cuando suena la alarma.
+ */
 class AlarmaReceiver : BroadcastReceiver() {
+    /**
+     * Aquí se recibe el aviso de que ya es hora de despertarse y se envía la notificación.
+     * El ID de la notificación es el ID del día.
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
         val horaActual = LocalTime.now()
         val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
         val horaFormateada = context!!.getString(R.string.hora_actual, formatter.format(horaActual))
-        enviarAlarma(context, 0, horaFormateada)
+        val notifyId = intent?.extras?.getInt(context.getString(R.string.notif_id_intent)) ?: -1
+        enviarNotificacionAlarma(context, notifyId, horaFormateada)
     }
 
 

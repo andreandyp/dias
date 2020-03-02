@@ -5,7 +5,6 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import me.andreandyp.dias.R
 import me.andreandyp.dias.domain.Alarma
@@ -93,23 +92,24 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     fun cambiarMomentoAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_momento", alarma.momento)
 
+    /**
+     * Establecer la alarma con la hora de la alarma.
+     * Si la alarma se activa, se establece la hora con ayuda del [AlarmManager].
+     * Si la alarma se desactiva, se cancela la alarma en el [AlarmManager].
+     */
     fun establecerAlarma(alarma: Alarma) {
-        val intent = Intent(app.applicationContext, AlarmaReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
+        // Intent para mostrar la alarma
+        val mostrarAlarmaIntent = Intent(app.applicationContext, AlarmaReceiver::class.java)
+        mostrarAlarmaIntent.putExtra("notify_id", alarma._id)
+        val mostrarAlarmaPending = PendingIntent.getBroadcast(
             app.applicationContext,
             alarma._id,
-            intent,
+            mostrarAlarmaIntent,
             PendingIntent.FLAG_CANCEL_CURRENT
         )
-        val posponer = Intent(app.applicationContext, PosponerReceiver::class.java)
-        val posponerPendingIntent = PendingIntent.getBroadcast(
-            app.applicationContext,
-            -1,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+        // Encender la alarma o apagarla
+        val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (alarma.encendida) {
             val fecha = Instant.now()
                 .plus(alarma.horas.toLong(), ChronoUnit.MINUTES)
@@ -117,11 +117,24 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 fecha.toEpochMilli(),
-                pendingIntent
+                mostrarAlarmaPending
             )
         } else {
-            alarmManager.cancel(pendingIntent)
-            alarmManager.cancel(posponerPendingIntent)
+            alarmManager.cancel(mostrarAlarmaPending)
+
+            // Intent para posponer la alarma (necesaria para cancelarla)
+            val posponerIntent = Intent(app.applicationContext, PosponerReceiver::class.java)
+            val posponerPending = PendingIntent.getBroadcast(
+                app.applicationContext,
+                POSPONER_CODE,
+                posponerIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            alarmManager.cancel(posponerPending)
         }
+    }
+
+    companion object {
+        private const val POSPONER_CODE = -1
     }
 }

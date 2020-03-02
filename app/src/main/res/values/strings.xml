@@ -27,4 +27,5 @@
     <string name="hora_actual">Son las %s</string>
     <string name="alarma_sonando">Alarma sonando</string>
     <string name="posponer">Posponer</string>
+    <string name="notif_id_intent">notification_id</string>
 </resources>

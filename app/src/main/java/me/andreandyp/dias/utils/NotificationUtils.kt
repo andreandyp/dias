@@ -13,6 +13,13 @@ import me.andreandyp.dias.R
 import me.andreandyp.dias.activities.MostrarAlarmaActivity
 import me.andreandyp.dias.receivers.PosponerReceiver
 
+private const val POSPONER_CODE = -1
+
+/**
+ * Crear canal de notificaciones para Android 8.0 en adelante.
+ * Luces, vibración e badge en el launcher activados.
+ * Luces de color azul.
+ */
 fun crearCanalNotificaciones(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val nombre = context.getString(R.string.channel_nombre)
@@ -33,18 +40,23 @@ fun crearCanalNotificaciones(context: Context) {
     }
 }
 
-fun enviarAlarma(
+/**
+ * Enviar la notificación, al abrirla se muestra la activity con opciones.
+ * Incluye una acción para posponer.
+ */
+fun enviarNotificacionAlarma(
     context: Context,
     notificationId: Int,
     horaFormateada: String
 ) {
-    val mostrarAlarma = Intent(context, MostrarAlarmaActivity::class.java)
-    val mostrarAlarmaPendingIntent = PendingIntent.getActivity(
-        context, 0, mostrarAlarma, PendingIntent.FLAG_UPDATE_CURRENT
+    val mostrarAlarmaIntent = Intent(context, MostrarAlarmaActivity::class.java)
+    val mostrarAlarmaPending = PendingIntent.getActivity(
+        context, notificationId, mostrarAlarmaIntent, PendingIntent.FLAG_UPDATE_CURRENT
     )
-    val posponerAlarma = Intent(context, PosponerReceiver::class.java)
-    val posponerAlarmaPendingIntent = PendingIntent.getActivity(
-        context, -1, posponerAlarma, PendingIntent.FLAG_UPDATE_CURRENT
+    val posponerAlarmaIntent = Intent(context.applicationContext, PosponerReceiver::class.java)
+    posponerAlarmaIntent.putExtra(context.getString(R.string.notif_id_intent), notificationId)
+    val posponerAlarmaPending = PendingIntent.getBroadcast(
+        context.applicationContext, POSPONER_CODE, posponerAlarmaIntent, PendingIntent.FLAG_CANCEL_CURRENT
     )
     val notificacion =
         NotificationCompat.Builder(context, context.getString(R.string.channel_id)).run {
@@ -52,9 +64,9 @@ fun enviarAlarma(
             setContentText(horaFormateada)
             setAutoCancel(true)
             setSmallIcon(android.R.drawable.alert_dark_frame)
-            setContentIntent(mostrarAlarmaPendingIntent)
+            setContentIntent(mostrarAlarmaPending)
             priority = NotificationCompat.PRIORITY_MAX
-            addAction(android.R.drawable.alert_dark_frame, context.getString(R.string.posponer), posponerAlarmaPendingIntent)
+            addAction(android.R.drawable.alert_dark_frame, context.getString(R.string.posponer), posponerAlarmaPending)
 
             build()
         }
