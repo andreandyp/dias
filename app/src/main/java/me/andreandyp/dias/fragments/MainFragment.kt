@@ -48,6 +48,8 @@ class MainFragment : Fragment() {
             listaAlarmas = viewModel.alarmas
         }
 
+        binding.vm = viewModel
+
         return binding.root
     }
 

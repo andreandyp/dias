@@ -28,4 +28,9 @@
     <string name="alarma_sonando">Alarma sonando</string>
     <string name="posponer">Posponer</string>
     <string name="notif_id_intent">notification_id</string>
+    <string name="siguiente_alarma">%d:%d</string>
+    <string name="segun_internet">Según internet</string>
+    <string name="segun_bd">Según el promedio de los últimos 7 días</string>
+    <string name="detalles_alarma">Abrir detalles de la alarma</string>
+    <string name="separador_alarma">Separador de alarma</string>
 </resources>

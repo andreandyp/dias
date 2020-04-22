@@ -3,6 +3,7 @@ package me.andreandyp.dias.domain
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.library.baseAdapters.BR
+import org.threeten.bp.LocalTime
 
 /**
  * Alarma que sirve para mostrar los datos guardados en las shared preferences. Todos los datos son observables.
@@ -11,18 +12,20 @@ import androidx.databinding.library.baseAdapters.BR
  * @property [dia] Día de la semana.
  * @property [encendida] Estado de la alarma (on/off).
  * @property [vibrar] Para saber si la alarma vibra o no.
- * @property [horas] Hora a la que sonará la alarma.
- * @property [minutos] Minutos a los que sonará la alarma.
+ * @property [horasDiferencia] Hora de retraso o adelanto
+ * @property [minutosDiferencia] Minutos de retraso o adelanto
+ * @property [horaAmanecer] Hora a la que será el amanecer
  * @property [tono] Tono que utilizará la alarma para sonar.
- * @property [horaFormateada] Hora de la alarma en el formato ±0:00.
+ * @property [diferenciaFormateada] Retraso o adelanto seleccionado para la alarma en el formato ±0:00.
+ * @property [horaFormateada] Hora a la que sonará la alarma con retraso o adelanto incluido en el formato ±0:00.
  */
 data class Alarma(
     val _id: Int,
     val dia: String,
     private var _encendida: Boolean,
     private var _vibrar: Boolean,
-    private var _horas: Int,
-    private var _minutos: Int,
+    private var _horasDiferencia: Int,
+    private var _minutosDiferencia: Int,
     private var _momento: Int,
     private var _tono: String? = null
 ) : BaseObservable() {
@@ -40,21 +43,28 @@ data class Alarma(
             _vibrar = value
             notifyPropertyChanged(BR.vibrar)
         }
-    var horas: Int
+    var horasDiferencia: Int
         @Bindable
-        get() = _horas
+        get() = _horasDiferencia
         set(value) {
-            _horas = value
-            notifyPropertyChanged(BR.horas)
+            _horasDiferencia = value
+            notifyPropertyChanged(BR.horasDiferencia)
+            notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.horaFormateada)
         }
-
-    var minutos: Int
+    var minutosDiferencia: Int
         @Bindable
-        get() = _minutos
+        get() = _minutosDiferencia
         set(value) {
-            _minutos = value
-            notifyPropertyChanged(BR.minutos)
+            _minutosDiferencia = value
+            notifyPropertyChanged(BR.minutosDiferencia)
+            notifyPropertyChanged(BR.diferenciaFormateada)
+            notifyPropertyChanged(BR.horaFormateada)
+        }
+    var horaAmanecer: LocalTime? = null
+        @Bindable
+        set(value) {
+            field = value
             notifyPropertyChanged(BR.horaFormateada)
         }
     var momento: Int
@@ -63,9 +73,9 @@ data class Alarma(
         set(value) {
             _momento = value
             notifyPropertyChanged(BR.momento)
-            notifyPropertyChanged(BR.horaFormateada)
+            notifyPropertyChanged(BR.diferenciaFormateada)
         }
-    val horaFormateada: String
+    val diferenciaFormateada: String
         @Bindable
         get() {
             val masMenos = when (momento) {
@@ -73,6 +83,18 @@ data class Alarma(
                 1 -> "+"
                 else -> "±"
             }
-            return "${masMenos}${horas}:${if (minutos != 0) minutos.toString() else "00"}"
+            return "${masMenos}${horasDiferencia}:${if (minutosDiferencia != 0) minutosDiferencia.toString() else "00"}"
+        }
+    val horaFormateada: String
+        @Bindable
+        get() {
+            return if (momento == 0) {
+                horaAmanecer?.minusHours(horasDiferencia.toLong())
+                    ?.minusMinutes(minutosDiferencia.toLong())
+                    .toString()
+            } else {
+                horaAmanecer?.plusHours(horasDiferencia.toLong())
+                    ?.plusMinutes(minutosDiferencia.toLong()).toString()
+            }
         }
 }

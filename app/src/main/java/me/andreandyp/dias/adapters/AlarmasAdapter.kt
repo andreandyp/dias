@@ -70,8 +70,8 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                     when (propertyId) {
                         BR.encendida -> viewModel.cambiarEstadoAlarma(sender)
                         BR.vibrar -> viewModel.cambiarVibrarAlarma(sender)
-                        BR.horas -> viewModel.cambiarHorasAlarma(sender)
-                        BR.minutos -> viewModel.cambiarMinAlarma(sender)
+                        BR.horasDiferencia -> viewModel.cambiarHorasAlarma(sender)
+                        BR.minutosDiferencia -> viewModel.cambiarMinAlarma(sender)
                         BR.momento -> viewModel.cambiarMomentoAlarma(sender)
                     }
                 }
@@ -90,17 +90,17 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                 val hora: NumberPicker = dialogView.findViewById(R.id.hora)
                 hora.minValue = 0
                 hora.maxValue = 3
-                hora.value = alarma!!.horas
+                hora.value = alarma!!.horasDiferencia
 
                 val minutos: NumberPicker = dialogView.findViewById(R.id.minutos)
                 val elementos = arrayOf("00", "15", "30", "45")
                 minutos.displayedValues = elementos
                 minutos.minValue = 0
                 minutos.maxValue = elementos.size - 1
-                if (alarma!!.minutos == 0) {
+                if (alarma!!.minutosDiferencia == 0) {
                     minutos.value = 0
                 } else {
-                    minutos.value = elementos.indexOf(alarma!!.minutos.toString())
+                    minutos.value = elementos.indexOf(alarma!!.minutosDiferencia.toString())
                 }
 
                 // Poner la vista y el título
@@ -110,8 +110,8 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                 // Poner listeners a los botones
                 dialogView.findViewById<MaterialButton>(R.id.button_aceptar).setOnClickListener {
                     // Actualizar los valores en alarma para guardarlos
-                    alarma!!.horas = hora.value
-                    alarma!!.minutos = elementos[minutos.value].toInt()
+                    alarma!!.horasDiferencia = hora.value
+                    alarma!!.minutosDiferencia = elementos[minutos.value].toInt()
                     alarma!!.momento = antesDespues.value
                     this.dismiss()
                 }

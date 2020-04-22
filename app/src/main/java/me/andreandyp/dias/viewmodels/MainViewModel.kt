@@ -9,6 +9,8 @@ import android.location.Location
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -21,6 +23,7 @@ import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.receivers.PosponerReceiver
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalTime
 import org.threeten.bp.temporal.ChronoUnit
 
 /**
@@ -38,9 +41,16 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
 
     val alarmas = mutableListOf<Alarma>()
 
+    private val _siguienteAlarma = MutableLiveData<Alarma>()
+    val siguienteAlarma: LiveData<Alarma>
+        get() = _siguienteAlarma
+
+    private val _datosDeInternet = MutableLiveData<Boolean>()
+    val datosDeInternet: LiveData<Boolean>
+        get() = _datosDeInternet
+
     init {
         // Inicializar la lista de alarmas con los datos guardados en las shared preferences
-        Log.i("PRUEBA", "Antes de for")
         for (i: Int in 0..6) {
             alarmas.add(
                 Alarma(
@@ -48,8 +58,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                     dia = dias[i],
                     _encendida = preferencias.getBoolean("${i}_on", false),
                     _vibrar = preferencias.getBoolean("${i}_vib", false),
-                    _horas = preferencias.getInt("${i}_hr", 0),
-                    _minutos = preferencias.getInt("${i}_min", 0),
+                    _horasDiferencia = preferencias.getInt("${i}_hr", 0),
+                    _minutosDiferencia = preferencias.getInt("${i}_min", 0),
                     _momento = preferencias.getInt("${i}_momento", -1)
                 )
             )
@@ -58,8 +68,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     }
 
     private fun obtenerUbicacion() {
-        var fusedLocationClient: FusedLocationProviderClient? = null
-        fusedLocationClient =
+        val fusedLocationClient: FusedLocationProviderClient? =
             LocationServices.getFusedLocationProviderClient(app.applicationContext)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
             viewModelScope.launch {
@@ -78,13 +87,18 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             return
         }
 
-        withContext(Dispatchers.IO) {
-            val amanecer = repository.obtenerAmanecerDiario(
+        val amanecer = withContext(Dispatchers.IO) {
+            return@withContext repository.obtenerAmanecerDiario(
                 ubicacion.latitude.toString(),
                 ubicacion.longitude.toString()
             )
-            repository.insertarAmanecer(amanecer)
         }
+        _datosDeInternet.value = amanecer.deInternet
+        Log.i("PRUEBA", amanecer.segundos.toString())
+        val siguienteDia = alarmas[amanecer.dia - 1]
+        val horaAmanecer = LocalTime.of(amanecer.horas, amanecer.minutos)
+        siguienteDia.horaAmanecer = horaAmanecer
+        _siguienteAlarma.value = siguienteDia
     }
 
     /**
@@ -122,13 +136,13 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
      * Guarda la hora a la que sonará la alarma.
      */
     fun cambiarHorasAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma._id}_hr", alarma.horas)
+        guardarPreferencias("${alarma._id}_hr", alarma.horasDiferencia)
 
     /**
      * Guarda los minutos a los que sonará la alarma.
      */
     fun cambiarMinAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma._id}_min", alarma.minutos)
+        guardarPreferencias("${alarma._id}_min", alarma.minutosDiferencia)
 
     /**
      * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
@@ -156,8 +170,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (alarma.encendida) {
             val fecha = Instant.now()
-                .plus(alarma.horas.toLong(), ChronoUnit.MINUTES)
-                .plus(alarma.minutos.toLong(), ChronoUnit.SECONDS)
+                .plus(alarma.horasDiferencia.toLong(), ChronoUnit.MINUTES)
+                .plus(alarma.minutosDiferencia.toLong(), ChronoUnit.SECONDS)
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 fecha.toEpochMilli(),

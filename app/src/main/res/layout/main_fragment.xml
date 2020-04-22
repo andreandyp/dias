@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="vm"
+            type="me.andreandyp.dias.viewmodels.MainViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,8 +31,7 @@
             android:id="@+id/fuente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:text="Según internet"
+            android:text="@{vm.datosDeInternet ? @string/segun_internet : @string/segun_bd}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +42,7 @@
             android:id="@+id/hora_alarma"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/hora_predeterminada"
+            android:text="@{vm.siguienteAlarma.horaFormateada}"
             android:textAppearance="?attr/textAppearanceHeadline4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
