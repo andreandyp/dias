@@ -38,11 +38,12 @@ android {
 dependencies {
     def lifecycle_version = "2.2.0"
     def material_version = "1.1.0"
-    def room_version = "2.2.4"
-    def navigation_version = "2.2.1"
+    def room_version = "2.2.5"
+    def navigation_version = "2.2.2"
     def retrofit_version = "2.7.1"
     def moshi_version = "1.9.2"
     def data_binding_version = "3.1.4"
+    def play_services_location_version = "17.0.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -70,4 +71,5 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     implementation "com.squareup.moshi:moshi:$moshi_version"
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
+    implementation "com.google.android.gms:play-services-location:$play_services_location_version"
 }

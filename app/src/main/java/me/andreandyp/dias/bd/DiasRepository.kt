@@ -4,7 +4,6 @@ import android.app.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.andreandyp.dias.bd.dao.AmanecerDAO
-import me.andreandyp.dias.bd.entities.AmanecerEntity
 import me.andreandyp.dias.network.AmanecerNetwork
 import me.andreandyp.dias.network.SunriseSunsetAPI
 
@@ -21,14 +20,14 @@ class DiasRepository(application: Application) {
             SunriseSunsetAPI.sunriseSunsetService.obtenerAmanecer(latitud, longitud)
         }
 
-    suspend fun insertarAmanecer(amanecerEntity: AmanecerEntity) {
+    suspend fun insertarAmanecer(amanecerNetwork: AmanecerNetwork) {
         withContext(Dispatchers.IO) {
             val amaneceres = amanecerDAO.obtenerNumeroAmaneceres()
             if (amaneceres >= 30) {
                 val masAntiguo = amanecerDAO.obtenerAmanecerMasAntiguo()
                 amanecerDAO.eliminarAmanecer(masAntiguo)
             } else {
-                amanecerDAO.insertarAmanecer(amanecerEntity)
+                amanecerDAO.insertarAmanecer(amanecerNetwork.asEntity())
             }
         }
     }

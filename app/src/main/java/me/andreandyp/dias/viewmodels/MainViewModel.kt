@@ -5,8 +5,18 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.location.Location
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.andreandyp.dias.R
+import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.receivers.PosponerReceiver
@@ -24,10 +34,13 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         app.getString(R.string.preference_file), Context.MODE_PRIVATE
     )
 
+    private val repository = DiasRepository(app)
+
     val alarmas = mutableListOf<Alarma>()
 
     init {
         // Inicializar la lista de alarmas con los datos guardados en las shared preferences
+        Log.i("PRUEBA", "Antes de for")
         for (i: Int in 0..6) {
             alarmas.add(
                 Alarma(
@@ -40,6 +53,37 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                     _momento = preferencias.getInt("${i}_momento", -1)
                 )
             )
+        }
+        obtenerUbicacion()
+    }
+
+    private fun obtenerUbicacion() {
+        var fusedLocationClient: FusedLocationProviderClient? = null
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(app.applicationContext)
+        fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
+            viewModelScope.launch {
+                obtenerSiguienteAlarma(location)
+            }
+        }
+    }
+
+    private suspend fun obtenerSiguienteAlarma(ubicacion: Location?) {
+        if (ubicacion == null) {
+            Toast.makeText(
+                app.applicationContext,
+                "No se pudo obtener la ubicación más reciente",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        withContext(Dispatchers.IO) {
+            val amanecer = repository.obtenerAmanecerDiario(
+                ubicacion.latitude.toString(),
+                ubicacion.longitude.toString()
+            )
+            repository.insertarAmanecer(amanecer)
         }
     }
 
@@ -100,7 +144,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     fun establecerAlarma(alarma: Alarma) {
         // Intent para mostrar la alarma
         val mostrarAlarmaIntent = Intent(app.applicationContext, AlarmaReceiver::class.java)
-        mostrarAlarmaIntent.putExtra("notify_id", alarma._id)
+        mostrarAlarmaIntent.putExtra(app.getString(R.string.notif_id_intent), alarma._id)
         val mostrarAlarmaPending = PendingIntent.getBroadcast(
             app.applicationContext,
             alarma._id,

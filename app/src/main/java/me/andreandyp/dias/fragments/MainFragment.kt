@@ -24,7 +24,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        crearCanalNotificaciones(context!!)
+        crearCanalNotificaciones(requireContext())
         binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -41,7 +41,7 @@ class MainFragment : Fragment() {
 
         viewModel = ViewModelProvider(
             this,
-            MainViewModelFactory(activity!!.application, dias)
+            MainViewModelFactory(requireActivity().application, dias)
         )[MainViewModel::class.java]
 
         binding.alarmas.adapter = AlarmasAdapter(context, viewModel).apply {

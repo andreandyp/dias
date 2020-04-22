@@ -15,7 +15,7 @@ import me.andreandyp.dias.bd.entities.AmanecerEntity
         AmanecerEntity::class
     ],
     exportSchema = false,
-    version = 0
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class DiasDatabase : RoomDatabase() {

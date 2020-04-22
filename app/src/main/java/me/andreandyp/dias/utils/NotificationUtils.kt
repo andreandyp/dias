@@ -17,8 +17,9 @@ private const val POSPONER_CODE = -1
 
 /**
  * Crear canal de notificaciones para Android 8.0 en adelante.
- * Luces, vibración e badge en el launcher activados.
+ * Luces y badge en el launcher activados.
  * Luces de color azul.
+ * Se habilita la vibración pero se establece un patrón de 0 para que no vibre la notificación de forma predeterminada.
  */
 fun crearCanalNotificaciones(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -30,6 +31,7 @@ fun crearCanalNotificaciones(context: Context) {
                 description = descripcion
                 enableLights(true)
                 lightColor = Color.BLUE
+                vibrationPattern = longArrayOf(0L)
                 enableVibration(true)
                 setShowBadge(true)
             }
@@ -49,6 +51,8 @@ fun enviarNotificacionAlarma(
     notificationId: Int,
     horaFormateada: String
 ) {
+    val preferencias = context.getSharedPreferences(context.getString(R.string.preference_file), Context.MODE_PRIVATE)
+
     val mostrarAlarmaIntent = Intent(context, MostrarAlarmaActivity::class.java)
     val mostrarAlarmaPending = PendingIntent.getActivity(
         context, notificationId, mostrarAlarmaIntent, PendingIntent.FLAG_UPDATE_CURRENT
