@@ -22,8 +22,7 @@ import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.receivers.PosponerReceiver
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalTime
+import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoUnit
 
 /**
@@ -94,7 +93,6 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             )
         }
         _datosDeInternet.value = amanecer.deInternet
-        Log.i("PRUEBA", amanecer.segundos.toString())
         val siguienteDia = alarmas[amanecer.dia - 1]
         val horaAmanecer = LocalTime.of(amanecer.horas, amanecer.minutos)
         siguienteDia.horaAmanecer = horaAmanecer
@@ -135,20 +133,27 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     /**
      * Guarda la hora a la que sonará la alarma.
      */
-    fun cambiarHorasAlarma(alarma: Alarma) =
+    fun cambiarHorasAlarma(alarma: Alarma) {
         guardarPreferencias("${alarma._id}_hr", alarma.horasDiferencia)
+        alarma.encendida = true
+    }
 
     /**
      * Guarda los minutos a los que sonará la alarma.
      */
-    fun cambiarMinAlarma(alarma: Alarma) =
+    fun cambiarMinAlarma(alarma: Alarma) {
         guardarPreferencias("${alarma._id}_min", alarma.minutosDiferencia)
+        alarma.encendida = true
+    }
 
     /**
      * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
      */
-    fun cambiarMomentoAlarma(alarma: Alarma) =
+    fun cambiarMomentoAlarma(alarma: Alarma) {
         guardarPreferencias("${alarma._id}_momento", alarma.momento)
+        alarma.encendida = true
+    }
+
 
     /**
      * Establecer la alarma con la hora de la alarma.
@@ -169,12 +174,20 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         // Encender la alarma o apagarla
         val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (alarma.encendida) {
-            val fecha = Instant.now()
-                .plus(alarma.horasDiferencia.toLong(), ChronoUnit.MINUTES)
-                .plus(alarma.minutosDiferencia.toLong(), ChronoUnit.SECONDS)
+
+            val s = LocalDate.now().plusDays(1).atTime(alarma.horaAmanecer)
+            val hora = if (alarma.momento == 0) {
+                s.minusHours(alarma.horasDiferencia.toLong()).minusMinutes(alarma.minutosDiferencia.toLong())
+            }
+            else{
+                s.plusHours(alarma.horasDiferencia.toLong()).plusMinutes(alarma.minutosDiferencia.toLong())
+            }
+
+            val instante = hora.toInstant(ZoneOffset.UTC)
+            Log.i("PRUEBA", "AQUI")
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                fecha.toEpochMilli(),
+                instante.toEpochMilli(),
                 mostrarAlarmaPending
             )
         } else {

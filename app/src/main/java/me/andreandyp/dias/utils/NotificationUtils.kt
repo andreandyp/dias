@@ -31,7 +31,6 @@ fun crearCanalNotificaciones(context: Context) {
                 description = descripcion
                 enableLights(true)
                 lightColor = Color.BLUE
-                vibrationPattern = longArrayOf(0L)
                 enableVibration(true)
                 setShowBadge(true)
             }
@@ -54,6 +53,8 @@ fun enviarNotificacionAlarma(
     val preferencias = context.getSharedPreferences(context.getString(R.string.preference_file), Context.MODE_PRIVATE)
 
     val mostrarAlarmaIntent = Intent(context, MostrarAlarmaActivity::class.java)
+    mostrarAlarmaIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+    mostrarAlarmaIntent.putExtra(context.getString(R.string.notif_id_intent), notificationId)
     val mostrarAlarmaPending = PendingIntent.getActivity(
         context, notificationId, mostrarAlarmaIntent, PendingIntent.FLAG_UPDATE_CURRENT
     )
@@ -71,7 +72,7 @@ fun enviarNotificacionAlarma(
             setContentIntent(mostrarAlarmaPending)
             priority = NotificationCompat.PRIORITY_MAX
             addAction(android.R.drawable.alert_dark_frame, context.getString(R.string.posponer), posponerAlarmaPending)
-
+            setFullScreenIntent(mostrarAlarmaPending, true)
             build()
         }
 

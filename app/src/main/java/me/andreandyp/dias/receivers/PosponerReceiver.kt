@@ -31,7 +31,7 @@ class PosponerReceiver : BroadcastReceiver() {
 
         // Añadir los minutos que configuró el usuario para posponer
         val fecha = Instant.now()
-            .plus(1, ChronoUnit.MINUTES)
+            .plus(15, ChronoUnit.MINUTES)
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             fecha.toEpochMilli(),
