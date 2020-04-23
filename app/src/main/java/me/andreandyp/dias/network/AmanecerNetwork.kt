@@ -12,23 +12,34 @@ data class AmanecerNetwork(
     val results: ResultsNetwork,
     val status: String
 ) {
+    /**
+     * Convierte los datos del amanecer que vienen de internet a una entidad de la BD.
+     * Debe convertir la fecha a un [OffsetDateTime] porque viene en formato UTC de la API.
+     * Posteriormente se guarda de forma individual la fecha y la hora.
+     * @return el amanecer en forma de [AmanecerEntity]
+     */
     fun asEntity(): AmanecerEntity {
+        val fechaHoraAmanecer = OffsetDateTime.parse(results.sunrise)
+
         return AmanecerEntity(
             _id = 0,
-            amanecerFechaHora = OffsetDateTime.parse(results.sunrise).toInstant()
+            amanecerFecha = fechaHoraAmanecer.toLocalDate(),
+            amanecerHora = fechaHoraAmanecer.toLocalTime()
         )
     }
 
+    /**
+     * Convierte los datos del amanecer de la API a datos que se manejan en la app.
+     * A la hora dela API se le específica el Offset (UTC) y posteriormente se convierte a la hora
+     * en la zona horaria del dispositivo.
+     * @return el amanecer en forma de [Amanecer] (Dominio)
+     */
     fun asDomain(): Amanecer {
-        val instante = OffsetDateTime.parse(results.sunrise)
-        val local = instante.atZoneSameInstant(ZoneId.systemDefault())
+        val fechaHoraAPI = OffsetDateTime.parse(results.sunrise)
+        val fechaHoraLocal = fechaHoraAPI.atZoneSameInstant(ZoneId.systemDefault())
         return Amanecer(
-            dia = local[ChronoField.DAY_OF_WEEK],
-            mes = local[ChronoField.MONTH_OF_YEAR],
-            año = local[ChronoField.YEAR],
-            horas = local[ChronoField.HOUR_OF_DAY],
-            minutos = local[ChronoField.MINUTE_OF_HOUR],
-            segundos = local[ChronoField.SECOND_OF_MINUTE],
+            diaSemana = fechaHoraLocal[ChronoField.DAY_OF_WEEK],
+            fechaHoraLocal = fechaHoraLocal.withSecond(0),
             deInternet = true
         )
     }

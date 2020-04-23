@@ -3,7 +3,7 @@ package me.andreandyp.dias.domain
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.library.baseAdapters.BR
-import org.threeten.bp.LocalTime
+import org.threeten.bp.LocalDateTime
 
 /**
  * Alarma que sirve para mostrar los datos guardados en las shared preferences. Todos los datos son observables.
@@ -61,7 +61,7 @@ data class Alarma(
             notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.horaFormateada)
         }
-    var horaAmanecer: LocalTime? = null
+    var horaAmanecer: LocalDateTime? = null
         @Bindable
         set(value) {
             field = value
@@ -91,10 +91,13 @@ data class Alarma(
             return if (momento == 0) {
                 horaAmanecer?.minusHours(horasDiferencia.toLong())
                     ?.minusMinutes(minutosDiferencia.toLong())
+                    ?.toLocalTime()
                     .toString()
             } else {
                 horaAmanecer?.plusHours(horasDiferencia.toLong())
-                    ?.plusMinutes(minutosDiferencia.toLong()).toString()
+                    ?.plusMinutes(minutosDiferencia.toLong())
+                    ?.toLocalTime()
+                    .toString()
             }
         }
 }

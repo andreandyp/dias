@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -22,8 +21,7 @@ import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.receivers.PosponerReceiver
-import org.threeten.bp.*
-import org.threeten.bp.temporal.ChronoUnit
+import org.threeten.bp.ZoneId
 
 /**
  * ViewModel para la lista de alarmas.
@@ -93,9 +91,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             )
         }
         _datosDeInternet.value = amanecer.deInternet
-        val siguienteDia = alarmas[amanecer.dia - 1]
-        val horaAmanecer = LocalTime.of(amanecer.horas, amanecer.minutos)
-        siguienteDia.horaAmanecer = horaAmanecer
+        val siguienteDia = alarmas[amanecer.diaSemana - 1]
+        siguienteDia.horaAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
         _siguienteAlarma.value = siguienteDia
     }
 
@@ -175,19 +172,24 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (alarma.encendida) {
 
-            val s = LocalDate.now().plusDays(1).atTime(alarma.horaAmanecer)
-            val hora = if (alarma.momento == 0) {
-                s.minusHours(alarma.horasDiferencia.toLong()).minusMinutes(alarma.minutosDiferencia.toLong())
-            }
-            else{
-                s.plusHours(alarma.horasDiferencia.toLong()).plusMinutes(alarma.minutosDiferencia.toLong())
+            val horaAmanecer = alarma.horaAmanecer
+            val horaAlarma = if (alarma.momento == 0) {
+                horaAmanecer
+                    ?.minusHours(alarma.horasDiferencia.toLong())
+                    ?.minusMinutes(alarma.minutosDiferencia.toLong())
+            } else {
+                horaAmanecer
+                    ?.plusHours(alarma.horasDiferencia.toLong())
+                    ?.plusMinutes(alarma.minutosDiferencia.toLong())
+                    ?.plusHours(7)
+                    ?.minusMinutes(3)
+                    ?.minusDays(1)
             }
 
-            val instante = hora.toInstant(ZoneOffset.UTC)
-            Log.i("PRUEBA", "AQUI")
+            val horaAlarmaInstant = horaAlarma?.atZone(ZoneId.systemDefault())?.toInstant()
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                instante.toEpochMilli(),
+                horaAlarmaInstant!!.toEpochMilli(),
                 mostrarAlarmaPending
             )
         } else {

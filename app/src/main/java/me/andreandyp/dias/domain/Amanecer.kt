@@ -1,11 +1,9 @@
 package me.andreandyp.dias.domain
 
+import org.threeten.bp.ZonedDateTime
+
 data class Amanecer(
-    val dia: Int,
-    val mes: Int,
-    val año: Int,
-    var horas: Int,
-    var minutos: Int,
-    var segundos: Int,
+    val diaSemana: Int,
+    val fechaHoraLocal: ZonedDateTime,
     val deInternet: Boolean
 )
