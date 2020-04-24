@@ -86,7 +86,7 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                 val masMenos = arrayOf("-", "+")
                 antesDespues.displayedValues = masMenos
                 antesDespues.maxValue = 1
-                antesDespues.value = masMenos.indexOf(alarma!!.momento.toString())
+                antesDespues.value = alarma!!.momento
                 val hora: NumberPicker = dialogView.findViewById(R.id.hora)
                 hora.minValue = 0
                 hora.maxValue = 3
@@ -113,6 +113,7 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                     alarma!!.horasDiferencia = hora.value
                     alarma!!.minutosDiferencia = elementos[minutos.value].toInt()
                     alarma!!.momento = antesDespues.value
+                    alarma!!.encendida = true
                     this.dismiss()
                 }
                 dialogView.findViewById<MaterialButton>(R.id.button_cancelar).setOnClickListener {

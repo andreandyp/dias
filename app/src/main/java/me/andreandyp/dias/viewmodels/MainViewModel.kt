@@ -1,26 +1,22 @@
 package me.andreandyp.dias.viewmodels
 
-import android.app.AlarmManager
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.andreandyp.dias.R
 import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
-import me.andreandyp.dias.receivers.PosponerReceiver
+import me.andreandyp.dias.utils.AlarmUtils
 import org.threeten.bp.ZoneId
 
 /**
@@ -34,7 +30,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         app.getString(R.string.preference_file), Context.MODE_PRIVATE
     )
 
-    private val repository = DiasRepository(app)
+    private val repository = DiasRepository(app.applicationContext)
 
     val alarmas = mutableListOf<Alarma>()
 
@@ -71,28 +67,19 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             viewModelScope.launch {
                 obtenerSiguienteAlarma(location)
             }
+        }?.addOnFailureListener {
+            viewModelScope.launch {
+                obtenerSiguienteAlarma(null)
+            }
         }
     }
 
     private suspend fun obtenerSiguienteAlarma(ubicacion: Location?) {
-        if (ubicacion == null) {
-            Toast.makeText(
-                app.applicationContext,
-                "No se pudo obtener la ubicación más reciente",
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
+        val amanecer = repository.obtenerAmanecerDiario(ubicacion)
 
-        val amanecer = withContext(Dispatchers.IO) {
-            return@withContext repository.obtenerAmanecerDiario(
-                ubicacion.latitude.toString(),
-                ubicacion.longitude.toString()
-            )
-        }
         _datosDeInternet.value = amanecer.deInternet
         val siguienteDia = alarmas[amanecer.diaSemana - 1]
-        siguienteDia.horaAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
+        siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
         _siguienteAlarma.value = siguienteDia
     }
 
@@ -130,84 +117,46 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     /**
      * Guarda la hora a la que sonará la alarma.
      */
-    fun cambiarHorasAlarma(alarma: Alarma) {
+    fun cambiarHorasAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_hr", alarma.horasDiferencia)
-        alarma.encendida = true
-    }
 
     /**
      * Guarda los minutos a los que sonará la alarma.
      */
-    fun cambiarMinAlarma(alarma: Alarma) {
+    fun cambiarMinAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_min", alarma.minutosDiferencia)
-        alarma.encendida = true
-    }
 
     /**
      * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
      */
-    fun cambiarMomentoAlarma(alarma: Alarma) {
+    fun cambiarMomentoAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_momento", alarma.momento)
-        alarma.encendida = true
-    }
-
 
     /**
      * Establecer la alarma con la hora de la alarma.
-     * Si la alarma se activa, se establece la hora con ayuda del [AlarmManager].
-     * Si la alarma se desactiva, se cancela la alarma en el [AlarmManager].
+     * Si estamos manipulando la alarma de mañana, se encenderá o apagará la alarma siguiente,
+     * si no, simplemente no se hará nada (el work manager se encargará de activarla).
      */
-    fun establecerAlarma(alarma: Alarma) {
-        // Intent para mostrar la alarma
-        val mostrarAlarmaIntent = Intent(app.applicationContext, AlarmaReceiver::class.java)
-        mostrarAlarmaIntent.putExtra(app.getString(R.string.notif_id_intent), alarma._id)
-        val mostrarAlarmaPending = PendingIntent.getBroadcast(
-            app.applicationContext,
-            alarma._id,
-            mostrarAlarmaIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
-        )
-
-        // Encender la alarma o apagarla
-        val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (alarma.encendida) {
-
-            val horaAmanecer = alarma.horaAmanecer
-            val horaAlarma = if (alarma.momento == 0) {
-                horaAmanecer
-                    ?.minusHours(alarma.horasDiferencia.toLong())
-                    ?.minusMinutes(alarma.minutosDiferencia.toLong())
-            } else {
-                horaAmanecer
-                    ?.plusHours(alarma.horasDiferencia.toLong())
-                    ?.plusMinutes(alarma.minutosDiferencia.toLong())
-                    ?.plusHours(7)
-                    ?.minusMinutes(3)
-                    ?.minusDays(1)
-            }
-
-            val horaAlarmaInstant = horaAlarma?.atZone(ZoneId.systemDefault())?.toInstant()
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                horaAlarmaInstant!!.toEpochMilli(),
-                mostrarAlarmaPending
-            )
-        } else {
-            alarmManager.cancel(mostrarAlarmaPending)
-
-            // Intent para posponer la alarma (necesaria para cancelarla)
-            val posponerIntent = Intent(app.applicationContext, PosponerReceiver::class.java)
-            val posponerPending = PendingIntent.getBroadcast(
+    private fun establecerAlarma(alarma: Alarma) {
+        alarma.fechaHoraAmanecer?.let {
+            // Intent para mostrar la alarma
+            val mostrarAlarmaIntent = Intent(app.applicationContext, AlarmaReceiver::class.java)
+            mostrarAlarmaIntent.putExtra(app.getString(R.string.notif_id_intent), alarma._id)
+            val mostrarAlarmaPending = PendingIntent.getBroadcast(
                 app.applicationContext,
-                POSPONER_CODE,
-                posponerIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                alarma._id,
+                mostrarAlarmaIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT
             )
-            alarmManager.cancel(posponerPending)
+
+            if (alarma.encendida) {
+                val horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
+                AlarmUtils.encenderAlarma(app, horaAlarmaUTC.toInstant(), mostrarAlarmaPending)
+            } else {
+                AlarmUtils.apagarAlarma(app, mostrarAlarmaPending)
+            }
         }
     }
 
-    companion object {
-        private const val POSPONER_CODE = -1
-    }
+
 }

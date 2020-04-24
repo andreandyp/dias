@@ -1,6 +1,7 @@
 package me.andreandyp.dias.bd
 
-import android.app.Application
+import android.content.Context
+import android.location.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.andreandyp.dias.bd.dao.AmanecerDAO
@@ -9,30 +10,53 @@ import me.andreandyp.dias.domain.Amanecer
 import me.andreandyp.dias.network.AmanecerNetwork
 import me.andreandyp.dias.network.SunriseSunsetAPI
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.ChronoField
 
-class DiasRepository(application: Application) {
+class DiasRepository(context: Context) {
     private val amanecerDAO: AmanecerDAO
 
     init {
-        val db = DiasDatabase.getDatabase(application.applicationContext)
+        val db = DiasDatabase.getDatabase(context)
         amanecerDAO = db.tiempoDao()
     }
 
     /**
      * Obtiene el amanecer de mañana de la BD.
      * Si no está en la BD, se obtiene de la API.
-     * @param latitud [String] la latitud de la ubicación del dispositivo
-     * @param longitud [String] la longitud de la ubicación del dispositivo
+     * Si la ubicación no está activada, se obtiene desde los datos del usuario
+     * @param ubicacion [Location] la ubicacion del dispositivo
      */
-    suspend fun obtenerAmanecerDiario(latitud: String, longitud: String): Amanecer {
-        val amanecerBD = obtenerAmanecerBD()
-        if (amanecerBD == null) {
-            val amanecerAPI = obtenerAmanecerAPI(latitud, longitud)
-            insertarAmanecer(amanecerAPI)
-            return amanecerAPI.asDomain()
-        }
+    suspend fun obtenerAmanecerDiario(ubicacion: Location?): Amanecer {
+        return withContext(Dispatchers.IO) {
+            val amanecerBD = obtenerAmanecerBD()
+            if(amanecerBD != null){
+                return@withContext amanecerBD.asDomain()
+            }
 
-        return amanecerBD.asDomain()
+            if (ubicacion != null) {
+                val amanecerAPI = obtenerAmanecerAPI(
+                    ubicacion.latitude.toString(),
+                    ubicacion.longitude.toString()
+                )
+                insertarAmanecer(amanecerAPI)
+                return@withContext amanecerAPI.asDomain()
+            }
+
+            // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
+            val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
+                .plusDays(1)
+                .withHour(7)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0)
+            return@withContext Amanecer(
+                diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
+                fechaHoraLocal = tomorrowDate,
+                deInternet = false
+            )
+        }
     }
 
     /**

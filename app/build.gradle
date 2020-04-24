@@ -21,6 +21,9 @@ android {
         targetCompatibility = "8"
         sourceCompatibility = "8"
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -44,6 +47,7 @@ dependencies {
     def moshi_version = "1.9.2"
     def data_binding_version = "3.1.4"
     def play_services_location_version = "17.0.0"
+    def work_version = "2.3.3"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -70,6 +74,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     implementation "com.squareup.moshi:moshi:$moshi_version"
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.3'
     implementation "com.google.android.gms:play-services-location:$play_services_location_version"
+    implementation "androidx.work:work-runtime-ktx:$work_version"
 }
