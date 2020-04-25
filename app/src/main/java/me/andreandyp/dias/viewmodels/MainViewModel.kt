@@ -150,7 +150,9 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             )
 
             if (alarma.encendida) {
-                val horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
+                var horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
+                //horaAlarmaUTC = horaAlarmaUTC.withHour(18).withMinute(57).withDayOfMonth(24)
+                //Log.i("PRUEBA", horaAlarmaUTC.toString())
                 AlarmUtils.encenderAlarma(app, horaAlarmaUTC.toInstant(), mostrarAlarmaPending)
             } else {
                 AlarmUtils.apagarAlarma(app, mostrarAlarmaPending)

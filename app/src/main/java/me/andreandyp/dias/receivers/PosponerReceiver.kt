@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Vibrator
 import androidx.core.content.ContextCompat
 import me.andreandyp.dias.R
 import org.threeten.bp.Instant
@@ -21,6 +22,8 @@ class PosponerReceiver : BroadcastReceiver() {
      */
     override fun onReceive(context: Context?, intent: Intent?) {
         val alarmaIntent = Intent(context, AlarmaReceiver::class.java)
+        val notifId = intent?.extras?.getInt(context?.getString(R.string.notif_id_intent)) ?: -1
+        alarmaIntent.putExtra(context?.getString(R.string.notif_id_intent), notifId)
         val alarmaPending = PendingIntent.getBroadcast(
             context,
             POSPONER_CODE,
@@ -38,13 +41,15 @@ class PosponerReceiver : BroadcastReceiver() {
             alarmaPending
         )
 
+        (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).cancel()
+
         val notificationManager = ContextCompat.getSystemService(
             context,
             NotificationManager::class.java
         ) as NotificationManager
 
         // Cancelar la notificación de la alarma
-        notificationManager.cancel(intent?.extras?.getInt(context.getString(R.string.notif_id_intent)) ?: -1)
+        notificationManager.cancel(notifId)
     }
 
     companion object {

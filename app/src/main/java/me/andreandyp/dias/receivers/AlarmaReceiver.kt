@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import me.andreandyp.dias.R
-import me.andreandyp.dias.utils.enviarNotificacionAlarma
+import me.andreandyp.dias.utils.NotificationUtils
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -22,7 +22,7 @@ class AlarmaReceiver : BroadcastReceiver() {
         val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
         val horaFormateada = context!!.getString(R.string.hora_actual, formatter.format(horaActual))
         val notifyId = intent?.extras?.getInt(context.getString(R.string.notif_id_intent)) ?: -1
-        enviarNotificacionAlarma(context, notifyId, horaFormateada)
+        NotificationUtils.enviarNotificacionAlarma(context, notifyId, horaFormateada)
     }
 
 

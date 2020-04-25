@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import me.andreandyp.dias.R
 import me.andreandyp.dias.adapters.AlarmasAdapter
 import me.andreandyp.dias.databinding.MainFragmentBinding
-import me.andreandyp.dias.utils.crearCanalNotificaciones
+import me.andreandyp.dias.utils.NotificationUtils
 import me.andreandyp.dias.viewmodels.MainViewModel
 import me.andreandyp.dias.viewmodels.MainViewModelFactory
 
@@ -24,7 +24,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        crearCanalNotificaciones(requireContext())
+        NotificationUtils.crearCanalNotificaciones(requireContext())
         binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
