@@ -1,12 +1,11 @@
 package me.andreandyp.dias.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import me.andreandyp.dias.R
 import me.andreandyp.dias.adapters.AlarmasAdapter
 import me.andreandyp.dias.databinding.MainFragmentBinding
@@ -24,12 +23,14 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         NotificationUtils.crearCanalNotificaciones(requireContext())
+
         binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
         val dias =
-            listOf<String>(
+            listOf(
                 getString(R.string.lunes),
                 getString(R.string.martes),
                 getString(R.string.miercoles),
@@ -53,4 +54,19 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.ajustes_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.ajustes -> {
+                this.findNavController()
+                    .navigate(MainFragmentDirections.mostrarAjustes())
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }

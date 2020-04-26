@@ -4,17 +4,19 @@ import android.content.Context
 import android.location.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.andreandyp.dias.R
 import me.andreandyp.dias.bd.dao.AmanecerDAO
 import me.andreandyp.dias.bd.entities.AmanecerEntity
 import me.andreandyp.dias.domain.Amanecer
 import me.andreandyp.dias.network.AmanecerNetwork
 import me.andreandyp.dias.network.SunriseSunsetAPI
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.ChronoField
 
-class DiasRepository(context: Context) {
+class DiasRepository(val context: Context) {
     private val amanecerDAO: AmanecerDAO
 
     init {
@@ -31,7 +33,7 @@ class DiasRepository(context: Context) {
     suspend fun obtenerAmanecerDiario(ubicacion: Location?): Amanecer {
         return withContext(Dispatchers.IO) {
             val amanecerBD = obtenerAmanecerBD()
-            if(amanecerBD != null){
+            if (amanecerBD != null) {
                 return@withContext amanecerBD.asDomain()
             }
 
@@ -45,10 +47,16 @@ class DiasRepository(context: Context) {
             }
 
             // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
+            val context = this@DiasRepository.context
+            val preferencias = context.getSharedPreferences(
+                context.getString(R.string.preference_file), Context.MODE_PRIVATE
+            )
+
+            val horaPref = LocalTime.parse(preferencias.getString("hora_default", "07:00"))
             val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
                 .plusDays(1)
-                .withHour(7)
-                .withMinute(0)
+                .withHour(horaPref[ChronoField.HOUR_OF_DAY])
+                .withMinute(horaPref[ChronoField.MINUTE_OF_HOUR])
                 .withSecond(0)
                 .withNano(0)
             return@withContext Amanecer(

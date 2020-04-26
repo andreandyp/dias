@@ -13,10 +13,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.hora_dialog.view.*
 import me.andreandyp.dias.R
 import me.andreandyp.dias.adapters.AlarmasAdapter.AlarmaViewHolder
 import me.andreandyp.dias.databinding.AlarmaItemBinding
+import me.andreandyp.dias.databinding.HoraDialogBinding
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.viewmodels.MainViewModel
 
@@ -77,53 +78,52 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                 }
             })
 
-            // Crear diálogo para mostrar los pickers de hora y minutos
-            val dialog = AlertDialog.Builder(context!!).create().apply {
-                val dialogView = View.inflate(context, R.layout.hora_dialog, null)
-
-                // Establecer valores a los pickers y configuraciones
-                val antesDespues: NumberPicker = dialogView.findViewById(R.id.antes_despues)
-                val masMenos = arrayOf("-", "+")
-                antesDespues.displayedValues = masMenos
-                antesDespues.maxValue = 1
-                antesDespues.value = alarma!!.momento
-                val hora: NumberPicker = dialogView.findViewById(R.id.hora)
-                hora.minValue = 0
-                hora.maxValue = 3
-                hora.value = alarma!!.horasDiferencia
-
-                val minutos: NumberPicker = dialogView.findViewById(R.id.minutos)
-                val elementos = arrayOf("00", "15", "30", "45")
-                minutos.displayedValues = elementos
-                minutos.minValue = 0
-                minutos.maxValue = elementos.size - 1
-                if (alarma!!.minutosDiferencia == 0) {
-                    minutos.value = 0
-                } else {
-                    minutos.value = elementos.indexOf(alarma!!.minutosDiferencia.toString())
-                }
-
-                // Poner la vista y el título
-                setView(dialogView)
-                setTitle("Establece la hora antes o después del amanecer")
-
-                // Poner listeners a los botones
-                dialogView.findViewById<MaterialButton>(R.id.button_aceptar).setOnClickListener {
-                    // Actualizar los valores en alarma para guardarlos
-                    alarma!!.horasDiferencia = hora.value
-                    alarma!!.minutosDiferencia = elementos[minutos.value].toInt()
-                    alarma!!.momento = antesDespues.value
-                    alarma!!.encendida = true
-                    this.dismiss()
-                }
-                dialogView.findViewById<MaterialButton>(R.id.button_cancelar).setOnClickListener {
-                    this.cancel()
-                }
-            }
-
-            // Asignar listeners para hora y minutos de alarma
+            // Al dar click en el indicador de hora, se abre un dialog para ajustar la hora
+            // Es mucho más eficiente que crearlo antes (comprobado)
             horaAntesDespues.setOnClickListener {
-                dialog.show()
+                AlertDialog.Builder(context!!).create().apply {
+                    val dialogView = HoraDialogBinding.inflate(this.layoutInflater).root
+
+                    // Establecer valores a los pickers y configuraciones
+                    val antesDespues: NumberPicker = dialogView.antes_despues
+                    val masMenos = arrayOf("-", "+")
+                    antesDespues.displayedValues = masMenos
+                    antesDespues.maxValue = 1
+                    antesDespues.value = alarma!!.momento
+                    val hora: NumberPicker = dialogView.hora
+                    hora.minValue = 0
+                    hora.maxValue = 3
+                    hora.value = alarma!!.horasDiferencia
+
+                    val minutos: NumberPicker = dialogView.minutos
+                    val elementos = arrayOf("00", "15", "30", "45")
+                    minutos.displayedValues = elementos
+                    minutos.minValue = 0
+                    minutos.maxValue = elementos.size - 1
+                    if (alarma!!.minutosDiferencia == 0) {
+                        minutos.value = 0
+                    } else {
+                        minutos.value = elementos.indexOf(alarma!!.minutosDiferencia.toString())
+                    }
+
+                    // Poner la vista y el título
+                    setView(dialogView)
+                    setTitle("Establece la hora antes o después del amanecer")
+
+                    // Poner listeners a los botones
+                    dialogView.button_aceptar.setOnClickListener {
+                        // Actualizar los valores en alarma para guardarlos
+                        alarma!!.horasDiferencia = hora.value
+                        alarma!!.minutosDiferencia = elementos[minutos.value].toInt()
+                        alarma!!.momento = antesDespues.value
+                        alarma!!.encendida = true
+                        this.dismiss()
+                    }
+                    dialogView.button_cancelar.setOnClickListener {
+                        this.cancel()
+                    }
+
+                }.show()
             }
 
             // Asignar listener para abrir y cerrar la alarma

@@ -1,0 +1,33 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/alarmas_header">
+
+        <com.takisoft.preferencex.TimePickerPreference
+            android:persistent="true"
+            app:key="hora_default"
+            app:pref_hourFormat="auto"
+            app:pref_summaryHasTime="@string/hora_default_summary"
+            app:title="@string/hora_default_title" />
+
+        <com.takisoft.preferencex.AutoSummaryEditTextPreference
+            android:inputType="number"
+            android:persistent="true"
+            app:key="posponer_minutos"
+            app:pref_summaryHasText="@string/posponer_summary"
+            app:title="@string/posponer_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            android:persistent="true"
+            app:key="sync2plano"
+            app:summaryOff="@string/sync_summary_off"
+            app:summaryOn="@string/sync_summary_on"
+            app:title="@string/sync_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

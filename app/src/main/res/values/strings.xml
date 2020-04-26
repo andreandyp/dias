@@ -33,4 +33,22 @@
     <string name="segun_bd">Según el promedio de los últimos 7 días</string>
     <string name="detalles_alarma">Abrir detalles de la alarma</string>
     <string name="separador_alarma">Separador de alarma</string>
+    <string name="title_activity_ajustes">Ajustes</string>
+
+    <!-- Preference Titles -->
+    <string name="alarmas_header">Alarmas</string>
+    <string name="sync_header">Sincronización en segundo plano</string>
+
+    <!-- Alarmas Preferences -->
+    <string name="hora_default_title">Hora predeterminada</string>
+    <string name="hora_default_summary">Si no se puede obtener el amanecer diario,
+        se considera que amanece a las %s</string>
+    <string name="posponer_title">Posponer alarmas durante…</string>
+    <string name="posponer_summary">%s minutos</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sincronizar en segundo plano</string>
+    <string name="sync_summary_on">Se sincronizará diaramente</string>
+    <string name="sync_summary_off">Solo sincronizar cuando se entra a la app</string>
+    <string name="ajustes">Ajustes</string>
 </resources>

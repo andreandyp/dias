@@ -32,9 +32,13 @@ class PosponerReceiver : BroadcastReceiver() {
         )
         val alarmManager = context!!.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+        val preferencias = context.getSharedPreferences(
+            context.getString(R.string.preference_file), Context.MODE_PRIVATE
+        )
+
         // Añadir los minutos que configuró el usuario para posponer
         val fecha = Instant.now()
-            .plus(15, ChronoUnit.MINUTES)
+            .plus(preferencias.getString("posponer_minutos", "15")!!.toLong(), ChronoUnit.MINUTES)
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             fecha.toEpochMilli(),
