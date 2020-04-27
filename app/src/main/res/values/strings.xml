@@ -29,9 +29,9 @@
     <string name="posponer">Posponer</string>
     <string name="notif_id_intent">notification_id</string>
     <string name="siguiente_alarma">%d:%d</string>
-    <string name="segun_internet">Datos obtenidos de internet</string>
-    <string name="segun_bd">Datos guardados previamente</string>
-    <string name="segun_usuario">No se pudieron obtener los datos más recientes. Usando tus preferencias</string>
+    <string name="segun_internet">Según internet</string>
+    <string name="segun_bd">Según datos de internet</string>
+    <string name="segun_usuario">Según la hora predeterminada</string>
     <string name="detalles_alarma">Abrir detalles de la alarma</string>
     <string name="separador_alarma">Separador de alarma</string>
     <string name="title_activity_ajustes">Ajustes</string>

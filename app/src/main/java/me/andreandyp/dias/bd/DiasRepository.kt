@@ -27,12 +27,17 @@ class DiasRepository(val context: Context) {
     /**
      * Obtiene el amanecer de mañana de la BD.
      * Si no está en la BD, se obtiene de la API.
-     * Si la ubicación no está activada, se obtiene desde los datos del usuario
-     * @param ubicacion [Location] la ubicacion del dispositivo
+     * Si no hay internet, se obtiene el amanecer predefinido por el usuario.
+     * Si la ubicación no está activada, se obtiene el amanecer predefinido por el usuario.
+     * @param ubicacion [Location] la ubicacion del dispositivo.
+     * @param forzarActualizacion [Boolean] si es true, se obtendrán los datos de internet aunque ya estén en la base.
      */
-    suspend fun obtenerAmanecerDiario(ubicacion: Location?, forzarActualizacion: Boolean): Amanecer {
+    suspend fun obtenerAmanecerDiario(
+        ubicacion: Location?,
+        forzarActualizacion: Boolean
+    ): Amanecer {
         return withContext(Dispatchers.IO) {
-            if(!forzarActualizacion) {
+            if (!forzarActualizacion) {
                 val amanecerBD = obtenerAmanecerBD()
                 if (amanecerBD != null) {
                     return@withContext amanecerBD.asDomain(Amanecer.Origen.BD)
@@ -40,32 +45,19 @@ class DiasRepository(val context: Context) {
             }
 
             if (ubicacion != null) {
-                val amanecerAPI = obtenerAmanecerAPI(
-                    ubicacion.latitude.toString(),
-                    ubicacion.longitude.toString()
-                )
-                insertarAmanecer(amanecerAPI)
-                return@withContext amanecerAPI.asDomain(Amanecer.Origen.INTERNET)
+                try {
+                    val amanecerAPI = obtenerAmanecerAPI(
+                        ubicacion.latitude.toString(),
+                        ubicacion.longitude.toString()
+                    )
+                    insertarAmanecer(amanecerAPI)
+                    return@withContext amanecerAPI.asDomain(Amanecer.Origen.INTERNET)
+                } catch (e: Exception) {
+                    return@withContext obtenerAmanecerUsuario(Amanecer.Origen.USUARIO_NORED)
+                }
             }
 
-            // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
-            val context = this@DiasRepository.context
-            val preferencias = context.getSharedPreferences(
-                context.getString(R.string.preference_file), Context.MODE_PRIVATE
-            )
-
-            val horaPref = LocalTime.parse(preferencias.getString("hora_default", "07:00"))
-            val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
-                .plusDays(1)
-                .withHour(horaPref[ChronoField.HOUR_OF_DAY])
-                .withMinute(horaPref[ChronoField.MINUTE_OF_HOUR])
-                .withSecond(0)
-                .withNano(0)
-            return@withContext Amanecer(
-                diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
-                fechaHoraLocal = tomorrowDate,
-                origen = Amanecer.Origen.USUARIO
-            )
+            return@withContext obtenerAmanecerUsuario(Amanecer.Origen.USUARIO_NOUBIC)
         }
     }
 
@@ -93,6 +85,27 @@ class DiasRepository(val context: Context) {
                 tomorrowDate.toString()
             )
         }
+    }
+
+    private fun obtenerAmanecerUsuario(origen: Amanecer.Origen): Amanecer {
+        // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
+        val context = this@DiasRepository.context
+        val preferencias = context.getSharedPreferences(
+            context.getString(R.string.preference_file), Context.MODE_PRIVATE
+        )
+
+        val horaPref = LocalTime.parse(preferencias.getString("hora_default", "07:00"))
+        val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
+            .plusDays(1)
+            .withHour(horaPref[ChronoField.HOUR_OF_DAY])
+            .withMinute(horaPref[ChronoField.MINUTE_OF_HOUR])
+            .withSecond(0)
+            .withNano(0)
+        return Amanecer(
+            diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
+            fechaHoraLocal = tomorrowDate,
+            origen = origen
+        )
     }
 
     /**

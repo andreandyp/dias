@@ -25,12 +25,13 @@
 
             <TextView
                 android:id="@+id/proxima_alarma"
+                style="@style/TextAppearance.MaterialComponents.Headline3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/proxima_alarma"
                 android:textAlignment="center"
-                android:textAppearance="?attr/textAppearanceHeadline3"
+                android:textColor="?android:attr/textColorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -41,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{vm.siguienteAlarma.horaFormateada}"
                 android:textAppearance="?attr/textAppearanceHeadline4"
+                android:textColor="?android:attr/textColorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/proxima_alarma"
@@ -52,12 +54,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/obteniendo_datos"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:textColor="?android:attr/textColorSecondary"
                 android:visibility="@{vm.actualizandoDatos ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toTopOf="@+id/separador_titlo_alarma"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fuente"
-                tools:text="Obteniendo datos de internet..."/>
+                tools:text="Obteniendo datos de internet..." />
 
             <TextView
                 android:id="@+id/fuente"
@@ -65,6 +68,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{vm.datosDeInternet}"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:textColor="?android:attr/textColorSecondary"
                 android:visibility="@{vm.actualizandoDatos ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toTopOf="@+id/obteniendo_datos"
                 app:layout_constraintEnd_toEndOf="parent"

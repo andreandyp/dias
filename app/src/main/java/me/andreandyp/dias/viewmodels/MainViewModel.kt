@@ -18,7 +18,9 @@ import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.domain.Amanecer
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.utils.AlarmUtils
+import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
+import org.threeten.bp.temporal.ChronoField
 
 /**
  * ViewModel para la lista de alarmas.
@@ -49,11 +51,13 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     init {
         _actualizandoDatos.value = false
         // Inicializar la lista de alarmas con los datos guardados en las shared preferences
+        val diaSiguienteAlarma = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
         for (i: Int in 0..6) {
             alarmas.add(
                 Alarma(
                     _id = i,
                     dia = dias[i],
+                    esSiguienteAlarma = diaSiguienteAlarma == i + 1,
                     _encendida = preferencias.getBoolean("${i}_on", false),
                     _vibrar = preferencias.getBoolean("${i}_vib", false),
                     _horasDiferencia = preferencias.getInt("${i}_hr", 0),
@@ -83,10 +87,11 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
         val amanecer = repository.obtenerAmanecerDiario(ubicacion, forzarActualizacion)
 
-        _datosDeInternet.value = when(amanecer.origen) {
+        _datosDeInternet.value = when (amanecer.origen) {
             Amanecer.Origen.INTERNET -> app.applicationContext.getString(R.string.segun_internet)
             Amanecer.Origen.BD -> app.applicationContext.getString(R.string.segun_bd)
-            Amanecer.Origen.USUARIO -> app.applicationContext.getString(R.string.segun_usuario)
+            Amanecer.Origen.USUARIO_NORED -> app.applicationContext.getString(R.string.segun_usuario)
+            Amanecer.Origen.USUARIO_NOUBIC -> app.applicationContext.getString(R.string.segun_usuario)
         }
         val siguienteDia = alarmas[amanecer.diaSemana - 1]
         siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()

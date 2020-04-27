@@ -8,6 +8,6 @@ data class Amanecer(
     val origen: Origen
 ) {
     enum class Origen {
-        INTERNET, BD, USUARIO
+        INTERNET, BD, USUARIO_NORED, USUARIO_NOUBIC
     }
 }

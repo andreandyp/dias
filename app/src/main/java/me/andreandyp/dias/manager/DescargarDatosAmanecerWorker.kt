@@ -14,7 +14,9 @@ import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.utils.AlarmUtils
+import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
+import org.threeten.bp.temporal.ChronoField
 
 class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -32,10 +34,17 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
                     applicationContext.getString(R.string.preference_file), Context.MODE_PRIVATE
                 )
 
+                val esSiguienteAlarma =
+                    LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK] == amanecer.diaSemana + 1
+
                 val alarma = Alarma(
                     _id = amanecer.diaSemana - 1,
                     dia = amanecer.diaSemana.toString(),
-                    _encendida = preferencias.getBoolean("${amanecer.diaSemana}_on", false),
+                    esSiguienteAlarma = esSiguienteAlarma,
+                    _encendida = preferencias.getBoolean(
+                        "${amanecer.diaSemana}_on",
+                        false
+                    ),
                     _vibrar = preferencias.getBoolean("${amanecer.diaSemana}_vib", false),
                     _horasDiferencia = preferencias.getInt("${amanecer.diaSemana}_hr", 0),
                     _minutosDiferencia = preferencias.getInt("${amanecer.diaSemana}_min", 0),

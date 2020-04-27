@@ -1,21 +1,23 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-  <color name="primaryColor">#f57c00</color>
-  <color name="primaryLightColor">#ffad42</color>
-  <color name="primaryDarkColor">#bb4d00</color>
-  <color name="secondaryColor">#fdd835</color>
-  <color name="secondaryLightColor">#ffff6b</color>
-  <color name="secondaryDarkColor">#c6a700</color>
-  <color name="primaryTextColor">#000000</color>
-  <color name="secondaryTextColor">#000000</color>
-  <color name="primaryTextColorInverse">#FFFFFF</color>
-  <color name="secondaryTextColorInverse">#FFFFFF</color>
+    <color name="secondaryColor">#f57c00</color>
+    <color name="secondaryLightColor">#ffad42</color>
+    <color name="secondaryDarkColor">#bb4d00</color>
 
-  <color name="colorBackground">#FFFFFF</color>
-  <color name="colorBackgroundInverse">#000000</color>
-  <color name="iconTint">#000000</color>
-  <color name="iconTintInverse">#FFFFFF</color>
+    <color name="primaryColor">#fdd835</color>
+    <color name="primaryLightColor">#ffff6b</color>
+    <color name="primaryDarkColor">#c6a700</color>
 
-  <color name="grey">#e0e0e0</color>
-  <color name="greyInverse">#40e0e0e0</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
+    <color name="primaryTextColorInverse">#FFFFFF</color>
+    <color name="secondaryTextColorInverse">#FFFFFF</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorBackgroundInverse">#000000</color>
+    <color name="iconTint">#000000</color>
+    <color name="iconTintInverse">#FFFFFF</color>
+
+    <color name="grey">#e0e0e0</color>
+    <color name="greyInverse">#40e0e0e0</color>
 </resources>

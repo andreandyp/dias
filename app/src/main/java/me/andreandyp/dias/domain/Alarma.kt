@@ -23,6 +23,7 @@ import org.threeten.bp.LocalDateTime
 data class Alarma(
     val _id: Int,
     val dia: String,
+    val esSiguienteAlarma: Boolean,
     private var _encendida: Boolean,
     private var _vibrar: Boolean,
     private var _horasDiferencia: Int,
