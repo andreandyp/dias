@@ -30,11 +30,13 @@ class DiasRepository(val context: Context) {
      * Si la ubicación no está activada, se obtiene desde los datos del usuario
      * @param ubicacion [Location] la ubicacion del dispositivo
      */
-    suspend fun obtenerAmanecerDiario(ubicacion: Location?): Amanecer {
+    suspend fun obtenerAmanecerDiario(ubicacion: Location?, forzarActualizacion: Boolean): Amanecer {
         return withContext(Dispatchers.IO) {
-            val amanecerBD = obtenerAmanecerBD()
-            if (amanecerBD != null) {
-                return@withContext amanecerBD.asDomain()
+            if(!forzarActualizacion) {
+                val amanecerBD = obtenerAmanecerBD()
+                if (amanecerBD != null) {
+                    return@withContext amanecerBD.asDomain(Amanecer.Origen.BD)
+                }
             }
 
             if (ubicacion != null) {
@@ -43,7 +45,7 @@ class DiasRepository(val context: Context) {
                     ubicacion.longitude.toString()
                 )
                 insertarAmanecer(amanecerAPI)
-                return@withContext amanecerAPI.asDomain()
+                return@withContext amanecerAPI.asDomain(Amanecer.Origen.INTERNET)
             }
 
             // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
@@ -62,7 +64,7 @@ class DiasRepository(val context: Context) {
             return@withContext Amanecer(
                 diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
                 fechaHoraLocal = tomorrowDate,
-                deInternet = false
+                origen = Amanecer.Origen.USUARIO
             )
         }
     }

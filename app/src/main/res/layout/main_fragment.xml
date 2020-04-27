@@ -4,74 +4,112 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="vm"
             type="me.andreandyp.dias.viewmodels.MainViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeToRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.MainFragment">
 
-        <TextView
-            android:id="@+id/proxima_alarma"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/proxima_alarma"
-            android:textAlignment="center"
-            android:textAppearance="@style/MaterialAlertDialog.MaterialComponents.Title.Text"
-            android:textSize="@dimen/h3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/fuente"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{vm.datosDeInternet ? @string/segun_internet : @string/segun_bd}"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/hora_alarma"
-            tools:text="Según tal" />
-
-        <TextView
-            android:id="@+id/hora_alarma"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{vm.siguienteAlarma.horaFormateada}"
-            android:textAppearance="?attr/textAppearanceHeadline4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/proxima_alarma"
-            tools:text="0:00" />
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/alarmas"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/creditos"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fuente"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            tools:listitem="@layout/alarma_item"
-            tools:itemCount="7" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/creditos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/creditos_api"
-            android:textAlignment="center"
-            android:textSize="@dimen/caption"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/proxima_alarma"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/proxima_alarma"
+                android:textAlignment="center"
+                android:textAppearance="?attr/textAppearanceHeadline3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/hora_alarma"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.siguienteAlarma.horaFormateada}"
+                android:textAppearance="?attr/textAppearanceHeadline4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/proxima_alarma"
+                tools:text="0:00" />
+
+            <TextView
+                android:id="@+id/obteniendo_datos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/obteniendo_datos"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:visibility="@{vm.actualizandoDatos ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toTopOf="@+id/separador_titlo_alarma"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fuente"
+                tools:text="Obteniendo datos de internet..."/>
+
+            <TextView
+                android:id="@+id/fuente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.datosDeInternet}"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:visibility="@{vm.actualizandoDatos ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toTopOf="@+id/obteniendo_datos"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/hora_alarma"
+                tools:text="Según tal"
+                tools:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/separador_titlo_alarma"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/separador_alarma"
+                app:layout_constraintBottom_toTopOf="@+id/alarmas"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/obteniendo_datos"
+                app:srcCompat="@color/grey" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/alarmas"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:layout_constraintBottom_toTopOf="@+id/creditos"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separador_titlo_alarma"
+                tools:itemCount="7"
+                tools:listitem="@layout/alarma_item" />
+
+            <TextView
+                android:id="@+id/creditos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/creditos_api"
+                android:textAlignment="center"
+                android:textSize="@dimen/caption"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

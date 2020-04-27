@@ -34,13 +34,13 @@ data class AmanecerNetwork(
      * en la zona horaria del dispositivo.
      * @return el amanecer en forma de [Amanecer] (Dominio)
      */
-    fun asDomain(): Amanecer {
+    fun asDomain(origen: Amanecer.Origen): Amanecer {
         val fechaHoraAPI = OffsetDateTime.parse(results.sunrise)
         val fechaHoraLocal = fechaHoraAPI.atZoneSameInstant(ZoneId.systemDefault())
         return Amanecer(
             diaSemana = fechaHoraLocal[ChronoField.DAY_OF_WEEK],
             fechaHoraLocal = fechaHoraLocal.withSecond(0),
-            deInternet = true
+            origen = origen
         )
     }
 }

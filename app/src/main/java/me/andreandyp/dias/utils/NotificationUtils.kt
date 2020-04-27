@@ -77,16 +77,16 @@ object NotificationUtils {
                 setSmallIcon(android.R.drawable.alert_dark_frame)
                 setContentIntent(mostrarAlarmaPending)
                 priority = NotificationCompat.PRIORITY_MAX
-                addAction(
+                /*addAction(
                     android.R.drawable.alert_dark_frame,
                     context.getString(R.string.apagar_alarma),
                     posponerAlarmaPending
-                )
-                /*addAction(
+                )*/
+                addAction(
                     android.R.drawable.alert_dark_frame,
                     context.getString(R.string.posponer),
                     posponerAlarmaPending
-                )*/
+                )
                 setFullScreenIntent(mostrarAlarmaPending, true)
                 build()
             }

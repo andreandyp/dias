@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import me.andreandyp.dias.R
 import me.andreandyp.dias.bd.DiasRepository
 import me.andreandyp.dias.domain.Alarma
+import me.andreandyp.dias.domain.Amanecer
 import me.andreandyp.dias.receivers.AlarmaReceiver
 import me.andreandyp.dias.utils.AlarmUtils
 import org.threeten.bp.ZoneId
@@ -38,11 +39,15 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     val siguienteAlarma: LiveData<Alarma>
         get() = _siguienteAlarma
 
-    private val _datosDeInternet = MutableLiveData<Boolean>()
-    val datosDeInternet: LiveData<Boolean>
+    private val _datosDeInternet = MutableLiveData<String>()
+    val datosDeInternet: LiveData<String>
         get() = _datosDeInternet
 
+    private val _actualizandoDatos = MutableLiveData<Boolean>()
+    val actualizandoDatos: LiveData<Boolean> = _actualizandoDatos
+
     init {
+        _actualizandoDatos.value = false
         // Inicializar la lista de alarmas con los datos guardados en las shared preferences
         for (i: Int in 0..6) {
             alarmas.add(
@@ -57,30 +62,36 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                 )
             )
         }
-        obtenerUbicacion()
+        obtenerUbicacion(false)
     }
 
-    private fun obtenerUbicacion() {
+    fun obtenerUbicacion(forzarActualizacion: Boolean) {
         val fusedLocationClient: FusedLocationProviderClient? =
             LocationServices.getFusedLocationProviderClient(app.applicationContext)
+        _actualizandoDatos.value = true
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
             viewModelScope.launch {
-                obtenerSiguienteAlarma(location)
+                obtenerSiguienteAlarma(location, forzarActualizacion)
             }
         }?.addOnFailureListener {
             viewModelScope.launch {
-                obtenerSiguienteAlarma(null)
+                obtenerSiguienteAlarma(null, forzarActualizacion)
             }
         }
     }
 
-    private suspend fun obtenerSiguienteAlarma(ubicacion: Location?) {
-        val amanecer = repository.obtenerAmanecerDiario(ubicacion)
+    private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
+        val amanecer = repository.obtenerAmanecerDiario(ubicacion, forzarActualizacion)
 
-        _datosDeInternet.value = amanecer.deInternet
+        _datosDeInternet.value = when(amanecer.origen) {
+            Amanecer.Origen.INTERNET -> app.applicationContext.getString(R.string.segun_internet)
+            Amanecer.Origen.BD -> app.applicationContext.getString(R.string.segun_bd)
+            Amanecer.Origen.USUARIO -> app.applicationContext.getString(R.string.segun_usuario)
+        }
         val siguienteDia = alarmas[amanecer.diaSemana - 1]
         siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
         _siguienteAlarma.value = siguienteDia
+        _actualizandoDatos.value = false
     }
 
     /**

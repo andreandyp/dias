@@ -23,13 +23,13 @@ data class AmanecerEntity(
      * Cuenta como "de internet" porque se almacenó en la BD desde la API.
      * @return el amanecer en forma de [Amanecer] (Dominio)
      */
-    fun asDomain(): Amanecer {
+    fun asDomain(origen: Amanecer.Origen): Amanecer {
         val fechaHoraBD = LocalDateTime.of(amanecerFecha, amanecerHora).atOffset(ZoneOffset.UTC)
         val fechaHoraLocal = fechaHoraBD.atZoneSameInstant(ZoneId.systemDefault())
         return Amanecer(
             diaSemana = fechaHoraLocal[ChronoField.DAY_OF_WEEK],
             fechaHoraLocal = fechaHoraLocal.withSecond(0),
-            deInternet = true
+            origen = origen
         )
     }
 }

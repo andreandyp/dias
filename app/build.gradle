@@ -82,4 +82,5 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$work_version"
     implementation "com.takisoft.preferencex:preferencex:1.1.0"
     implementation "com.takisoft.preferencex:preferencex-datetimepicker:1.1.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 }

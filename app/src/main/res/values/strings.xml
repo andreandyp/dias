@@ -29,8 +29,9 @@
     <string name="posponer">Posponer</string>
     <string name="notif_id_intent">notification_id</string>
     <string name="siguiente_alarma">%d:%d</string>
-    <string name="segun_internet">Según internet</string>
-    <string name="segun_bd">Según el promedio de los últimos 7 días</string>
+    <string name="segun_internet">Datos obtenidos de internet</string>
+    <string name="segun_bd">Datos guardados previamente</string>
+    <string name="segun_usuario">No se pudieron obtener los datos más recientes. Usando tus preferencias</string>
     <string name="detalles_alarma">Abrir detalles de la alarma</string>
     <string name="separador_alarma">Separador de alarma</string>
     <string name="title_activity_ajustes">Ajustes</string>
@@ -51,4 +52,5 @@
     <string name="sync_summary_on">Se sincronizará diaramente</string>
     <string name="sync_summary_off">Solo sincronizar cuando se entra a la app</string>
     <string name="ajustes">Ajustes</string>
+    <string name="obteniendo_datos">Obteniendo datos de internet...</string>
 </resources>

@@ -26,7 +26,7 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
 
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
             runBlocking {
-                val amanecer = repository.obtenerAmanecerDiario(location)
+                val amanecer = repository.obtenerAmanecerDiario(location, false)
 
                 val preferencias = applicationContext.getSharedPreferences(
                     applicationContext.getString(R.string.preference_file), Context.MODE_PRIVATE

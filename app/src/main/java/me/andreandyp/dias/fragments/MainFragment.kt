@@ -49,6 +49,11 @@ class MainFragment : Fragment() {
             listaAlarmas = viewModel.alarmas
         }
 
+        binding.swipeToRefresh.setOnRefreshListener {
+            viewModel.obtenerUbicacion(true)
+            binding.swipeToRefresh.isRefreshing = false
+        }
+
         binding.vm = viewModel
 
         return binding.root
