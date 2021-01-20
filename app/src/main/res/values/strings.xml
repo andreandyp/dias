@@ -4,7 +4,6 @@
     <string name="channel_id" translatable="false">alarma_channel</string>
 
     <string name="proxima_alarma">Próxima alarma</string>
-    <string name="tiempo_estimado">Tiempo estimado</string>
     <string name="encendida">¿Encendida?</string>
     <string name="vibrar">¿Vibrar?</string>
     <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
@@ -16,8 +15,6 @@
     <string name="viernes">Viernes</string>
     <string name="sabado">Sábado</string>
     <string name="domingo">Domingo</string>
-    <string name="sonar_a_las">Sonará a las <b>%d:%s</b></string>
-    <string name="al_amanecer">Sonará al amanecer</string>
     <string name="hora_predeterminada">±0:00</string>
     <string name="channel_nombre">Alarmas</string>
     <string name="channel_descripcion">Recibe una notificación cuando suene la alarma</string>
@@ -34,6 +31,7 @@
     <string name="segun_usuario">Según la hora predeterminada</string>
     <string name="detalles_alarma">Abrir detalles de la alarma</string>
     <string name="separador_alarma">Separador de alarma</string>
+    <string name="sin_alarma">Ninguna alarma programada.</string>
     <string name="title_activity_ajustes">Ajustes</string>
 
     <!-- Preference Titles -->
@@ -52,5 +50,7 @@
     <string name="sync_summary_on">Se sincronizará diaramente</string>
     <string name="sync_summary_off">Solo sincronizar cuando se entra a la app</string>
     <string name="ajustes">Ajustes</string>
-    <string name="obteniendo_datos">Obteniendo datos de internet...</string>
+    <string name="obteniendo_datos">Obteniendo datos de internet…</string>
+    <string name="tema">Tema</string>
+    <string name="dark_mode_title">Modo oscuro</string>
 </resources>

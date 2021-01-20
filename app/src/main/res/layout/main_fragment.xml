@@ -40,7 +40,7 @@
                 android:id="@+id/hora_alarma"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.siguienteAlarma.horaFormateada}"
+                android:text="@{vm.siguienteAlarma.encendida ?  vm.siguienteAlarma.horaFormateada : @string/sin_alarma}"
                 android:textAppearance="?attr/textAppearanceHeadline4"
                 android:textColor="?android:attr/textColorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"

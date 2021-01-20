@@ -15,7 +15,6 @@ import org.threeten.bp.LocalDateTime
  * @property [horasDiferencia] Hora de retraso o adelanto
  * @property [minutosDiferencia] Minutos de retraso o adelanto
  * @property [fechaHoraAmanecer] Fecha y hora a la que será el amanecer
- * @property [tono] Tono que utilizará la alarma para sonar.
  * @property [diferenciaFormateada] Retraso o adelanto seleccionado para la alarma en el formato ±0:00.
  * @property [fechaHoraSonar] Fecha y hora a la que sonará la alarma con retraso o adelanto incluido.
  * @property [horaFormateada] [fechaHoraSonar] en texto.

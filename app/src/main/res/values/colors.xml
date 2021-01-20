@@ -1,22 +1,17 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-    <color name="secondaryColor">#f57c00</color>
-    <color name="secondaryLightColor">#ffad42</color>
-    <color name="secondaryDarkColor">#bb4d00</color>
+    <color name="primaryColor">#64b5f6</color>
+    <color name="primaryLightColor">#9be7ff</color>
+    <color name="primaryDarkColor">#2286c3</color>
 
-    <color name="primaryColor">#fdd835</color>
-    <color name="primaryLightColor">#ffff6b</color>
-    <color name="primaryDarkColor">#c6a700</color>
+    <color name="secondaryColor">#ffc107</color>
+    <color name="secondaryLightColor">#fff350</color>
+    <color name="secondaryDarkColor">#c79100</color>
 
-    <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#000000</color>
-    <color name="primaryTextColorInverse">#FFFFFF</color>
-    <color name="secondaryTextColorInverse">#FFFFFF</color>
-
-    <color name="colorBackground">#FFFFFF</color>
-    <color name="colorBackgroundInverse">#000000</color>
     <color name="iconTint">#000000</color>
     <color name="iconTintInverse">#FFFFFF</color>
+    
+    <color name="actionBarDark">#212121</color>
 
     <color name="grey">#e0e0e0</color>
     <color name="greyInverse">#40e0e0e0</color>

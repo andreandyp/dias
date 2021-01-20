@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import androidx.databinding.Observable
+import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -52,18 +54,32 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         _actualizandoDatos.value = false
         // Inicializar la lista de alarmas con los datos guardados en las shared preferences
         val diaSiguienteAlarma = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
-        for (i: Int in 0..6) {
+        for (i: Int in dias.indices) {
+            val alarma = Alarma(
+                _id = i,
+                dia = dias[i],
+                esSiguienteAlarma = diaSiguienteAlarma == i + 1,
+                _encendida = preferencias.getBoolean("${i}_on", false),
+                _vibrar = preferencias.getBoolean("${i}_vib", false),
+                _horasDiferencia = preferencias.getInt("${i}_hr", 0),
+                _minutosDiferencia = preferencias.getInt("${i}_min", 0),
+                _momento = preferencias.getInt("${i}_momento", -1)
+            )
+
+            alarma.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+                override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                    sender as Alarma
+                    when (propertyId) {
+                        BR.encendida -> cambiarEstadoAlarma(sender)
+                        BR.vibrar -> cambiarVibrarAlarma(sender)
+                        BR.horasDiferencia -> cambiarHorasAlarma(sender)
+                        BR.minutosDiferencia -> cambiarMinAlarma(sender)
+                        BR.momento -> cambiarMomentoAlarma(sender)
+                    }
+                }
+            })
             alarmas.add(
-                Alarma(
-                    _id = i,
-                    dia = dias[i],
-                    esSiguienteAlarma = diaSiguienteAlarma == i + 1,
-                    _encendida = preferencias.getBoolean("${i}_on", false),
-                    _vibrar = preferencias.getBoolean("${i}_vib", false),
-                    _horasDiferencia = preferencias.getInt("${i}_hr", 0),
-                    _minutosDiferencia = preferencias.getInt("${i}_min", 0),
-                    _momento = preferencias.getInt("${i}_momento", -1)
-                )
+                alarma
             )
         }
         obtenerUbicacion(false)
@@ -166,7 +182,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             )
 
             if (alarma.encendida) {
-                var horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
+                val horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
                 //horaAlarmaUTC = horaAlarmaUTC.withHour(18).withMinute(57).withDayOfMonth(24)
                 //Log.i("PRUEBA", horaAlarmaUTC.toString())
                 AlarmUtils.encenderAlarma(app, horaAlarmaUTC.toInstant(), mostrarAlarmaPending)

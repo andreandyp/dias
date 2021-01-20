@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/buenos_dias"
-        android:textAppearance="@style/MaterialAlertDialog.MaterialComponents.Title.Text"
-        android:textSize="@dimen/h2"
+        android:textAppearance="?attr/textAppearanceHeadline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +61,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-        android:textSize="@dimen/h4"
         app:layout_constraintBottom_toTopOf="@+id/ic_alarma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

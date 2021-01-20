@@ -23,9 +23,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="@{alarma.dia}"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@{alarma.esSiguienteAlarma ? @color/secondaryColor : @color/secondary_text_inverse_when_activated_material}"
-            android:textSize="@dimen/h5"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            android:textColor="@{alarma.esSiguienteAlarma ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Lunes" />
@@ -39,8 +38,8 @@
             android:clickable="true"
             android:focusable="true"
             android:text="@{alarma.diferenciaFormateada}"
-            android:textColor="@{alarma.esSiguienteAlarma ? @color/primary_text_inverse_when_activated_material : @color/secondary_text_inverse_when_activated_material}"
-            android:textSize="@dimen/h6"
+            android:textColor="@{alarma.esSiguienteAlarma ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dia"
             tools:text="±0:00" />

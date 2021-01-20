@@ -7,13 +7,13 @@ import org.threeten.bp.LocalTime
 
 class Converters {
     @TypeConverter
-    fun LocalDateToString(ld: LocalDate): String = ld.toString()
+    fun localDateToString(ld: LocalDate): String = ld.toString()
 
     @TypeConverter
     fun stringToLocalDate(string: String): LocalDate = LocalDate.parse(string)
 
     @TypeConverter
-    fun LocalTimeToString(lt: LocalTime): String = lt.toString()
+    fun localTimeToString(lt: LocalTime): String = lt.toString()
 
     @TypeConverter
     fun stringToLocalTime(string: String): LocalTime = LocalTime.parse(string)

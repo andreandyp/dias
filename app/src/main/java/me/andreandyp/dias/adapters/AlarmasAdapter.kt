@@ -3,15 +3,12 @@ package me.andreandyp.dias.adapters
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.Observable
-import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.hora_dialog.view.*
 import me.andreandyp.dias.R
@@ -59,41 +56,24 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
      * Cada vez que hace scroll la pantalla, aquí se recicla la vista y se asignan valores y listeners.
      */
     override fun onBindViewHolder(holder: AlarmaViewHolder, position: Int) {
-        val modoNocturno =
-            context!!.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         holder.alarmaItemBinding.apply {
             alarma = listaAlarmas[position]
-
-            // Asignar listeners a las propiedades de la alarma para guardar los datos
-            alarma!!.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-                override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                    sender as Alarma
-                    when (propertyId) {
-                        BR.encendida -> viewModel.cambiarEstadoAlarma(sender)
-                        BR.vibrar -> viewModel.cambiarVibrarAlarma(sender)
-                        BR.horasDiferencia -> viewModel.cambiarHorasAlarma(sender)
-                        BR.minutosDiferencia -> viewModel.cambiarMinAlarma(sender)
-                        BR.momento -> viewModel.cambiarMomentoAlarma(sender)
-                    }
-                }
-            })
 
             // Al dar click en el indicador de hora, se abre un dialog para ajustar la hora
             // Es mucho más eficiente que crearlo antes (comprobado)
             horaAntesDespues.setOnClickListener {
                 AlertDialog.Builder(context!!).create().apply {
-                    val dialogView = HoraDialogBinding.inflate(this.layoutInflater).root
+                    val dialogView: HoraDialogBinding = DataBindingUtil.inflate(this.layoutInflater, R.layout.hora_dialog, null, false)
+                    dialogView.alarma = alarma
 
                     // Establecer valores a los pickers y configuraciones
-                    val antesDespues: NumberPicker = dialogView.antes_despues
+                    val antesDespues: NumberPicker = dialogView.antesDespues
                     val masMenos = arrayOf("-", "+")
                     antesDespues.displayedValues = masMenos
                     antesDespues.maxValue = 1
-                    antesDespues.value = alarma!!.momento
                     val hora: NumberPicker = dialogView.hora
                     hora.minValue = 0
                     hora.maxValue = 3
-                    hora.value = alarma!!.horasDiferencia
 
                     val minutos: NumberPicker = dialogView.minutos
                     val elementos = arrayOf("00", "15", "30", "45")
@@ -107,11 +87,11 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                     }
 
                     // Poner la vista y el título
-                    setView(dialogView)
+                    setView(dialogView.root)
                     setTitle("Establece la hora antes o después del amanecer")
 
                     // Poner listeners a los botones
-                    dialogView.button_aceptar.setOnClickListener {
+                    dialogView.buttonAceptar.setOnClickListener {
                         // Actualizar los valores en alarma para guardarlos
                         alarma!!.horasDiferencia = hora.value
                         alarma!!.minutosDiferencia = elementos[minutos.value].toInt()
@@ -119,7 +99,7 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                         alarma!!.encendida = true
                         this.dismiss()
                     }
-                    dialogView.button_cancelar.setOnClickListener {
+                    dialogView.buttonCancelar.setOnClickListener {
                         this.cancel()
                     }
 
@@ -135,12 +115,6 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                         null
                     )
                     detalles.setImageDrawable(flechaUp)
-                    alarmaConstraint.background =
-                        if (modoNocturno == Configuration.UI_MODE_NIGHT_YES) {
-                            ColorDrawable(context!!.getColor(R.color.greyInverse))
-                        } else {
-                            ColorDrawable(context!!.getColor(R.color.grey))
-                        }
                 } else {
                     containerLayout.visibility = View.GONE
                     val flechaDown = context!!.resources.getDrawable(
@@ -148,14 +122,7 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
                         null
                     )
                     detalles.setImageDrawable(flechaDown)
-                    alarmaConstraint.background =
-                        if (modoNocturno == Configuration.UI_MODE_NIGHT_YES) {
-                            ColorDrawable(context!!.getColor(android.R.color.transparent))
-                        } else {
-                            ColorDrawable(context!!.getColor(android.R.color.white))
-                        }
                 }
-
             }
 
             // Hacer click en la alarma es lo mismo que hacer click en la flecha

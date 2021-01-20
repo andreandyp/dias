@@ -1,7 +1,6 @@
 package me.andreandyp.dias.activities
 
 import android.app.KeyguardManager
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -10,7 +9,6 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import me.andreandyp.dias.R
 import me.andreandyp.dias.databinding.ActivityMostrarAlarmaBinding
 import me.andreandyp.dias.receivers.PosponerReceiver
