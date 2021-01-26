@@ -10,7 +10,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "me.andreandyp.dias"
+        applicationId "com.andreandyp.dias"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 2

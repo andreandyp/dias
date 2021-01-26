@@ -5,7 +5,7 @@
     <data>
         <variable
             name="alarma"
-            type="me.andreandyp.dias.domain.Alarma" />
+            type="com.andreandyp.dias.domain.Alarma" />
     </data>
 
     <LinearLayout

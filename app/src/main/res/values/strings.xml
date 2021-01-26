@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">¡Días!</string>
-    <string name="preference_file" translatable="false">me.andreandyp.dias.PREFERENCE_FILE_KEY</string>
+    <string name="preference_file" translatable="false">com.andreandyp.dias.PREFERENCE_FILE_KEY</string>
     <string name="channel_id" translatable="false">alarma_channel</string>
 
     <string name="proxima_alarma">Próxima alarma</string>
