@@ -22,39 +22,39 @@
         android:layout_width="@dimen/iconos_despertar"
         android:layout_height="@dimen/iconos_despertar"
         android:contentDescription="@string/posponer_alarma"
-        android:tint="?attr/colorControlNormal"
         app:layout_constraintBottom_toBottomOf="@+id/ic_alarma"
         app:layout_constraintEnd_toStartOf="@+id/ic_alarma"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ic_alarma"
-        app:srcCompat="@drawable/baseline_airline_seat_individual_suite_black" />
+        app:srcCompat="@drawable/baseline_airline_seat_individual_suite_black"
+        app:tint="?attr/colorControlNormal" />
 
     <ImageView
         android:id="@+id/ic_alarma"
         android:layout_width="@dimen/iconos_despertar"
         android:layout_height="@dimen/iconos_despertar"
         android:contentDescription="@string/alarma_sonando"
-        android:tint="?attr/colorControlNormal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/apagar_alarma"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/posponer_alarma"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_alarm_black" />
+        app:srcCompat="@drawable/baseline_alarm_black"
+        app:tint="?attr/colorControlNormal" />
 
     <ImageView
         android:id="@+id/apagar_alarma"
         android:layout_width="@dimen/iconos_despertar"
         android:layout_height="@dimen/iconos_despertar"
         android:contentDescription="@string/apagar_alarma"
-        android:tint="?attr/colorControlNormal"
         app:layout_constraintBottom_toBottomOf="@+id/ic_alarma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/ic_alarma"
         app:layout_constraintTop_toTopOf="@+id/ic_alarma"
-        app:srcCompat="@drawable/baseline_alarm_off_black" />
+        app:srcCompat="@drawable/baseline_alarm_off_black"
+        app:tint="?attr/colorControlNormal" />
 
     <TextView
         android:id="@+id/hora_actual"
