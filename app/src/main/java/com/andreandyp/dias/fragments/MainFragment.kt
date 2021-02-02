@@ -41,7 +41,7 @@ class MainFragment : Fragment() {
             )
 
         viewModel = ViewModelProvider(
-            this,
+            requireActivity(),
             MainViewModelFactory(requireActivity().application, dias)
         )[MainViewModel::class.java]
 

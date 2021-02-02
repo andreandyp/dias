@@ -1,19 +1,22 @@
 package com.andreandyp.dias.manager
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import androidx.core.app.ActivityCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.runBlocking
 import com.andreandyp.dias.R
 import com.andreandyp.dias.bd.DiasRepository
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.utils.AlarmUtils
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.runBlocking
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoField
@@ -25,6 +28,22 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
 
         val fusedLocationClient: FusedLocationProviderClient? =
             LocationServices.getFusedLocationProviderClient(applicationContext)
+
+        val permisoFineLocation = ActivityCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        val permisoCoarseLocation = ActivityCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        val permisoOtorgado = PackageManager.PERMISSION_GRANTED
+
+        if (permisoFineLocation != permisoOtorgado && permisoCoarseLocation != permisoOtorgado) {
+            return Result.failure()
+        }
 
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
             runBlocking {

@@ -2,12 +2,15 @@ package com.andreandyp.dias.adapters
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.NumberPicker
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -73,6 +76,11 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
             // Hacer click en la alarma es lo mismo que hacer click en la flecha
             alarmaConstraint.setOnClickListener {
                 detalles.performClick()
+            }
+
+            btnTono.setOnClickListener {
+                val tono = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                (context as AppCompatActivity).startActivityForResult(tono, alarma!!._id)
             }
         }
     }

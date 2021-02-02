@@ -28,7 +28,8 @@ data class Alarma(
     private var _horasDiferencia: Int,
     private var _minutosDiferencia: Int,
     private var _momento: Int,
-    private var _tono: String? = null
+    private var _tono: String? = null,
+    private var _uriTono: String? = null
 ) : BaseObservable() {
     var encendida: Boolean
         @Bindable
@@ -76,6 +77,20 @@ data class Alarma(
             notifyPropertyChanged(BR.momento)
             notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.fechaHoraSonar)
+        }
+    var tono: String
+        @Bindable
+        get() = _tono ?: ""
+        set(value) {
+            _tono = value
+            notifyPropertyChanged(BR.tono)
+        }
+    var uriTono: String
+        @Bindable
+        get() = _uriTono ?: ""
+        set(value) {
+            _uriTono = value
+            notifyPropertyChanged(BR.uriTono)
         }
     val diferenciaFormateada: String
         @Bindable

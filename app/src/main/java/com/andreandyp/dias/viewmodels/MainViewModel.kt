@@ -1,25 +1,29 @@
 package com.andreandyp.dias.viewmodels
 
+import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
+import androidx.core.app.ActivityCompat
 import androidx.databinding.Observable
 import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.launch
 import com.andreandyp.dias.R
 import com.andreandyp.dias.bd.DiasRepository
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.utils.AlarmUtils
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoField
@@ -63,7 +67,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                 _vibrar = preferencias.getBoolean("${i}_vib", false),
                 _horasDiferencia = preferencias.getInt("${i}_hr", 0),
                 _minutosDiferencia = preferencias.getInt("${i}_min", 0),
-                _momento = preferencias.getInt("${i}_momento", -1)
+                _momento = preferencias.getInt("${i}_momento", -1),
+                _tono = preferencias.getString("${i}_tono", app.getString(R.string.sonido_predeterminado))
             )
 
             alarma.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
@@ -75,6 +80,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                         BR.horasDiferencia -> cambiarHorasAlarma(sender)
                         BR.minutosDiferencia -> cambiarMinAlarma(sender)
                         BR.momento -> cambiarMomentoAlarma(sender)
+                        BR.tono -> cambiarTonoAlarma(sender)
+                        BR.uriTono -> cambiarUriTonoAlarma(sender)
                     }
                 }
             })
@@ -89,6 +96,26 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         val fusedLocationClient: FusedLocationProviderClient? =
             LocationServices.getFusedLocationProviderClient(app.applicationContext)
         _actualizandoDatos.value = true
+
+        val permisoFineLocation = ActivityCompat.checkSelfPermission(
+            app.applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        val permisoCoarseLocation = ActivityCompat.checkSelfPermission(
+            app.applicationContext,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        val permisoOtorgado = PackageManager.PERMISSION_GRANTED
+
+        if (permisoFineLocation != permisoOtorgado && permisoCoarseLocation != permisoOtorgado) {
+            viewModelScope.launch {
+                obtenerSiguienteAlarma(null, forzarActualizacion)
+            }
+            return
+        }
+
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
             viewModelScope.launch {
                 obtenerSiguienteAlarma(location, forzarActualizacion)
@@ -164,6 +191,9 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
     fun cambiarMomentoAlarma(alarma: Alarma) =
         guardarPreferencias("${alarma._id}_momento", alarma.momento)
 
+    fun cambiarTonoAlarma(alarma: Alarma) = guardarPreferencias("${alarma._id}_tono", alarma.tono)
+    fun cambiarUriTonoAlarma(alarma: Alarma) = guardarPreferencias("${alarma._id}_uri", alarma.uriTono)
+
     /**
      * Establecer la alarma con la hora de la alarma.
      * Si estamos manipulando la alarma de mañana, se encenderá o apagará la alarma siguiente,
@@ -192,5 +222,9 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         }
     }
 
+    fun onRingtoneSeleccionado(alarmaId: Int, uri: Uri?, ringtone: String) {
+        alarmas[alarmaId].tono = ringtone
+        alarmas[alarmaId].uriTono = uri.toString()
+    }
 
 }

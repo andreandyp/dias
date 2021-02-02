@@ -47,7 +47,7 @@
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sincronizar en segundo plano</string>
-    <string name="sync_summary_on">Se sincronizará diaramente</string>
+    <string name="sync_summary_on">Se sincronizará diariamente</string>
     <string name="sync_summary_off">Solo sincronizar cuando se entra a la app</string>
     <string name="ajustes">Ajustes</string>
     <string name="obteniendo_datos">Obteniendo datos de internet…</string>
