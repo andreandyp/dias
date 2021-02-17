@@ -68,7 +68,7 @@ class DiasRepository(val context: Context) {
     private suspend fun obtenerAmanecerBD(): AmanecerEntity? {
         val tomorrowDate = LocalDate.now().plusDays(1)
         return withContext(Dispatchers.IO) {
-            amanecerDAO.obtenerSiguienteAmanecer(tomorrowDate)
+            amanecerDAO.obtenerAmanecer(tomorrowDate)
         }
     }
 
@@ -119,9 +119,16 @@ class DiasRepository(val context: Context) {
             if (amaneceres >= 30) {
                 val masAntiguo = amanecerDAO.obtenerAmanecerMasAntiguo()
                 amanecerDAO.eliminarAmanecer(masAntiguo)
-            } else {
-                amanecerDAO.insertarAmanecer(amanecerNetwork.asEntity())
+                return@withContext
             }
+
+            val tomorrowDate = LocalDate.now().plusDays(1)
+            val amanecerDeHoy = amanecerDAO.obtenerAmanecer(tomorrowDate)
+            if(amanecerDeHoy != null) {
+                return@withContext
+            }
+
+            amanecerDAO.insertarAmanecer(amanecerNetwork.asEntity())
         }
     }
 }

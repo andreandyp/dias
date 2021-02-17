@@ -13,7 +13,7 @@ interface AmanecerDAO {
     fun insertarAmanecer(amanecer: AmanecerEntity)
 
     @Query("SELECT * FROM Tiempo WHERE amanecerFecha = :fecha")
-    fun obtenerSiguienteAmanecer(fecha: LocalDate): AmanecerEntity?
+    fun obtenerAmanecer(fecha: LocalDate): AmanecerEntity?
 
     @Query("SELECT * FROM Tiempo ORDER BY amanecerFecha ASC LIMIT 1")
     fun obtenerAmanecerMasAntiguo(): AmanecerEntity

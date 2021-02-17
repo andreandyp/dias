@@ -80,7 +80,7 @@ class AlarmasAdapter(private var context: Context?, private val viewModel: MainV
 
             btnTono.setOnClickListener {
                 val tono = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                (context as AppCompatActivity).startActivityForResult(tono, alarma!!._id)
+                (context as AppCompatActivity).startActivityForResult(tono, alarma!!.id)
             }
         }
     }

@@ -57,28 +57,24 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
                     LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK] == amanecer.diaSemana + 1
 
                 val alarma = Alarma(
-                    _id = amanecer.diaSemana - 1,
-                    dia = amanecer.diaSemana.toString(),
+                    id = amanecer.diaSemana - 1,
                     esSiguienteAlarma = esSiguienteAlarma,
-                    _encendida = preferencias.getBoolean(
-                        "${amanecer.diaSemana}_on",
-                        false
-                    ),
-                    _vibrar = preferencias.getBoolean("${amanecer.diaSemana}_vib", false),
-                    _horasDiferencia = preferencias.getInt("${amanecer.diaSemana}_hr", 0),
-                    _minutosDiferencia = preferencias.getInt("${amanecer.diaSemana}_min", 0),
-                    _momento = preferencias.getInt("${amanecer.diaSemana}_momento", -1)
-                )
+                ).apply {
+                    encendida = preferencias.getBoolean("${amanecer.diaSemana}_on", false)
+                    horasDiferencia = preferencias.getInt("${amanecer.diaSemana}_hr", 0)
+                    minutosDiferencia = preferencias.getInt("${amanecer.diaSemana}_min", 0)
+                    momento = preferencias.getInt("${amanecer.diaSemana}_momento", -1)
+                }
 
                 if (alarma.encendida) {
                     val mostrarAlarmaIntent = Intent(applicationContext, AlarmaReceiver::class.java)
                     mostrarAlarmaIntent.putExtra(
                         applicationContext.getString(R.string.notif_id_intent),
-                        alarma._id
+                        alarma.id
                     )
                     val mostrarAlarmaPending = PendingIntent.getBroadcast(
                         applicationContext,
-                        alarma._id,
+                        alarma.id,
                         mostrarAlarmaIntent,
                         PendingIntent.FLAG_CANCEL_CURRENT
                     )

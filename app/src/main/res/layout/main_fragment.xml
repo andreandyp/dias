@@ -68,7 +68,7 @@
                 android:id="@+id/fuente"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.datosDeInternet}"
+                android:text="@{vm.origenDatos}"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:textColor="?android:attr/textColorSecondary"
                 android:visibility="@{vm.actualizandoDatos ? View.GONE : View.VISIBLE}"

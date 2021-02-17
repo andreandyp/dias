@@ -7,91 +7,98 @@ import org.threeten.bp.LocalDateTime
 
 /**
  * Alarma que sirve para mostrar los datos guardados en las shared preferences. Todos los datos son observables.
- * @constructor Inicializa la alarma con los datos de las shared preferences.
- * @property [_id] ID para identificar la alarma (0..6).
- * @property [dia] Día de la semana.
+ * @constructor Inicializa la alarma con los datos esenciales.
+ * @param [id] ID para identificar la alarma (0..6).
+ * @param [esSiguienteAlarma] Es la siguiente alarma que sonará o no.
+ *
+ * @property [dia] Día de la semana en texto (Lunes, Martes, Miércoles...).
  * @property [encendida] Estado de la alarma (on/off).
- * @property [vibrar] Para saber si la alarma vibra o no.
- * @property [horasDiferencia] Hora de retraso o adelanto
- * @property [minutosDiferencia] Minutos de retraso o adelanto
- * @property [fechaHoraAmanecer] Fecha y hora a la que será el amanecer
+ * @property [vibrar] La alarma vibra o no al sonar.
+ * @property [horasDiferencia] Hora de retraso o adelanto con respecto al amanecer.
+ * @property [minutosDiferencia] Minutos de retraso o adelanto con respecto al amanecer.
+ * @property [momento] Sonará antes (0) o después (1) del amanecer.
+ * @property [tono] Nombre del tono seleccionado.
+ * @property [uriTono] URI del tono seleccionado.
+ * @property [fechaHoraAmanecer] Fecha y hora a la que será el amanecer.
+ *
  * @property [diferenciaFormateada] Retraso o adelanto seleccionado para la alarma en el formato ±0:00.
  * @property [fechaHoraSonar] Fecha y hora a la que sonará la alarma con retraso o adelanto incluido.
  * @property [horaFormateada] [fechaHoraSonar] en texto.
  */
 data class Alarma(
-    val _id: Int,
-    val dia: String,
+    val id: Int,
     val esSiguienteAlarma: Boolean,
-    private var _encendida: Boolean,
-    private var _vibrar: Boolean,
-    private var _horasDiferencia: Int,
-    private var _minutosDiferencia: Int,
-    private var _momento: Int,
-    private var _tono: String? = null,
-    private var _uriTono: String? = null
 ) : BaseObservable() {
-    var encendida: Boolean
-        @Bindable
-        get() = _encendida
+    @get:Bindable
+    var dia: String = ""
         set(value) {
-            _encendida = value
+            field = value
+            notifyPropertyChanged(BR.dia)
+        }
+
+    @get:Bindable
+    var encendida: Boolean = false
+        set(value) {
+            field = value
             notifyPropertyChanged(BR.encendida)
         }
-    var vibrar: Boolean
-        @Bindable
-        get() = _vibrar
+
+    @get:Bindable
+    var vibrar: Boolean = false
         set(value) {
-            _vibrar = value
+            field = value
             notifyPropertyChanged(BR.vibrar)
         }
-    var horasDiferencia: Int
-        @Bindable
-        get() = _horasDiferencia
+
+    @get:Bindable
+    var horasDiferencia: Int = 0
         set(value) {
-            _horasDiferencia = value
+            field = value
             notifyPropertyChanged(BR.horasDiferencia)
             notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.fechaHoraSonar)
         }
-    var minutosDiferencia: Int
-        @Bindable
-        get() = _minutosDiferencia
+
+    @get:Bindable
+    var minutosDiferencia: Int = 0
         set(value) {
-            _minutosDiferencia = value
+            field = value
             notifyPropertyChanged(BR.minutosDiferencia)
             notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.fechaHoraSonar)
         }
-    var fechaHoraAmanecer: LocalDateTime? = null
-        @Bindable
+
+    @get:Bindable
+    var momento: Int = -1
         set(value) {
             field = value
-            notifyPropertyChanged(BR.fechaHoraSonar)
-        }
-    var momento: Int
-        @Bindable
-        get() = _momento
-        set(value) {
-            _momento = value
             notifyPropertyChanged(BR.momento)
             notifyPropertyChanged(BR.diferenciaFormateada)
             notifyPropertyChanged(BR.fechaHoraSonar)
         }
-    var tono: String
-        @Bindable
-        get() = _tono ?: ""
+
+    @get:Bindable
+    var tono: String? = null
         set(value) {
-            _tono = value
+            field = value
             notifyPropertyChanged(BR.tono)
         }
-    var uriTono: String
-        @Bindable
-        get() = _uriTono ?: ""
+
+    @get:Bindable
+    var uriTono: String? = null
         set(value) {
-            _uriTono = value
+            field = value
             notifyPropertyChanged(BR.uriTono)
         }
+
+    var fechaHoraAmanecer: LocalDateTime? = null
+        @Bindable
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.fechaHoraAmanecer)
+            notifyPropertyChanged(BR.fechaHoraSonar)
+        }
+
     val diferenciaFormateada: String
         @Bindable
         get() {
@@ -105,7 +112,6 @@ data class Alarma(
     val fechaHoraSonar: LocalDateTime?
         @Bindable
         get() {
-            notifyPropertyChanged(BR.horaFormateada)
             return if (momento == 0) {
                 fechaHoraAmanecer?.minusHours(horasDiferencia.toLong())
                     ?.minusMinutes(minutosDiferencia.toLong())
@@ -115,6 +121,5 @@ data class Alarma(
             }
         }
     val horaFormateada: String
-        @Bindable
         get() = (fechaHoraSonar?.toLocalTime() ?: "N/A").toString()
 }
