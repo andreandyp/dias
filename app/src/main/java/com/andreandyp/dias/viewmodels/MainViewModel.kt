@@ -144,6 +144,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
 
     private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
         val amanecer = repository.obtenerAmanecerDiario(ubicacion, forzarActualizacion)
+        Log.i("PRUEBA", amanecer.origen.toString())
 
         _origenDatos.value = when (amanecer.origen) {
             Amanecer.Origen.INTERNET -> app.applicationContext.getString(R.string.segun_internet)
