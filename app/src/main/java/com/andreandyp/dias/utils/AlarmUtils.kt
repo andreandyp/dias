@@ -4,6 +4,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.andreandyp.dias.R
+import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.receivers.PosponerReceiver
 import org.threeten.bp.Instant
 
@@ -33,5 +35,16 @@ object AlarmUtils {
         )
 
         alarmManager.cancel(posponerPending)
+    }
+
+    fun crearIntentAlarma(context: Context, idAlarma: Int): PendingIntent {
+        val mostrarAlarmaIntent = Intent(context, AlarmaReceiver::class.java)
+        mostrarAlarmaIntent.putExtra(context.getString(R.string.notif_id_intent), idAlarma)
+        return PendingIntent.getBroadcast(
+            context,
+            idAlarma,
+            mostrarAlarmaIntent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
     }
 }

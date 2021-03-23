@@ -2,9 +2,6 @@ package com.andreandyp.dias.viewmodels
 
 import android.Manifest
 import android.app.Application
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
@@ -16,11 +13,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.andreandyp.dias.R
-import com.andreandyp.dias.bd.DiasRepository
 import com.andreandyp.dias.domain.Alarma
-import com.andreandyp.dias.domain.Amanecer
-import com.andreandyp.dias.receivers.AlarmaReceiver
+import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.utils.AlarmUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -35,20 +30,18 @@ import org.threeten.bp.temporal.ChronoField
  * @property [app] La aplicación para obtener los recursos.
  * @property [dias] Una [List] con los días de la semana.
  */
-class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewModel(app) {
-    private val preferencias = app.getSharedPreferences(
-        app.getString(R.string.preference_file), Context.MODE_PRIVATE
-    )
-
-    private val repository = DiasRepository(app.applicationContext)
-
+class MainViewModel(
+    private val repository: DiasRepository,
+    val app: Application,
+    val dias: List<String>,
+) : AndroidViewModel(app) {
     val alarmas = mutableListOf<Alarma>()
 
     private val _siguienteAlarma = MutableLiveData<Alarma>()
     val siguienteAlarma: LiveData<Alarma> = _siguienteAlarma
 
-    private val _origenDatos = MutableLiveData<String>()
-    val origenDatos: LiveData<String> = _origenDatos
+    private val _origenDatos = MutableLiveData<Origen>()
+    val origenDatos: LiveData<Origen> = _origenDatos
 
     private val _actualizandoDatos = MutableLiveData(false)
     val actualizandoDatos: LiveData<Boolean> = _actualizandoDatos
@@ -69,11 +62,6 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
             LocationServices.getFusedLocationProviderClient(app.applicationContext)
         _actualizandoDatos.value = true
 
-        val permisoFineLocation = ActivityCompat.checkSelfPermission(
-            app.applicationContext,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-
         val permisoCoarseLocation = ActivityCompat.checkSelfPermission(
             app.applicationContext,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -81,7 +69,8 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
 
         val permisoOtorgado = PackageManager.PERMISSION_GRANTED
 
-        if (permisoFineLocation != permisoOtorgado && permisoCoarseLocation != permisoOtorgado) {
+        if (permisoCoarseLocation != permisoOtorgado) {
+            Log.i("PRUEBA", "SIN PERMISO")
             viewModelScope.launch {
                 obtenerSiguienteAlarma(null, forzarActualizacion)
             }
@@ -89,6 +78,7 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
         }
 
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
+            Log.i("PRUEBA", location.toString())
             viewModelScope.launch {
                 obtenerSiguienteAlarma(location, forzarActualizacion)
             }
@@ -109,70 +99,18 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
      */
     fun cambiarEstadoAlarma(alarma: Alarma) {
         establecerAlarma(alarma)
-        guardarPreferencias("${alarma.id}_on", alarma.encendida)
+        repository.guardarEstadoAlarma(alarma)
     }
-
-    /**
-     * Guarda la configuración de vibración de la alarma (sí/no).
-     */
-    fun cambiarVibrarAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_vib", alarma.vibrar)
-
-    /**
-     * Guarda la hora a la que sonará la alarma.
-     */
-    fun cambiarHorasAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_hr", alarma.horasDiferencia)
-
-    /**
-     * Guarda los minutos a los que sonará la alarma.
-     */
-    fun cambiarMinAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_min", alarma.minutosDiferencia)
-
-    /**
-     * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
-     */
-    fun cambiarMomentoAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_momento", alarma.momento)
-
-    fun cambiarTonoAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_tono", alarma.tono ?: "")
-
-    fun cambiarUriTonoAlarma(alarma: Alarma) =
-        guardarPreferencias("${alarma.id}_uri", alarma.uriTono ?: "")
 
     private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
         val amanecer = repository.obtenerAmanecerDiario(ubicacion, forzarActualizacion)
         Log.i("PRUEBA", amanecer.origen.toString())
 
-        _origenDatos.value = when (amanecer.origen) {
-            Amanecer.Origen.INTERNET -> app.applicationContext.getString(R.string.segun_internet)
-            Amanecer.Origen.BD -> app.applicationContext.getString(R.string.segun_bd)
-            Amanecer.Origen.USUARIO_NORED -> app.applicationContext.getString(R.string.segun_usuario)
-            Amanecer.Origen.USUARIO_NOUBIC -> app.applicationContext.getString(R.string.segun_usuario)
-        }
+        _origenDatos.value = amanecer.origen
         val siguienteDia = alarmas[amanecer.diaSemana - 1]
         siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
         _siguienteAlarma.value = siguienteDia
         _actualizandoDatos.value = false
-    }
-
-    /**
-     * Guarda las preferencias según el tipo de dato que se le mande.
-     * @param [clave] La clave de la preferencia a almacenar.
-     * @param [valor] El valor de la preferencia a almacenar.
-     */
-    private fun guardarPreferencias(clave: String, valor: Any) {
-        with(preferencias.edit()) {
-            when (valor) {
-                is String -> putString(clave, valor)
-                is Int -> putInt(clave, valor)
-                is Boolean -> putBoolean(clave, valor)
-                else -> putString(clave, valor.toString())
-            }
-            commit()
-        }
     }
 
     /**
@@ -182,23 +120,19 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
      */
     private fun establecerAlarma(alarma: Alarma) {
         alarma.fechaHoraAmanecer?.let {
-            // Intent para mostrar la alarma
-            val mostrarAlarmaIntent = Intent(app.applicationContext, AlarmaReceiver::class.java)
-            mostrarAlarmaIntent.putExtra(app.getString(R.string.notif_id_intent), alarma.id)
-            val mostrarAlarmaPending = PendingIntent.getBroadcast(
-                app.applicationContext,
-                alarma.id,
-                mostrarAlarmaIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT
-            )
+            val pendingIntent = AlarmUtils.crearIntentAlarma(app.applicationContext, alarma.id)
 
             if (alarma.encendida) {
                 val horaAlarmaUTC = alarma.fechaHoraSonar!!.atZone(ZoneId.systemDefault())
                 //horaAlarmaUTC = horaAlarmaUTC.withHour(14).withMinute(57).withDayOfMonth(17)
                 Log.i("PRUEBA", horaAlarmaUTC.toString())
-                AlarmUtils.encenderAlarma(app, horaAlarmaUTC.toInstant(), mostrarAlarmaPending)
+                AlarmUtils.encenderAlarma(
+                    app.applicationContext,
+                    horaAlarmaUTC.toInstant(),
+                    pendingIntent
+                )
             } else {
-                AlarmUtils.apagarAlarma(app, mostrarAlarmaPending)
+                AlarmUtils.apagarAlarma(app.applicationContext, pendingIntent)
             }
         }
     }
@@ -211,30 +145,20 @@ class MainViewModel(val app: Application, val dias: List<String>) : AndroidViewM
                 sender as Alarma
                 when (propertyId) {
                     BR.encendida -> cambiarEstadoAlarma(sender)
-                    BR.vibrar -> cambiarVibrarAlarma(sender)
-                    BR.horasDiferencia -> cambiarHorasAlarma(sender)
-                    BR.minutosDiferencia -> cambiarMinAlarma(sender)
-                    BR.momento -> cambiarMomentoAlarma(sender)
-                    BR.tono -> cambiarTonoAlarma(sender)
-                    BR.uriTono -> cambiarUriTonoAlarma(sender)
+                    BR.vibrar -> repository.guardarVibrarAlarma(sender)
+                    BR.horasDiferencia -> repository.guardarHorasAlarma(sender)
+                    BR.minutosDiferencia -> repository.guardarMinAlarma(sender)
+                    BR.momento -> repository.guardarMomentoAlarma(sender)
+                    BR.tono -> repository.guardarTonoAlarma(sender)
+                    BR.uriTono -> repository.guardarUriTonoAlarma(sender)
                     BR.fechaHoraAmanecer -> cambiarEstadoAlarma(sender)
                 }
             }
         })
 
-        return alarma.apply {
-            dia = dias[idAlarma]
-            encendida = preferencias.getBoolean("${idAlarma}_on", false)
-            vibrar = preferencias.getBoolean("${idAlarma}_vib", false)
-            horasDiferencia = preferencias.getInt("${idAlarma}_hr", 0)
-            minutosDiferencia = preferencias.getInt("${idAlarma}_min", 0)
-            momento = preferencias.getInt("${idAlarma}_momento", -1)
-            tono = preferencias.getString(
-                "${idAlarma}_tono",
-                app.getString(R.string.sonido_predeterminado)
-            )
-            uriTono = preferencias.getString("${idAlarma}_uri", null)
-        }
+        alarma.dia = dias[alarma.id]
+
+        return repository.establecerPreferenciasAlarma(alarma)
     }
 
 }

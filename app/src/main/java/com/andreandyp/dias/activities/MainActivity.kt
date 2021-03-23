@@ -2,7 +2,9 @@ package com.andreandyp.dias.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.net.Uri
@@ -16,6 +18,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.andreandyp.dias.R
+import com.andreandyp.dias.preferences.SharedPreferencesDataSource
+import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
 
@@ -40,8 +44,14 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.domingo)
         )
 
+        val preferencias: SharedPreferences = getSharedPreferences(
+            getString(R.string.preference_file), Context.MODE_PRIVATE
+        )
+        val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
+        val repository = DiasRepository(applicationContext, sharedPreferencesDataSource)
+
         viewModel = ViewModelProvider(
-            this, MainViewModelFactory(this.application, dias)
+            this, MainViewModelFactory(repository, application, dias)
         )[MainViewModel::class.java]
     }
 

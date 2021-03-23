@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.andreandyp.dias.domain.Amanecer
+import com.andreandyp.dias.domain.Origen
 import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoField
 
@@ -23,7 +24,7 @@ data class AmanecerEntity(
      * Cuenta como "de internet" porque se almacenó en la BD desde la API.
      * @return el amanecer en forma de [Amanecer] (Dominio)
      */
-    fun asDomain(origen: Amanecer.Origen): Amanecer {
+    fun asDomain(origen: Origen): Amanecer {
         val fechaHoraBD = LocalDateTime.of(amanecerFecha, amanecerHora).atOffset(ZoneOffset.UTC)
         val fechaHoraLocal = fechaHoraBD.atZoneSameInstant(ZoneId.systemDefault())
         return Amanecer(

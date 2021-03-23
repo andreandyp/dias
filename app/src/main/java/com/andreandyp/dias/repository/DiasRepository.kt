@@ -1,22 +1,23 @@
-package com.andreandyp.dias.bd
+package com.andreandyp.dias.repository
 
 import android.content.Context
 import android.location.Location
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import com.andreandyp.dias.R
+import com.andreandyp.dias.bd.DiasDatabase
 import com.andreandyp.dias.bd.dao.AmanecerDAO
 import com.andreandyp.dias.bd.entities.AmanecerEntity
+import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
+import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.network.AmanecerNetwork
 import com.andreandyp.dias.network.SunriseSunsetAPI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.temporal.ChronoField
 
-class DiasRepository(val context: Context) {
+class DiasRepository(
+    val context: Context,
+    private val sharedPreferencesDataSource: PreferencesDataSource,
+) {
     private val amanecerDAO: AmanecerDAO
 
     init {
@@ -40,7 +41,7 @@ class DiasRepository(val context: Context) {
             if (!forzarActualizacion) {
                 val amanecerBD = obtenerAmanecerBD()
                 if (amanecerBD != null) {
-                    return@withContext amanecerBD.asDomain(Amanecer.Origen.BD)
+                    return@withContext amanecerBD.asDomain(Origen.BD)
                 }
             }
 
@@ -51,13 +52,13 @@ class DiasRepository(val context: Context) {
                         ubicacion.longitude.toString()
                     )
                     insertarAmanecer(amanecerAPI)
-                    return@withContext amanecerAPI.asDomain(Amanecer.Origen.INTERNET)
+                    return@withContext amanecerAPI.asDomain(Origen.INTERNET)
                 } catch (e: Exception) {
-                    return@withContext obtenerAmanecerUsuario(Amanecer.Origen.USUARIO_NORED)
+                    return@withContext obtenerAmanecerUsuario(Origen.USUARIO_NORED)
                 }
             }
 
-            return@withContext obtenerAmanecerUsuario(Amanecer.Origen.USUARIO_NOUBIC)
+            return@withContext obtenerAmanecerUsuario(Origen.USUARIO_NOUBIC)
         }
     }
 
@@ -87,25 +88,8 @@ class DiasRepository(val context: Context) {
         }
     }
 
-    private fun obtenerAmanecerUsuario(origen: Amanecer.Origen): Amanecer {
-        // Si no hay amanecer en la BD, ni ubicación, se utiliza los ajustes del usuario
-        val context = this@DiasRepository.context
-        val preferencias = context.getSharedPreferences(
-            context.getString(R.string.preference_file), Context.MODE_PRIVATE
-        )
-
-        val horaPref = LocalTime.parse(preferencias.getString("hora_default", "07:00"))
-        val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
-            .plusDays(1)
-            .withHour(horaPref[ChronoField.HOUR_OF_DAY])
-            .withMinute(horaPref[ChronoField.MINUTE_OF_HOUR])
-            .withSecond(0)
-            .withNano(0)
-        return Amanecer(
-            diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
-            fechaHoraLocal = tomorrowDate,
-            origen = origen
-        )
+    private fun obtenerAmanecerUsuario(origen: Origen): Amanecer {
+        return sharedPreferencesDataSource.obtenerAmanecerUsuario(origen)
     }
 
     /**
@@ -124,11 +108,51 @@ class DiasRepository(val context: Context) {
 
             val tomorrowDate = LocalDate.now().plusDays(1)
             val amanecerDeHoy = amanecerDAO.obtenerAmanecer(tomorrowDate)
-            if(amanecerDeHoy != null) {
+            if (amanecerDeHoy != null) {
                 return@withContext
             }
 
             amanecerDAO.insertarAmanecer(amanecerNetwork.asEntity())
         }
     }
+
+    fun establecerPreferenciasAlarma(alarma: Alarma): Alarma {
+        return sharedPreferencesDataSource.establecerPreferenciasAlarma(alarma)
+    }
+
+    fun guardarEstadoAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_on", alarma.encendida)
+
+    /**
+     * Guarda la configuración de vibración de la alarma (sí/no).
+     */
+    fun guardarVibrarAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_vib", alarma.vibrar)
+
+    /**
+     * Guarda la hora a la que sonará la alarma.
+     */
+    fun guardarHorasAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_hr", alarma.horasDiferencia)
+
+    /**
+     * Guarda los minutos a los que sonará la alarma.
+     */
+    fun guardarMinAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias(
+            "${alarma.id}_min",
+            alarma.minutosDiferencia
+        )
+
+    /**
+     * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
+     */
+    fun guardarMomentoAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_momento", alarma.momento)
+
+    fun guardarTonoAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_tono", alarma.tono ?: "")
+
+    fun guardarUriTonoAlarma(alarma: Alarma) =
+        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_uri", alarma.uriTono ?: "")
 }

@@ -13,7 +13,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.andreandyp.dias.R
-import com.andreandyp.dias.bd.DiasRepository
+import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.utils.AlarmUtils
@@ -34,7 +34,7 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
     @SuppressLint("MissingPermission")
     override fun startWork(): ListenableFuture<Result> {
         return CallbackToFutureAdapter.getFuture { completer ->
-            val repository = DiasRepository(applicationContext)
+            /*val repository = DiasRepository(applicationContext)
             val preferencias = applicationContext.getSharedPreferences(
                 applicationContext.getString(R.string.preference_file), Context.MODE_PRIVATE
             )
@@ -81,7 +81,7 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
             }?.addOnFailureListener {
                 val data = workDataOf(RESULT_KEY to it.message)
                 completer.set(Result.failure(data))
-            }
+            }*/
         }
     }
 

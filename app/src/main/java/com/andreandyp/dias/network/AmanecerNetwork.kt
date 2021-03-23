@@ -3,6 +3,7 @@ package com.andreandyp.dias.network
 import com.squareup.moshi.JsonClass
 import com.andreandyp.dias.bd.entities.AmanecerEntity
 import com.andreandyp.dias.domain.Amanecer
+import com.andreandyp.dias.domain.Origen
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoField
@@ -34,7 +35,7 @@ data class AmanecerNetwork(
      * en la zona horaria del dispositivo.
      * @return el amanecer en forma de [Amanecer] (Dominio)
      */
-    fun asDomain(origen: Amanecer.Origen): Amanecer {
+    fun asDomain(origen: Origen): Amanecer {
         val fechaHoraAPI = OffsetDateTime.parse(results.sunrise)
         val fechaHoraLocal = fechaHoraAPI.atZoneSameInstant(ZoneId.systemDefault())
         return Amanecer(
