@@ -12,7 +12,11 @@ import org.threeten.bp.Instant
 object AlarmUtils {
     private const val POSPONER_CODE = -1
 
-    fun encenderAlarma(context: Context, horaAlarmaInstant: Instant, mostrarAlarmaPending: PendingIntent) {
+    fun encenderAlarma(
+        context: Context,
+        horaAlarmaInstant: Instant,
+        mostrarAlarmaPending: PendingIntent
+    ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,

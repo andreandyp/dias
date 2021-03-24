@@ -2,8 +2,8 @@ package com.andreandyp.dias
 
 import android.app.Application
 import androidx.work.*
-import com.jakewharton.threetenabp.AndroidThreeTen
 import com.andreandyp.dias.manager.DescargarDatosAmanecerWorker
+import com.jakewharton.threetenabp.AndroidThreeTen
 import java.util.concurrent.TimeUnit
 
 class DiasApplication : Application() {

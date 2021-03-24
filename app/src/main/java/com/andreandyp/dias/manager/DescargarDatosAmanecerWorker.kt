@@ -6,27 +6,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.ActivityCompat
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
 import com.andreandyp.dias.R
-import com.andreandyp.dias.repository.DiasRepository
-import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.utils.AlarmUtils
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
-import org.threeten.bp.temporal.ChronoField
 
 class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
     ListenableWorker(context, params) {

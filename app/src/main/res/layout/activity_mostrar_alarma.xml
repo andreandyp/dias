@@ -27,7 +27,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ic_alarma"
-        app:srcCompat="@drawable/baseline_airline_seat_individual_suite_black"
+        app:srcCompat="@drawable/ic_baseline_airline_seat_individual_suite_24"
         app:tint="?attr/colorControlNormal" />
 
     <ImageView
@@ -40,7 +40,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/posponer_alarma"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_alarm_black"
+        app:srcCompat="@drawable/ic_baseline_alarm_24"
         app:tint="?attr/colorControlNormal" />
 
     <ImageView
@@ -53,7 +53,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/ic_alarma"
         app:layout_constraintTop_toTopOf="@+id/ic_alarma"
-        app:srcCompat="@drawable/baseline_alarm_off_black"
+        app:srcCompat="@drawable/ic_baseline_alarm_off_24"
         app:tint="?attr/colorControlNormal" />
 
     <TextView
