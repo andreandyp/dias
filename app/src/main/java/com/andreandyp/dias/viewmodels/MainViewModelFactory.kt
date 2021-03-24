@@ -14,8 +14,9 @@ import com.andreandyp.dias.repository.DiasRepository
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(
     private val repository: DiasRepository,
+    private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
-    val dias: List<String>
+    val dias: List<String>,
 ) :
     ViewModelProvider.Factory {
 
@@ -23,8 +24,9 @@ class MainViewModelFactory(
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(
                 repository,
+                tienePermisoDeUbicacion,
                 app,
-                dias
+                dias,
             ) as T // No sé cómo eliminar este unchecked cast sin la anotación @Suppress
         }
 

@@ -17,6 +17,7 @@ import org.threeten.bp.LocalDate
 class DiasRepository(
     val context: Context,
     private val sharedPreferencesDataSource: PreferencesDataSource,
+    private val gmsLocationDataSource: LocationDataSource
 ) {
     private val amanecerDAO: AmanecerDAO
 
@@ -85,6 +86,12 @@ class DiasRepository(
                 longitud,
                 tomorrowDate.toString()
             )
+        }
+    }
+
+    suspend fun obtenerUbicacion(): Location? {
+        return withContext(Dispatchers.IO) {
+            gmsLocationDataSource.obtenerUbicacion()
         }
     }
 

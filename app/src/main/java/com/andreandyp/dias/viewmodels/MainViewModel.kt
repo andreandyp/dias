@@ -1,12 +1,9 @@
 package com.andreandyp.dias.viewmodels
 
-import android.Manifest
 import android.app.Application
-import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.databinding.Observable
 import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.AndroidViewModel
@@ -17,8 +14,6 @@ import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.utils.AlarmUtils
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
@@ -32,6 +27,7 @@ import org.threeten.bp.temporal.ChronoField
  */
 class MainViewModel(
     private val repository: DiasRepository,
+    private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
     val dias: List<String>,
 ) : AndroidViewModel(app) {
@@ -58,34 +54,18 @@ class MainViewModel(
     }
 
     fun obtenerUbicacion(forzarActualizacion: Boolean) {
-        val fusedLocationClient: FusedLocationProviderClient? =
-            LocationServices.getFusedLocationProviderClient(app.applicationContext)
         _actualizandoDatos.value = true
 
-        val permisoCoarseLocation = ActivityCompat.checkSelfPermission(
-            app.applicationContext,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-        val permisoOtorgado = PackageManager.PERMISSION_GRANTED
-
-        if (permisoCoarseLocation != permisoOtorgado) {
-            Log.i("PRUEBA", "SIN PERMISO")
+        if (!tienePermisoDeUbicacion) {
             viewModelScope.launch {
                 obtenerSiguienteAlarma(null, forzarActualizacion)
             }
             return
         }
 
-        fusedLocationClient?.lastLocation?.addOnSuccessListener { location: Location? ->
-            Log.i("PRUEBA", location.toString())
-            viewModelScope.launch {
-                obtenerSiguienteAlarma(location, forzarActualizacion)
-            }
-        }?.addOnFailureListener {
-            viewModelScope.launch {
-                obtenerSiguienteAlarma(null, forzarActualizacion)
-            }
+        viewModelScope.launch {
+            val ubicacion = repository.obtenerUbicacion()
+            obtenerSiguienteAlarma(ubicacion, forzarActualizacion)
         }
     }
 

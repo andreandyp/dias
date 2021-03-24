@@ -9,23 +9,26 @@ import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.andreandyp.dias.R
+import com.andreandyp.dias.location.GMSLocationDataSource
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
+import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {
-    private val REQUEST_LOCATION_PERMISSION = 1
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels {
+        createViewModelFactory()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,26 +36,6 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupActionBarWithNavController(this, this.findNavController(R.id.fragment))
 
         habilitarLocalizacion()
-
-        val dias = listOf(
-            getString(R.string.lunes),
-            getString(R.string.martes),
-            getString(R.string.miercoles),
-            getString(R.string.jueves),
-            getString(R.string.viernes),
-            getString(R.string.sabado),
-            getString(R.string.domingo)
-        )
-
-        val preferencias: SharedPreferences = getSharedPreferences(
-            getString(R.string.preference_file), Context.MODE_PRIVATE
-        )
-        val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
-        val repository = DiasRepository(applicationContext, sharedPreferencesDataSource)
-
-        viewModel = ViewModelProvider(
-            this, MainViewModelFactory(repository, application, dias)
-        )[MainViewModel::class.java]
     }
 
     override fun onRequestPermissionsResult(
@@ -60,10 +43,27 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 habilitarLocalizacion()
             }
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.fragment)
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        return navController.navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            val ringtone = RingtoneManager.getRingtone(this, uri)
+            viewModel.onRingtoneSeleccionado(requestCode, uri, ringtone.getTitle(this))
         }
     }
 
@@ -84,19 +84,33 @@ class MainActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.fragment)
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+    private fun createViewModelFactory(): MainViewModelFactory {
+        val dias = listOf(
+            getString(R.string.lunes),
+            getString(R.string.martes),
+            getString(R.string.miercoles),
+            getString(R.string.jueves),
+            getString(R.string.viernes),
+            getString(R.string.sabado),
+            getString(R.string.domingo)
+        )
+        val preferencias: SharedPreferences = getSharedPreferences(
+            getString(R.string.preference_file), Context.MODE_PRIVATE
+        )
+        val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
+        val repository =
+            DiasRepository(applicationContext, sharedPreferencesDataSource, gmsLocationDataSource)
+        return MainViewModelFactory(
+            repository,
+            isPermissionGranted(),
+            application,
+            dias,
+        )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            val ringtone = RingtoneManager.getRingtone(this, uri)
-            viewModel.onRingtoneSeleccionado(requestCode, uri, ringtone.getTitle(this))
-        }
+    companion object {
+        private const val REQUEST_LOCATION_PERMISSION = 1
     }
 }
