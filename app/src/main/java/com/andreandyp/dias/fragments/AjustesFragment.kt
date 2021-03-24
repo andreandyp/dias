@@ -2,10 +2,10 @@ package com.andreandyp.dias.fragments
 
 import android.content.Context
 import android.os.Bundle
-import com.takisoft.preferencex.PreferenceFragmentCompat
 import com.andreandyp.dias.R
+import com.takisoft.preferencex.PreferenceFragmentCompat
 
-class AjustesFragment: PreferenceFragmentCompat() {
+class AjustesFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         val preferenceFile = this.getString(R.string.preference_file)
         preferenceManager.sharedPreferencesName = preferenceFile

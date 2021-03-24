@@ -18,10 +18,11 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.andreandyp.dias.R
+import com.andreandyp.dias.bd.DiasDatabase
+import com.andreandyp.dias.bd.RoomDataSource
 import com.andreandyp.dias.location.GMSLocationDataSource
 import com.andreandyp.dias.network.RetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
-import com.andreandyp.dias.network.SunriseSunsetService
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.viewmodels.MainViewModel
@@ -98,6 +99,8 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.domingo)
         )
 
+        val db = DiasDatabase.getDatabase(this)
+        val roomDataSource = RoomDataSource(db)
         val retrofitDataSource = RetrofitDataSource(SunriseSunsetAPI.sunriseSunsetService)
         val preferencias: SharedPreferences = getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
         val repository = DiasRepository(
-            applicationContext,
+            roomDataSource,
             retrofitDataSource,
             sharedPreferencesDataSource,
             gmsLocationDataSource

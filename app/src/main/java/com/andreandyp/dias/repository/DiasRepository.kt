@@ -1,15 +1,10 @@
 package com.andreandyp.dias.repository
 
-import android.content.Context
 import android.location.Location
-import com.andreandyp.dias.bd.DiasDatabase
-import com.andreandyp.dias.bd.dao.AmanecerDAO
 import com.andreandyp.dias.bd.entities.AmanecerEntity
-import com.andreandyp.dias.bd.entities.asEntity
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
-import com.andreandyp.dias.domain.asDomain
 import com.andreandyp.dias.network.AmanecerNetwork
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -17,36 +12,67 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 
 class DiasRepository(
-    val context: Context,
-    private val retrofitDataSource: RemoteDataSource,
-    private val sharedPreferencesDataSource: PreferencesDataSource,
-    private val gmsLocationDataSource: LocationDataSource,
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource,
+    private val preferencesDataSource: PreferencesDataSource,
+    private val locationDataSource: LocationDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-    private val amanecerDAO: AmanecerDAO
 
-    init {
-        val db = DiasDatabase.getDatabase(context)
-        amanecerDAO = db.tiempoDao()
+    /**
+     * Obtiene el amanecer de mañana desde la BD.
+     * @return el amanecer en forma de [AmanecerEntity] o null si no hay ningún amanecer
+     */
+    private suspend fun obtenerAmanecerBD(): Amanecer? {
+        val tomorrowDate = LocalDate.now().plusDays(1)
+        return withContext(dispatcher) {
+            localDataSource.obtenerAmanecer(tomorrowDate)
+        }
+    }
+
+    private suspend fun obtenerAmanecerAPI(latitud: String, longitud: String): Amanecer {
+        val tomorrowDate = LocalDate.now().plusDays(1)
+        return withContext(dispatcher) {
+            remoteDataSource.obtenerAmanecerAPI(tomorrowDate, latitud, longitud)
+        }
     }
 
     /**
-     * Obtiene el amanecer de mañana de la BD.
-     * Si no está en la BD, se obtiene de la API.
-     * Si no hay internet, se obtiene el amanecer predefinido por el usuario.
-     * Si la ubicación no está activada, se obtiene el amanecer predefinido por el usuario.
+     * Inserta un amanecer en forma de [AmanecerNetwork] en la BD.
+     * Elimina el último amanecer en caso de que existan más de 30.
+     * @param amanecerAPI [Amanecer] de la API.
+     */
+    private suspend fun insertarAmanecer(amanecerAPI: Amanecer) {
+        withContext(dispatcher) {
+            localDataSource.insertarAmanecer(amanecerAPI)
+        }
+    }
+
+    private fun obtenerAmanecerUsuario(origen: Origen): Amanecer {
+        return preferencesDataSource.obtenerAmanecerUsuario(origen)
+    }
+
+    suspend fun obtenerUbicacion(): Location? {
+        return withContext(dispatcher) {
+            locationDataSource.obtenerUbicacion()
+        }
+    }
+
+    /**
+     * Obtiene el amanecer de mañana de la fuente local o de la remota, según se solicite.
+     * Si no se puede conseguir el amanecer de ninguna de esas 2 fuentes, se obtiene de las preferencias del usuario.
      * @param ubicacion [Location] la ubicacion del dispositivo.
-     * @param forzarActualizacion [Boolean] si es true, se obtendrán los datos de internet aunque ya estén en la base.
+     * @param forzarActualizacion [Boolean] si es true, se tratarán de obtener los datos de internet aunque ya estén o no en la fuente local.
      */
     suspend fun obtenerAmanecerDiario(
         ubicacion: Location?,
         forzarActualizacion: Boolean
     ): Amanecer {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             if (!forzarActualizacion) {
                 val amanecerBD = obtenerAmanecerBD()
                 if (amanecerBD != null) {
-                    return@withContext amanecerBD.asDomain()
+                    return@withContext amanecerBD
                 }
             }
 
@@ -61,7 +87,7 @@ class DiasRepository(
                 } catch (e: Exception) {
                     val amanecerBD = obtenerAmanecerBD()
                     if (amanecerBD != null) {
-                        return@withContext amanecerBD.asDomain()
+                        return@withContext amanecerBD
                     }
 
                     return@withContext obtenerAmanecerUsuario(Origen.USUARIO_NORED)
@@ -72,83 +98,30 @@ class DiasRepository(
         }
     }
 
-    /**
-     * Obtiene el amanecer de mañana desde la BD.
-     * @return el amanecer en forma de [AmanecerEntity] o null si no hay ningún amanecer
-     */
-    private suspend fun obtenerAmanecerBD(): AmanecerEntity? {
-        val tomorrowDate = LocalDate.now().plusDays(1)
-        return withContext(Dispatchers.IO) {
-            amanecerDAO.obtenerAmanecer(tomorrowDate)
-        }
-    }
-
-
-    private suspend fun obtenerAmanecerAPI(latitud: String, longitud: String): Amanecer {
-        val tomorrowDate = LocalDate.now().plusDays(1)
-        return withContext(dispatcher) {
-            retrofitDataSource.obtenerAmanecerAPI(tomorrowDate, latitud, longitud)
-        }
-    }
-
-    suspend fun obtenerUbicacion(): Location? {
-        return withContext(Dispatchers.IO) {
-            gmsLocationDataSource.obtenerUbicacion()
-        }
-    }
-
-    private fun obtenerAmanecerUsuario(origen: Origen): Amanecer {
-        return sharedPreferencesDataSource.obtenerAmanecerUsuario(origen)
-    }
-
-    /**
-     * Inserta un amanecer en forma de [AmanecerNetwork] en la BD.
-     * Elimina el último amanecer en caso de que existan más de 30.
-     * @param amanecerAPI [Amanecer] de la API.
-     */
-    private suspend fun insertarAmanecer(amanecerAPI: Amanecer) {
-        withContext(Dispatchers.IO) {
-            val amaneceres = amanecerDAO.obtenerNumeroAmaneceres()
-            if (amaneceres >= 30) {
-                val masAntiguo = amanecerDAO.obtenerAmanecerMasAntiguo()
-                amanecerDAO.eliminarAmanecer(masAntiguo)
-                return@withContext
-            }
-
-            val tomorrowDate = LocalDate.now().plusDays(1)
-            val amanecerDeHoy = amanecerDAO.obtenerAmanecer(tomorrowDate)
-            if (amanecerDeHoy != null) {
-                return@withContext
-            }
-
-            amanecerDAO.insertarAmanecer(amanecerAPI.asEntity())
-        }
-    }
-
     fun establecerPreferenciasAlarma(alarma: Alarma): Alarma {
-        return sharedPreferencesDataSource.establecerPreferenciasAlarma(alarma)
+        return preferencesDataSource.establecerPreferenciasAlarma(alarma)
     }
 
     fun guardarEstadoAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_on", alarma.encendida)
+        preferencesDataSource.guardarPreferencias("${alarma.id}_on", alarma.encendida)
 
     /**
      * Guarda la configuración de vibración de la alarma (sí/no).
      */
     fun guardarVibrarAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_vib", alarma.vibrar)
+        preferencesDataSource.guardarPreferencias("${alarma.id}_vib", alarma.vibrar)
 
     /**
      * Guarda la hora a la que sonará la alarma.
      */
     fun guardarHorasAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_hr", alarma.horasDiferencia)
+        preferencesDataSource.guardarPreferencias("${alarma.id}_hr", alarma.horasDiferencia)
 
     /**
      * Guarda los minutos a los que sonará la alarma.
      */
     fun guardarMinAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias(
+        preferencesDataSource.guardarPreferencias(
             "${alarma.id}_min",
             alarma.minutosDiferencia
         )
@@ -157,11 +130,11 @@ class DiasRepository(
      * Guarda el momento en el que sonará la alarma (antes/después del amanecer).
      */
     fun guardarMomentoAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_momento", alarma.momento)
+        preferencesDataSource.guardarPreferencias("${alarma.id}_momento", alarma.momento)
 
     fun guardarTonoAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_tono", alarma.tono ?: "")
+        preferencesDataSource.guardarPreferencias("${alarma.id}_tono", alarma.tono ?: "")
 
     fun guardarUriTonoAlarma(alarma: Alarma) =
-        sharedPreferencesDataSource.guardarPreferencias("${alarma.id}_uri", alarma.uriTono ?: "")
+        preferencesDataSource.guardarPreferencias("${alarma.id}_uri", alarma.uriTono ?: "")
 }

@@ -13,6 +13,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.andreandyp.dias.R
 import com.andreandyp.dias.adapters.AlarmasAdapter
+import com.andreandyp.dias.bd.DiasDatabase
+import com.andreandyp.dias.bd.RoomDataSource
 import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.location.GMSLocationDataSource
@@ -102,6 +104,8 @@ class MainFragment : Fragment() {
             getString(R.string.domingo)
         )
 
+        val db = DiasDatabase.getDatabase(requireContext())
+        val roomDataSource = RoomDataSource(db)
         val retrofitDataSource = RetrofitDataSource(SunriseSunsetAPI.sunriseSunsetService)
         val preferencias: SharedPreferences = requireContext().getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
@@ -109,13 +113,12 @@ class MainFragment : Fragment() {
         val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
-        val repository =
-            DiasRepository(
-                requireContext().applicationContext,
-                retrofitDataSource,
-                sharedPreferencesDataSource,
-                gmsLocationDataSource
-            )
+        val repository = DiasRepository(
+            roomDataSource,
+            retrofitDataSource,
+            sharedPreferencesDataSource,
+            gmsLocationDataSource
+        )
         return MainViewModelFactory(
             repository,
             isPermissionGranted(),
