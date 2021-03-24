@@ -16,6 +16,8 @@ import com.andreandyp.dias.adapters.AlarmasAdapter
 import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.location.GMSLocationDataSource
+import com.andreandyp.dias.network.RetrofitDataSource
+import com.andreandyp.dias.network.SunriseSunsetAPI
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
 import com.andreandyp.dias.utils.NotificationUtils
@@ -99,6 +101,8 @@ class MainFragment : Fragment() {
             getString(R.string.sabado),
             getString(R.string.domingo)
         )
+
+        val retrofitDataSource = RetrofitDataSource(SunriseSunsetAPI.sunriseSunsetService)
         val preferencias: SharedPreferences = requireContext().getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
         )
@@ -108,6 +112,7 @@ class MainFragment : Fragment() {
         val repository =
             DiasRepository(
                 requireContext().applicationContext,
+                retrofitDataSource,
                 sharedPreferencesDataSource,
                 gmsLocationDataSource
             )

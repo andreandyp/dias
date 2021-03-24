@@ -47,7 +47,7 @@ class SharedPreferencesDataSource(private val preferencias: SharedPreferences) :
             .withNano(0)
         return Amanecer(
             diaSemana = tomorrowDate[ChronoField.DAY_OF_WEEK],
-            fechaHoraLocal = tomorrowDate,
+            fechaHoraUTC = tomorrowDate,
             origen = origen
         )
     }

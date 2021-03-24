@@ -88,7 +88,7 @@ class MainViewModel(
 
         _origenDatos.value = amanecer.origen
         val siguienteDia = alarmas[amanecer.diaSemana - 1]
-        siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraLocal.toLocalDateTime()
+        siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraUTC.toLocalDateTime()
         _siguienteAlarma.value = siguienteDia
         _actualizandoDatos.value = false
     }

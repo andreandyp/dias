@@ -5,19 +5,23 @@ import android.location.Location
 import com.andreandyp.dias.bd.DiasDatabase
 import com.andreandyp.dias.bd.dao.AmanecerDAO
 import com.andreandyp.dias.bd.entities.AmanecerEntity
+import com.andreandyp.dias.bd.entities.asEntity
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.asDomain
 import com.andreandyp.dias.network.AmanecerNetwork
-import com.andreandyp.dias.network.SunriseSunsetAPI
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 
 class DiasRepository(
     val context: Context,
+    private val retrofitDataSource: RemoteDataSource,
     private val sharedPreferencesDataSource: PreferencesDataSource,
-    private val gmsLocationDataSource: LocationDataSource
+    private val gmsLocationDataSource: LocationDataSource,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val amanecerDAO: AmanecerDAO
 
@@ -42,7 +46,7 @@ class DiasRepository(
             if (!forzarActualizacion) {
                 val amanecerBD = obtenerAmanecerBD()
                 if (amanecerBD != null) {
-                    return@withContext amanecerBD.asDomain(Origen.BD)
+                    return@withContext amanecerBD.asDomain()
                 }
             }
 
@@ -53,8 +57,13 @@ class DiasRepository(
                         ubicacion.longitude.toString()
                     )
                     insertarAmanecer(amanecerAPI)
-                    return@withContext amanecerAPI.asDomain(Origen.INTERNET)
+                    return@withContext amanecerAPI
                 } catch (e: Exception) {
+                    val amanecerBD = obtenerAmanecerBD()
+                    if (amanecerBD != null) {
+                        return@withContext amanecerBD.asDomain()
+                    }
+
                     return@withContext obtenerAmanecerUsuario(Origen.USUARIO_NORED)
                 }
             }
@@ -74,18 +83,11 @@ class DiasRepository(
         }
     }
 
-    /**
-     * Obtiene el amanecer de mañana desde la API.
-     * @return el amanecer en forma de [AmanecerNetwork]
-     */
-    private suspend fun obtenerAmanecerAPI(latitud: String, longitud: String): AmanecerNetwork {
+
+    private suspend fun obtenerAmanecerAPI(latitud: String, longitud: String): Amanecer {
         val tomorrowDate = LocalDate.now().plusDays(1)
-        return withContext(Dispatchers.IO) {
-            SunriseSunsetAPI.sunriseSunsetService.obtenerAmanecer(
-                latitud,
-                longitud,
-                tomorrowDate.toString()
-            )
+        return withContext(dispatcher) {
+            retrofitDataSource.obtenerAmanecerAPI(tomorrowDate, latitud, longitud)
         }
     }
 
@@ -102,9 +104,9 @@ class DiasRepository(
     /**
      * Inserta un amanecer en forma de [AmanecerNetwork] en la BD.
      * Elimina el último amanecer en caso de que existan más de 30.
-     * @param amanecerNetwork [AmanecerNetwork] de la API.
+     * @param amanecerAPI [Amanecer] de la API.
      */
-    private suspend fun insertarAmanecer(amanecerNetwork: AmanecerNetwork) {
+    private suspend fun insertarAmanecer(amanecerAPI: Amanecer) {
         withContext(Dispatchers.IO) {
             val amaneceres = amanecerDAO.obtenerNumeroAmaneceres()
             if (amaneceres >= 30) {
@@ -119,7 +121,7 @@ class DiasRepository(
                 return@withContext
             }
 
-            amanecerDAO.insertarAmanecer(amanecerNetwork.asEntity())
+            amanecerDAO.insertarAmanecer(amanecerAPI.asEntity())
         }
     }
 
