@@ -14,17 +14,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.andreandyp.dias.R
 import com.andreandyp.dias.bd.DiasDatabase
-import com.andreandyp.dias.bd.RoomDataSource
+import com.andreandyp.dias.bd.SunriseRoomDataSource
 import com.andreandyp.dias.location.GMSLocationDataSource
-import com.andreandyp.dias.network.RetrofitDataSource
+import com.andreandyp.dias.network.SunriseRetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.repository.SunriseRepository
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -37,7 +39,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        NavigationUI.setupActionBarWithNavController(this, this.findNavController(R.id.fragment))
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
         habilitarLocalizacion()
     }
@@ -100,19 +107,27 @@ class MainActivity : AppCompatActivity() {
         )
 
         val db = DiasDatabase.getDatabase(this)
-        val roomDataSource = RoomDataSource(db)
-        val retrofitDataSource = RetrofitDataSource(SunriseSunsetAPI.sunriseSunsetService)
         val preferencias: SharedPreferences = getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
         )
         val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
+
+        /* Mientras se hace el cambio a Clean */
+        val sunriseRoomDataSource = SunriseRoomDataSource(db)
+        val sunriseRetrofitDataSource = SunriseRetrofitDataSource(
+            SunriseSunsetAPI.sunriseSunsetService
+        )
+        val sunriseRepository = SunriseRepository(
+            sunriseRoomDataSource,
+            sunriseRetrofitDataSource
+        )
+
         val repository = DiasRepository(
-            roomDataSource,
-            retrofitDataSource,
             sharedPreferencesDataSource,
-            gmsLocationDataSource
+            gmsLocationDataSource,
+            sunriseRepository,
         )
         return MainViewModelFactory(
             repository,

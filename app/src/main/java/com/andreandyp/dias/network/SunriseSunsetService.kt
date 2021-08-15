@@ -20,11 +20,11 @@ private val retrofit: Retrofit = Retrofit.Builder().run {
 
 interface SunriseSunsetService {
     @GET("/json?formatted=0&date=today")
-    suspend fun obtenerAmanecer(
-        @Query("lat") latitud: String,
-        @Query("lng") longitud: String,
-        @Query("date") fecha: String
-    ): AmanecerNetwork
+    suspend fun fetchSunrise(
+        @Query("date") date: String,
+        @Query("lat") latitude: String,
+        @Query("lng") longitude: String,
+    ): SunriseNetwork
 }
 
 object SunriseSunsetAPI {

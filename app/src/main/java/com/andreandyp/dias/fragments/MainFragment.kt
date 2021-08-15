@@ -14,14 +14,15 @@ import androidx.navigation.fragment.findNavController
 import com.andreandyp.dias.R
 import com.andreandyp.dias.adapters.AlarmasAdapter
 import com.andreandyp.dias.bd.DiasDatabase
-import com.andreandyp.dias.bd.RoomDataSource
+import com.andreandyp.dias.bd.SunriseRoomDataSource
 import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.location.GMSLocationDataSource
-import com.andreandyp.dias.network.RetrofitDataSource
+import com.andreandyp.dias.network.SunriseRetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.repository.SunriseRepository
 import com.andreandyp.dias.utils.NotificationUtils
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
@@ -105,19 +106,27 @@ class MainFragment : Fragment() {
         )
 
         val db = DiasDatabase.getDatabase(requireContext())
-        val roomDataSource = RoomDataSource(db)
-        val retrofitDataSource = RetrofitDataSource(SunriseSunsetAPI.sunriseSunsetService)
         val preferencias: SharedPreferences = requireContext().getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
         )
         val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
+
+        /* Mientras se hace el cambio a Clean */
+        val sunriseRoomDataSource = SunriseRoomDataSource(db)
+        val sunriseRetrofitDataSource = SunriseRetrofitDataSource(
+            SunriseSunsetAPI.sunriseSunsetService
+        )
+        val sunriseRepository = SunriseRepository(
+            sunriseRoomDataSource,
+            sunriseRetrofitDataSource
+        )
+
         val repository = DiasRepository(
-            roomDataSource,
-            retrofitDataSource,
             sharedPreferencesDataSource,
-            gmsLocationDataSource
+            gmsLocationDataSource,
+            sunriseRepository,
         )
         return MainViewModelFactory(
             repository,

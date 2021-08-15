@@ -1,51 +1,58 @@
 package com.andreandyp.dias.repository
 
 import android.location.Location
-import com.andreandyp.dias.bd.entities.AmanecerEntity
 import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
-import com.andreandyp.dias.network.AmanecerNetwork
+import com.andreandyp.dias.domain.Sunrise
+import com.andreandyp.dias.network.SunriseNetwork
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.threeten.bp.LocalDate
+import org.threeten.bp.ZonedDateTime
+import java.time.DayOfWeek
 
 class DiasRepository(
-    private val localDataSource: LocalDataSource,
-    private val remoteDataSource: RemoteDataSource,
     private val preferencesDataSource: PreferencesDataSource,
     private val locationDataSource: LocationDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val sunriseRepository: SunriseRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
-    /**
-     * Obtiene el amanecer de mañana desde la BD.
-     * @return el amanecer en forma de [AmanecerEntity] o null si no hay ningún amanecer
-     */
     private suspend fun obtenerAmanecerBD(): Amanecer? {
-        val tomorrowDate = LocalDate.now().plusDays(1)
-        return withContext(dispatcher) {
-            localDataSource.obtenerAmanecer(tomorrowDate)
+        val tomorrowDate = java.time.LocalDate.now().plusDays(1)
+        val sunrise = sunriseRepository.fetchLocalSunrise(tomorrowDate)
+        return sunrise?.let {
+            Amanecer(
+                it.dayOfWeek.value,
+                ZonedDateTime.parse(it.dateTimeUTC.toString()),
+                it.origin,
+            )
         }
     }
 
     private suspend fun obtenerAmanecerAPI(latitud: String, longitud: String): Amanecer {
-        val tomorrowDate = LocalDate.now().plusDays(1)
-        return withContext(dispatcher) {
-            remoteDataSource.obtenerAmanecerAPI(tomorrowDate, latitud, longitud)
-        }
+        val tomorrowDate = java.time.LocalDate.now().plusDays(1)
+        val sunrise = sunriseRepository.fetchAPISunrise(tomorrowDate, latitud, longitud)
+        return Amanecer(
+            sunrise.dayOfWeek.value,
+            ZonedDateTime.parse(sunrise.dateTimeUTC.toString()),
+            sunrise.origin,
+        )
     }
 
     /**
-     * Inserta un amanecer en forma de [AmanecerNetwork] en la BD.
+     * Inserta un amanecer en forma de [SunriseNetwork] en la BD.
      * Elimina el último amanecer en caso de que existan más de 30.
      * @param amanecerAPI [Amanecer] de la API.
      */
     private suspend fun insertarAmanecer(amanecerAPI: Amanecer) {
-        withContext(dispatcher) {
-            localDataSource.insertarAmanecer(amanecerAPI)
-        }
+        val sunrise = Sunrise(
+            DayOfWeek.of(amanecerAPI.diaSemana),
+            java.time.ZonedDateTime.parse(amanecerAPI.fechaHoraUTC.toString()),
+            amanecerAPI.origen,
+        )
+        sunriseRepository.saveDownloadedSunrise(sunrise)
     }
 
     private fun obtenerAmanecerUsuario(origen: Origen): Amanecer {

@@ -2,8 +2,8 @@ package com.andreandyp.dias.bd
 
 import androidx.room.TypeConverter
 import org.threeten.bp.Instant
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 class Converters {
     @TypeConverter
