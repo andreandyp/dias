@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 
 /**
  * Clase para generar MainViewModel.
@@ -13,6 +14,7 @@ import com.andreandyp.dias.repository.DiasRepository
  */
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(
+    private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val repository: DiasRepository,
     private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
@@ -23,6 +25,7 @@ class MainViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(
+                getTomorrowSunriseUseCase,
                 repository,
                 tienePermisoDeUbicacion,
                 app,

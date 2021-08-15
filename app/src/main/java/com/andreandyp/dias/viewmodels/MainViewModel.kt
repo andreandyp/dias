@@ -11,12 +11,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.domain.Alarma
+import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.utils.AlarmUtils
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.ChronoField
 
 /**
@@ -26,6 +29,7 @@ import org.threeten.bp.temporal.ChronoField
  * @property [dias] Una [List] con los días de la semana.
  */
 class MainViewModel(
+    private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val repository: DiasRepository,
     private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
@@ -83,7 +87,12 @@ class MainViewModel(
     }
 
     private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
-        val amanecer = repository.obtenerAmanecerDiario(ubicacion, forzarActualizacion)
+        val sunrise = getTomorrowSunriseUseCase(ubicacion, forzarActualizacion)
+        val amanecer = Amanecer(
+            sunrise.dayOfWeek.value,
+            ZonedDateTime.parse(sunrise.dateTimeUTC.toString()),
+            sunrise.origin,
+        )
         Log.i("PRUEBA", amanecer.origen.toString())
 
         _origenDatos.value = amanecer.origen

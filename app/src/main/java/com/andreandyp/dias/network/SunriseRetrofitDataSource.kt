@@ -1,7 +1,7 @@
 package com.andreandyp.dias.network
 
 import com.andreandyp.dias.domain.Sunrise
-import com.andreandyp.dias.repository.SunriseRemoteDataSource
+import com.andreandyp.dias.repository.sunrise.SunriseRemoteDataSource
 import java.time.LocalDate
 
 class SunriseRetrofitDataSource(

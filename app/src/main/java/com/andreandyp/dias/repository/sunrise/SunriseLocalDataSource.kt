@@ -1,4 +1,4 @@
-package com.andreandyp.dias.repository
+package com.andreandyp.dias.repository.sunrise
 
 import com.andreandyp.dias.domain.Sunrise
 import java.time.LocalDate

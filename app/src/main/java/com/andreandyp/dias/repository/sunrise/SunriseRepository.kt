@@ -1,5 +1,6 @@
-package com.andreandyp.dias.repository
+package com.andreandyp.dias.repository.sunrise
 
+import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.domain.Sunrise
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -7,6 +8,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class SunriseRepository(
+    private val sunrisePreferenceDataSource: SunrisePreferenceDataSource,
     private val sunriseLocalDataSource: SunriseLocalDataSource,
     private val sunriseRemoteDataSource: SunriseRemoteDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -23,6 +25,10 @@ class SunriseRepository(
         tomorrowDate: LocalDate
     ) = withContext(dispatcher) {
         sunriseLocalDataSource.fetchSunrise(tomorrowDate)
+    }
+
+    fun fetchPreferencesSunrise(origin: Origen): Sunrise {
+        return sunrisePreferenceDataSource.fetchSunrise(origin)
     }
 
     suspend fun saveDownloadedSunrise(sunrise: Sunrise) = withContext(dispatcher) {
