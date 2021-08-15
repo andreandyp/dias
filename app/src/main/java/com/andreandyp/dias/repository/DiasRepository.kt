@@ -1,23 +1,10 @@
 package com.andreandyp.dias.repository
 
-import android.location.Location
 import com.andreandyp.dias.domain.Alarma
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class DiasRepository(
-    private val preferencesDataSource: PreferencesDataSource,
-    private val locationDataSource: LocationDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val preferencesDataSource: PreferencesDataSource
 ) {
-
-    suspend fun obtenerUbicacion(): Location? {
-        return withContext(dispatcher) {
-            locationDataSource.obtenerUbicacion()
-        }
-    }
-
     fun establecerPreferenciasAlarma(alarma: Alarma): Alarma {
         return preferencesDataSource.establecerPreferenciasAlarma(alarma)
     }

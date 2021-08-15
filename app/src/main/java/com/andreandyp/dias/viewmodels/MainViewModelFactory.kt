@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 
 /**
@@ -14,23 +15,24 @@ import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
  */
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(
+    private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val repository: DiasRepository,
     private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
     val dias: List<String>,
-) :
-    ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(
+                getLastLocationUseCase,
                 getTomorrowSunriseUseCase,
                 repository,
                 tienePermisoDeUbicacion,
                 app,
                 dias,
-            ) as T // No sé cómo eliminar este unchecked cast sin la anotación @Suppress
+            ) as T
         }
 
         throw IllegalArgumentException("Unable to construct viewmodel")

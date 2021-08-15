@@ -14,6 +14,7 @@ import com.andreandyp.dias.domain.Alarma
 import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.utils.AlarmUtils
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ import org.threeten.bp.temporal.ChronoField
  * @property [dias] Una [List] con los días de la semana.
  */
 class MainViewModel(
+    private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val repository: DiasRepository,
     private val tienePermisoDeUbicacion: Boolean,
@@ -68,8 +70,8 @@ class MainViewModel(
         }
 
         viewModelScope.launch {
-            val ubicacion = repository.obtenerUbicacion()
-            obtenerSiguienteAlarma(ubicacion, forzarActualizacion)
+            val location = getLastLocationUseCase()
+            obtenerSiguienteAlarma(location, forzarActualizacion)
         }
     }
 

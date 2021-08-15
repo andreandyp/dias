@@ -23,7 +23,9 @@ import com.andreandyp.dias.network.SunriseSunsetAPI
 import com.andreandyp.dias.preferences.SharedPreferencesDataSource
 import com.andreandyp.dias.preferences.SunriseSharedPreferencesDataSource
 import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.repository.location.LocationRepository
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
+import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.utils.NotificationUtils
 import com.andreandyp.dias.viewmodels.MainViewModel
@@ -116,6 +118,8 @@ class MainFragment : Fragment() {
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
 
         /* Mientras se hace el cambio a Clean */
+        val locationRepository = LocationRepository(gmsLocationDataSource)
+        val getLastLocationUseCase = GetLastLocationUseCase(locationRepository)
         val sunriseSharedPreferencesDataSource = SunriseSharedPreferencesDataSource(preferencias)
         val sunriseRoomDataSource = SunriseRoomDataSource(db)
         val sunriseRetrofitDataSource = SunriseRetrofitDataSource(
@@ -130,9 +134,9 @@ class MainFragment : Fragment() {
 
         val repository = DiasRepository(
             sharedPreferencesDataSource,
-            gmsLocationDataSource,
         )
         return MainViewModelFactory(
+            getLastLocationUseCase,
             getTomorrowSunriseUseCase,
             repository,
             isPermissionGranted(),
