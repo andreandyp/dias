@@ -24,13 +24,15 @@ import com.andreandyp.dias.bd.SunriseRoomDataSource
 import com.andreandyp.dias.location.GMSLocationDataSource
 import com.andreandyp.dias.network.SunriseRetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
-import com.andreandyp.dias.preferences.SharedPreferencesDataSource
+import com.andreandyp.dias.preferences.AlarmSharedPreferencesDataSource
 import com.andreandyp.dias.preferences.SunriseSharedPreferencesDataSource
-import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import com.andreandyp.dias.repository.location.LocationRepository
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
+import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
+import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -114,7 +116,6 @@ class MainActivity : AppCompatActivity() {
         val preferencias: SharedPreferences = getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
         )
-        val sharedPreferencesDataSource = SharedPreferencesDataSource(preferencias)
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
 
@@ -134,13 +135,16 @@ class MainActivity : AppCompatActivity() {
         )
         val getTomorrowSunriseUseCase = GetTomorrowSunriseUseCase(sunriseRepository)
 
-        val repository = DiasRepository(
-            sharedPreferencesDataSource,
-        )
+        val alarmSharedPreferencesDataSource = AlarmSharedPreferencesDataSource(preferencias)
+        val alarmsRepository = AlarmsRepository(alarmSharedPreferencesDataSource)
+        val saveAlarmSettingsUseCase = SaveAlarmSettingsUseCase(alarmsRepository)
+        val configureAlarmSettingsUseCase = ConfigureAlarmSettingsUseCase(alarmsRepository)
+
         return MainViewModelFactory(
             getLastLocationUseCase,
             getTomorrowSunriseUseCase,
-            repository,
+            saveAlarmSettingsUseCase,
+            configureAlarmSettingsUseCase,
             isPermissionGranted(),
             application,
             dias,

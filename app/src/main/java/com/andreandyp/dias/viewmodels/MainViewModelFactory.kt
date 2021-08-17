@@ -3,9 +3,10 @@ package com.andreandyp.dias.viewmodels
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.andreandyp.dias.repository.DiasRepository
+import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
+import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 
 /**
  * Clase para generar MainViewModel.
@@ -17,7 +18,8 @@ import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 class MainViewModelFactory(
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
-    private val repository: DiasRepository,
+    private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
+    private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
     private val tienePermisoDeUbicacion: Boolean,
     val app: Application,
     val dias: List<String>,
@@ -28,7 +30,8 @@ class MainViewModelFactory(
             return MainViewModel(
                 getLastLocationUseCase,
                 getTomorrowSunriseUseCase,
-                repository,
+                saveAlarmSettingsUseCase,
+                configureAlarmSettingsUseCase,
                 tienePermisoDeUbicacion,
                 app,
                 dias,
