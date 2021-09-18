@@ -42,10 +42,10 @@ dependencies {
     def room_version = "2.3.0"
     def lifecycle_version = "2.2.0"
     def lifecycle_viewmodel_version = "2.3.0"
-    def work_version = "2.5.0"
+    def work_manager_version = "2.6.0"
 
     def retrofit_version = "2.9.0"
-    def moshi_version = "1.11.0"
+    def moshi_version = "1.12.0"
 
     def constraint_version = "2.1.0"
     def preferencex_version = "1.1.0"
@@ -60,7 +60,6 @@ dependencies {
     def dex_maker_version = '2.12.1'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
@@ -73,7 +72,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dex_maker_version"
-    androidTestImplementation "androidx.work:work-testing:$work_version"
+    androidTestImplementation "androidx.work:work-testing:$work_manager_version"
 
     // Componentes de arquitectura
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
@@ -84,7 +83,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_viewmodel_version"
     kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation "androidx.work:work-runtime-ktx:$work_manager_version"
     implementation "androidx.concurrent:concurrent-futures-ktx:1.1.0"
 
     // Retrofit
