@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import com.andreandyp.dias.R
 import com.andreandyp.dias.utils.NotificationUtils
-import org.threeten.bp.LocalTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Receiver para cuando suena la alarma.

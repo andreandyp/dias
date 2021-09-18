@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
@@ -37,8 +37,8 @@ class MainViewModel(
     private val _nextAlarm = MutableLiveData<Alarm>()
     val nextAlarm: LiveData<Alarm> = _nextAlarm
 
-    private val _dataOrigin = MutableLiveData<Origen>()
-    val dataOrigin: LiveData<Origen> = _dataOrigin
+    private val _dataOrigin = MutableLiveData<Origin>()
+    val dataOrigin: LiveData<Origin> = _dataOrigin
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading

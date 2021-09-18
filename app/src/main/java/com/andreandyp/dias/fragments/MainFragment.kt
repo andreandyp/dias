@@ -19,7 +19,7 @@ import com.andreandyp.dias.adapters.AlarmasAdapter
 import com.andreandyp.dias.bd.DiasDatabase
 import com.andreandyp.dias.bd.SunriseRoomDataSource
 import com.andreandyp.dias.databinding.MainFragmentBinding
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.location.GMSLocationDataSource
 import com.andreandyp.dias.network.SunriseRetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
@@ -92,8 +92,8 @@ class MainFragment : Fragment() {
     private fun setUpObservers() {
         viewModel.dataOrigin.observe(viewLifecycleOwner) {
             binding.fuente.text = when (it) {
-                Origen.INTERNET -> requireContext().getString(R.string.segun_internet)
-                Origen.BD -> requireContext().getString(R.string.segun_bd)
+                Origin.INTERNET -> requireContext().getString(R.string.segun_internet)
+                Origin.DATABASE -> requireContext().getString(R.string.segun_bd)
                 else -> requireContext().getString(R.string.segun_usuario)
             }
         }

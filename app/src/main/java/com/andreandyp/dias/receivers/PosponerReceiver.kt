@@ -9,8 +9,8 @@ import android.content.Intent
 import android.os.Vibrator
 import androidx.core.content.ContextCompat
 import com.andreandyp.dias.R
-import org.threeten.bp.Instant
-import org.threeten.bp.temporal.ChronoUnit
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * Receiver para posponer la alarma.

@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.andreandyp.dias.R
 import com.andreandyp.dias.databinding.ActivityMostrarAlarmaBinding
 import com.andreandyp.dias.receivers.PosponerReceiver
-import org.threeten.bp.LocalTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Mostrar la alarma y opciones para apagar o posponer

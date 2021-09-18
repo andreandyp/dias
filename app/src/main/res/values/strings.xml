@@ -8,13 +8,6 @@
     <string name="vibrar">¿Vibrar?</string>
     <string name="creditos_api">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
     <string name="sonido_predeterminado">Sonido predeterminado</string>
-    <string name="lunes">Lunes</string>
-    <string name="martes">Martes</string>
-    <string name="miercoles">Miércoles</string>
-    <string name="jueves">Jueves</string>
-    <string name="viernes">Viernes</string>
-    <string name="sabado">Sábado</string>
-    <string name="domingo">Domingo</string>
     <string name="hora_predeterminada">±0:00</string>
     <string name="channel_nombre">Alarmas</string>
     <string name="channel_descripcion">Recibe una notificación cuando suene la alarma</string>

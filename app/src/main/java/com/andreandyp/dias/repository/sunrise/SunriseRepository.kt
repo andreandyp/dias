@@ -1,6 +1,6 @@
 package com.andreandyp.dias.repository.sunrise
 
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class SunriseRepository(
         sunriseLocalDataSource.fetchSunrise(tomorrowDate)
     }
 
-    fun fetchPreferencesSunrise(origin: Origen): Sunrise {
+    fun fetchPreferencesSunrise(origin: Origin): Sunrise {
         return sunrisePreferenceDataSource.fetchSunrise(origin)
     }
 

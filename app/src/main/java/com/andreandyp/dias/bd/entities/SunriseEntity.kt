@@ -3,7 +3,7 @@ package com.andreandyp.dias.bd.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import java.time.LocalDate
 import java.time.LocalTime
@@ -30,7 +30,7 @@ fun SunriseEntity.asDomain(): Sunrise {
     return Sunrise(
         dayOfWeek = dateTimeUTC.dayOfWeek,
         dateTimeUTC = dateTimeUTC,
-        origin = Origen.BD
+        origin = Origin.DATABASE
     )
 }
 

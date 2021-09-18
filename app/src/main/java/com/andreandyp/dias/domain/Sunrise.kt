@@ -6,5 +6,5 @@ import java.time.ZonedDateTime
 data class Sunrise(
     val dayOfWeek: DayOfWeek,
     val dateTimeUTC: ZonedDateTime,
-    val origin: Origen,
+    val origin: Origin,
 )

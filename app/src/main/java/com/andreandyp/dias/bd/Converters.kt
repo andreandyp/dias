@@ -1,7 +1,7 @@
 package com.andreandyp.dias.bd
 
 import androidx.room.TypeConverter
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 

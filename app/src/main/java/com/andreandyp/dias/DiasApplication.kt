@@ -3,13 +3,11 @@ package com.andreandyp.dias
 import android.app.Application
 import androidx.work.*
 import com.andreandyp.dias.manager.DescargarDatosAmanecerWorker
-import com.jakewharton.threetenabp.AndroidThreeTen
 import java.util.concurrent.TimeUnit
 
 class DiasApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this)
 
         val limites = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -1,7 +1,7 @@
 package com.andreandyp.dias.usecases
 
 import android.location.Location
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import java.time.LocalDate
@@ -34,8 +34,8 @@ class GetTomorrowSunriseUseCase(
                     return localSunrise
                 }
 
-                return sunriseRepository.fetchPreferencesSunrise(Origen.USUARIO_NORED)
+                return sunriseRepository.fetchPreferencesSunrise(Origin.NO_INTERNET)
             }
-        } ?: sunriseRepository.fetchPreferencesSunrise(Origen.USUARIO_NOUBIC)
+        } ?: sunriseRepository.fetchPreferencesSunrise(Origin.NO_LOCATION)
     }
 }

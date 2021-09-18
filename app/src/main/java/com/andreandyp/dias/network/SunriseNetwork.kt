@@ -1,6 +1,6 @@
 package com.andreandyp.dias.network
 
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import com.squareup.moshi.JsonClass
 import java.time.OffsetDateTime
@@ -17,6 +17,6 @@ fun SunriseNetwork.asDomain(): Sunrise {
     return Sunrise(
         dayOfWeek = dateTimeUTC.dayOfWeek,
         dateTimeUTC = dateTimeUTC.withSecond(0),
-        origin = Origen.INTERNET
+        origin = Origin.INTERNET
     )
 }

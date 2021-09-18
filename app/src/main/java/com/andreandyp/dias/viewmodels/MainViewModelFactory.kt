@@ -1,7 +1,6 @@
 package com.andreandyp.dias.viewmodels
 
 import android.app.AlarmManager
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase

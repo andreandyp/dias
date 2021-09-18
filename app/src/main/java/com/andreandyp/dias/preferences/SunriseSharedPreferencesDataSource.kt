@@ -1,7 +1,7 @@
 package com.andreandyp.dias.preferences
 
 import android.content.SharedPreferences
-import com.andreandyp.dias.domain.Origen
+import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunrisePreferenceDataSource
 import java.time.LocalTime
@@ -13,7 +13,7 @@ class SunriseSharedPreferencesDataSource(
     private val preferences: SharedPreferences
 ) : SunrisePreferenceDataSource {
 
-    override fun fetchSunrise(origin: Origen): Sunrise {
+    override fun fetchSunrise(origin: Origin): Sunrise {
         val horaPref = LocalTime.parse(preferences.getString("hora_default", DEFAULT_VALUE))
         val tomorrowDate = ZonedDateTime.now(ZoneId.systemDefault())
             .plusDays(1)
@@ -24,7 +24,7 @@ class SunriseSharedPreferencesDataSource(
         return Sunrise(
             dayOfWeek = tomorrowDate.dayOfWeek,
             dateTimeUTC = tomorrowDate,
-            origin = Origen.USUARIO_NORED
+            origin = origin
         )
     }
 

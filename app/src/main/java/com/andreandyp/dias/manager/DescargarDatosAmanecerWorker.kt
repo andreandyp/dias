@@ -13,8 +13,8 @@ import androidx.work.WorkerParameters
 import com.andreandyp.dias.R
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.google.common.util.concurrent.ListenableFuture
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
     ListenableWorker(context, params) {
