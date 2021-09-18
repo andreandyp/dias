@@ -1,12 +1,13 @@
 package com.andreandyp.dias.viewmodels
 
-import android.app.Application
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.location.Location
 import android.net.Uri
 import androidx.databinding.Observable
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
@@ -15,9 +16,11 @@ import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
-import com.andreandyp.dias.utils.AlarmUtils
+import com.andreandyp.dias.utils.turnOffAlarm
+import com.andreandyp.dias.utils.turnOnAlarm
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 
@@ -27,9 +30,8 @@ class MainViewModel(
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
     private val hasLocationPermission: Boolean,
-    val app: Application,
-    val dias: List<String>,
-) : AndroidViewModel(app) {
+    private val alarmManager: AlarmManager,
+) : ViewModel() {
     val alarms = mutableListOf<Alarm>()
 
     private val _nextAlarm = MutableLiveData<Alarm>()
@@ -41,10 +43,13 @@ class MainViewModel(
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _alarmStatusUpdated = MutableLiveData<Event<Alarm>>()
+    val alarmStatusUpdated: LiveData<Event<Alarm>> = _alarmStatusUpdated
+
     init {
         val nextDay = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
-        for (i: Int in dias.indices) {
-            val alarm = setupAlarm(i + 1, nextDay == i + 1)
+        for (i: Int in 1..7) {
+            val alarm = setupAlarm(i, nextDay == i)
             alarms.add(alarm)
         }
 
@@ -72,6 +77,14 @@ class MainViewModel(
         alarms[alarmId].uriTone = uri.toString()
     }
 
+    fun onAlarmOn(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
+        alarmManager.turnOnAlarm(alarmInstant, alarmPendingIntent)
+    }
+
+    fun onAlarmOff(alarmPendingIntent: PendingIntent, snoozePendingIntent: PendingIntent) {
+        alarmManager.turnOffAlarm(alarmPendingIntent, snoozePendingIntent)
+    }
+
     private suspend fun getNextAlarm(location: Location?, forceUpdate: Boolean) {
         val sunrise = getTomorrowSunriseUseCase(location, forceUpdate)
 
@@ -83,18 +96,8 @@ class MainViewModel(
     }
 
     private fun changeAlarmStatus(alarm: Alarm) {
-        alarm.ringingAt?.let {
-            val pendingIntent = AlarmUtils.crearIntentAlarma(app.applicationContext, alarm.id)
-
-            if (alarm.on) {
-                AlarmUtils.encenderAlarma(
-                    app.applicationContext,
-                    it.toInstant(),
-                    pendingIntent
-                )
-            } else {
-                AlarmUtils.apagarAlarma(app.applicationContext, pendingIntent)
-            }
+        if (alarm.ringingAt != null) {
+            _alarmStatusUpdated.value = Event(alarm)
         }
     }
 
@@ -107,11 +110,7 @@ class MainViewModel(
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 sender as Alarm
                 val field = when (propertyId) {
-                    BR.on -> {
-                        changeAlarmStatus(alarm)
-                        Alarm.Field.ON
-                    }
-                    BR.ringingAt -> {
+                    BR.on, BR.ringingAt -> {
                         changeAlarmStatus(alarm)
                         Alarm.Field.ON
                     }

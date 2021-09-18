@@ -1,7 +1,10 @@
 package com.andreandyp.dias.fragments
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -22,6 +25,8 @@ import com.andreandyp.dias.network.SunriseRetrofitDataSource
 import com.andreandyp.dias.network.SunriseSunsetAPI
 import com.andreandyp.dias.preferences.AlarmSharedPreferencesDataSource
 import com.andreandyp.dias.preferences.SunriseSharedPreferencesDataSource
+import com.andreandyp.dias.receivers.AlarmaReceiver
+import com.andreandyp.dias.receivers.PosponerReceiver
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import com.andreandyp.dias.repository.location.LocationRepository
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
@@ -29,6 +34,7 @@ import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
+import com.andreandyp.dias.utils.Constants
 import com.andreandyp.dias.utils.NotificationUtils
 import com.andreandyp.dias.viewmodels.MainViewModel
 import com.andreandyp.dias.viewmodels.MainViewModelFactory
@@ -91,6 +97,39 @@ class MainFragment : Fragment() {
                 else -> requireContext().getString(R.string.segun_usuario)
             }
         }
+        viewModel.alarmStatusUpdated.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { alarm ->
+                val alarmPendingIntent = createAlarmPendingIntent(alarm.id)
+                if (alarm.on) {
+                    viewModel.onAlarmOn(alarm.ringingAt!!.toInstant(), alarmPendingIntent)
+                } else {
+                    val snoozePendingIntent = createSnoozePendingIntent()
+                    viewModel.onAlarmOff(alarmPendingIntent, snoozePendingIntent)
+                }
+            }
+        }
+    }
+
+    private fun createAlarmPendingIntent(alarmId: Int): PendingIntent {
+        val context = requireContext()
+        val alarmIntent = Intent(context, AlarmaReceiver::class.java)
+        alarmIntent.putExtra(context.getString(R.string.notif_id_intent), alarmId)
+        return PendingIntent.getBroadcast(
+            context,
+            alarmId,
+            alarmIntent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
+    }
+
+    private fun createSnoozePendingIntent(): PendingIntent {
+        val snoozeIntent = Intent(context, PosponerReceiver::class.java)
+        return PendingIntent.getBroadcast(
+            context,
+            Constants.SNOOZE_ALARM_CODE,
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun isPermissionGranted(): Boolean {
@@ -101,16 +140,6 @@ class MainFragment : Fragment() {
     }
 
     private fun createViewModelFactory(): MainViewModelFactory {
-        val dias = listOf(
-            getString(R.string.lunes),
-            getString(R.string.martes),
-            getString(R.string.miercoles),
-            getString(R.string.jueves),
-            getString(R.string.viernes),
-            getString(R.string.sabado),
-            getString(R.string.domingo)
-        )
-
         val db = DiasDatabase.getDatabase(requireContext())
         val preferencias: SharedPreferences = requireContext().getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
@@ -138,14 +167,15 @@ class MainFragment : Fragment() {
         val saveAlarmSettingsUseCase = SaveAlarmSettingsUseCase(alarmsRepository)
         val configureAlarmSettingsUseCase = ConfigureAlarmSettingsUseCase(alarmsRepository)
 
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
         return MainViewModelFactory(
             getLastLocationUseCase,
             getTomorrowSunriseUseCase,
             saveAlarmSettingsUseCase,
             configureAlarmSettingsUseCase,
             isPermissionGranted(),
-            requireActivity().application,
-            dias,
+            alarmManager
         )
     }
 }

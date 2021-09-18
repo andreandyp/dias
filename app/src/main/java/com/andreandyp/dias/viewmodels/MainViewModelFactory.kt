@@ -1,5 +1,6 @@
 package com.andreandyp.dias.viewmodels
 
+import android.app.AlarmManager
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,21 +9,14 @@ import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 
-/**
- * Clase para generar MainViewModel.
- * @constructor Recibe la aplicación actual y la lista de días, ambos utilizados por el ViewModel.
- * @property [app] La aplicación que utilizará el ViewModel.
- * @property [dias] La lista de días de la semana que utilizará el ViewModel.
- */
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
-    private val tienePermisoDeUbicacion: Boolean,
-    val app: Application,
-    val dias: List<String>,
+    private val hasLocationPermission: Boolean,
+    private val alarmManager: AlarmManager,
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -32,9 +26,8 @@ class MainViewModelFactory(
                 getTomorrowSunriseUseCase,
                 saveAlarmSettingsUseCase,
                 configureAlarmSettingsUseCase,
-                tienePermisoDeUbicacion,
-                app,
-                dias,
+                hasLocationPermission,
+                alarmManager,
             ) as T
         }
 

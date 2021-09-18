@@ -2,6 +2,7 @@ package com.andreandyp.dias.activities
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -102,16 +103,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createViewModelFactory(): MainViewModelFactory {
-        val dias = listOf(
-            getString(R.string.lunes),
-            getString(R.string.martes),
-            getString(R.string.miercoles),
-            getString(R.string.jueves),
-            getString(R.string.viernes),
-            getString(R.string.sabado),
-            getString(R.string.domingo)
-        )
-
         val db = DiasDatabase.getDatabase(this)
         val preferencias: SharedPreferences = getSharedPreferences(
             getString(R.string.preference_file), Context.MODE_PRIVATE
@@ -139,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         val alarmsRepository = AlarmsRepository(alarmSharedPreferencesDataSource)
         val saveAlarmSettingsUseCase = SaveAlarmSettingsUseCase(alarmsRepository)
         val configureAlarmSettingsUseCase = ConfigureAlarmSettingsUseCase(alarmsRepository)
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         return MainViewModelFactory(
             getLastLocationUseCase,
@@ -146,8 +138,7 @@ class MainActivity : AppCompatActivity() {
             saveAlarmSettingsUseCase,
             configureAlarmSettingsUseCase,
             isPermissionGranted(),
-            application,
-            dias,
+            alarmManager,
         )
     }
 
