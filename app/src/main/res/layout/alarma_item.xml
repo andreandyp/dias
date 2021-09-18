@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="alarma"
-            type="com.andreandyp.dias.domain.Alarma" />
+            name="alarm"
+            type="com.andreandyp.dias.domain.Alarm" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,9 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@{alarma.dia}"
+            android:text="@{alarm.formattedDay}"
             android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textColor="@{alarma.esSiguienteAlarma ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
+            android:textColor="@{alarm.isNextAlarm ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Lunes" />
@@ -37,9 +37,9 @@
             android:layout_marginTop="8dp"
             android:clickable="true"
             android:focusable="true"
-            android:text="@{alarma.diferenciaFormateada}"
+            android:text="@{alarm.formattedOffset}"
             android:textAppearance="?attr/textAppearanceHeadline6"
-            android:textColor="@{alarma.esSiguienteAlarma ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
+            android:textColor="@{alarm.isNextAlarm ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_dia"
             tools:text="±0:00" />
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:checked="@={alarma.vibrar}"
+            android:checked="@={alarm.vibration}"
             android:text="@string/vibrar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/switch_encender"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:checked="@={alarma.encendida}"
+            android:checked="@={alarm.on}"
             android:text="@string/encendida"
             app:layout_constraintBottom_toBottomOf="@+id/tv_dia"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="@{alarma.tono}"
+            android:text="@{alarm.tone}"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

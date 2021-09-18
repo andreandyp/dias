@@ -3,7 +3,6 @@ package com.andreandyp.dias.viewmodels
 import android.app.Application
 import android.location.Location
 import android.net.Uri
-import android.util.Log
 import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -11,8 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
-import com.andreandyp.dias.domain.Alarma
-import com.andreandyp.dias.domain.Amanecer
 import com.andreandyp.dias.domain.Origen
 import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
@@ -20,39 +17,29 @@ import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 import com.andreandyp.dias.utils.AlarmUtils
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.temporal.ChronoField
 
-/**
- * ViewModel para la lista de alarmas.
- * @constructor Se llama desde [MainViewModelFactory].
- * @property [app] La aplicación para obtener los recursos.
- * @property [dias] Una [List] con los días de la semana.
- */
 class MainViewModel(
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
-    private val tienePermisoDeUbicacion: Boolean,
+    private val hasLocationPermission: Boolean,
     val app: Application,
     val dias: List<String>,
 ) : AndroidViewModel(app) {
-    val alarmas = mutableListOf<Alarma>()
     val alarms = mutableListOf<Alarm>()
 
-    private val _siguienteAlarma = MutableLiveData<Alarma>()
-    val siguienteAlarma: LiveData<Alarma> = _siguienteAlarma
+    private val _nextAlarm = MutableLiveData<Alarm>()
+    val nextAlarm: LiveData<Alarm> = _nextAlarm
 
-    private val _origenDatos = MutableLiveData<Origen>()
-    val origenDatos: LiveData<Origen> = _origenDatos
+    private val _dataOrigin = MutableLiveData<Origen>()
+    val dataOrigin: LiveData<Origen> = _dataOrigin
 
-    private val _actualizandoDatos = MutableLiveData(false)
-    val actualizandoDatos: LiveData<Boolean> = _actualizandoDatos
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
     init {
         val nextDay = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
@@ -61,44 +48,38 @@ class MainViewModel(
             alarms.add(alarm)
         }
 
-        obtenerUbicacion(false)
+        fetchLocation(false)
     }
 
-    fun obtenerUbicacion(forzarActualizacion: Boolean) {
-        _actualizandoDatos.value = true
+    fun fetchLocation(forceUpdate: Boolean) {
+        _isLoading.value = true
 
-        if (!tienePermisoDeUbicacion) {
+        if (!hasLocationPermission) {
             viewModelScope.launch {
-                obtenerSiguienteAlarma(null, forzarActualizacion)
+                getNextAlarm(null, forceUpdate)
             }
             return
         }
 
         viewModelScope.launch {
             val location = getLastLocationUseCase()
-            obtenerSiguienteAlarma(location, forzarActualizacion)
+            getNextAlarm(location, forceUpdate)
         }
     }
 
-    fun onRingtoneSeleccionado(alarmId: Int, uri: Uri?, ringtone: String) {
+    fun onRingtoneSelected(alarmId: Int, uri: Uri?, ringtone: String) {
         alarms[alarmId].tone = ringtone
         alarms[alarmId].uriTone = uri.toString()
     }
 
-    private suspend fun obtenerSiguienteAlarma(ubicacion: Location?, forzarActualizacion: Boolean) {
-        val sunrise = getTomorrowSunriseUseCase(ubicacion, forzarActualizacion)
-        val amanecer = Amanecer(
-            sunrise.dayOfWeek.value,
-            ZonedDateTime.parse(sunrise.dateTimeUTC.toString()),
-            sunrise.origin,
-        )
-        Log.i("PRUEBA", amanecer.origen.toString())
+    private suspend fun getNextAlarm(location: Location?, forceUpdate: Boolean) {
+        val sunrise = getTomorrowSunriseUseCase(location, forceUpdate)
 
-        _origenDatos.value = amanecer.origen
-        val siguienteDia = alarmas[amanecer.diaSemana - 1]
-        siguienteDia.fechaHoraAmanecer = amanecer.fechaHoraUTC.toLocalDateTime()
-        _siguienteAlarma.value = siguienteDia
-        _actualizandoDatos.value = false
+        _dataOrigin.value = sunrise.origin
+        val nextDay = alarms[sunrise.dayOfWeek.minus(1).value]
+        nextDay.utcRingingAt = sunrise.dateTimeUTC
+        _nextAlarm.value = nextDay
+        _isLoading.value = false
     }
 
     private fun changeAlarmStatus(alarm: Alarm) {
@@ -106,11 +87,9 @@ class MainViewModel(
             val pendingIntent = AlarmUtils.crearIntentAlarma(app.applicationContext, alarm.id)
 
             if (alarm.on) {
-                val dateTimeUTC = alarm.ringingAt!!.atZone(ZoneId.systemDefault())
-
                 AlarmUtils.encenderAlarma(
                     app.applicationContext,
-                    Instant.parse(dateTimeUTC.toString()),
+                    it.toInstant(),
                     pendingIntent
                 )
             } else {

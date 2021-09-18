@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="alarma"
-            type="com.andreandyp.dias.domain.Alarma" />
+            name="alarm"
+            type="com.andreandyp.dias.domain.Alarm" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +21,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:valor="@{alarma.momento}" />
+            app:valor="@{alarm.offsetType}" />
 
         <NumberPicker
             android:id="@+id/hora"
@@ -30,7 +30,7 @@
             app:layout_constraintEnd_toStartOf="@+id/minutos"
             app:layout_constraintStart_toEndOf="@+id/antes_despues"
             app:layout_constraintTop_toTopOf="parent"
-            app:valor="@{alarma.horasDiferencia}" />
+            app:valor="@{alarm.offsetHours}" />
 
         <NumberPicker
             android:id="@+id/minutos"

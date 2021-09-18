@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val ringtone = RingtoneManager.getRingtone(this, uri)
-            viewModel.onRingtoneSeleccionado(requestCode, uri, ringtone.getTitle(this))
+            viewModel.onRingtoneSelected(requestCode, uri, ringtone.getTitle(this))
         }
     }
 

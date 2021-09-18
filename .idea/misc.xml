@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/hora_dialog.xml" value="0.1" />
+        <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/main_fragment.xml" value="0.25" />
       </map>
     </option>
   </component>

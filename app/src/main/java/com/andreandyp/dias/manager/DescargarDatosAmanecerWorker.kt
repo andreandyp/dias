@@ -12,7 +12,6 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.andreandyp.dias.R
 import com.andreandyp.dias.receivers.AlarmaReceiver
-import com.andreandyp.dias.utils.AlarmUtils
 import com.google.common.util.concurrent.ListenableFuture
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
@@ -99,11 +98,11 @@ class DescargarDatosAmanecerWorker(context: Context, params: WorkerParameters) :
         )
 
         val horaAlarmaUTC = fechaHoraSonar.atZone(ZoneId.systemDefault())
-        AlarmUtils.encenderAlarma(
+        /*AlarmUtils.encenderAlarma(
             applicationContext,
             horaAlarmaUTC.toInstant(),
             mostrarAlarmaPending
-        )
+        )*/
     }
 
     companion object {

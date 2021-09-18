@@ -15,7 +15,7 @@ class AlarmSharedPreferencesDataSource(
             uriTone = preferences.getString("$id-$URI_TONE", null)
             offsetHours = preferences.getInt("$id-$OFFSET_HOURS", 0)
             offsetMinutes = preferences.getInt("$id-$OFFSET_MINUTES", 0)
-            offsetType = preferences.getInt("$id-$OFFSET_TYPE", 0)
+            offsetType = preferences.getInt("$id-$OFFSET_TYPE", -1)
         }
     }
 

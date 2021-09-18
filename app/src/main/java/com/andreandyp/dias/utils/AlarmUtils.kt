@@ -7,7 +7,7 @@ import android.content.Intent
 import com.andreandyp.dias.R
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.receivers.PosponerReceiver
-import org.threeten.bp.Instant
+import java.time.Instant
 
 object AlarmUtils {
     private const val POSPONER_CODE = -1

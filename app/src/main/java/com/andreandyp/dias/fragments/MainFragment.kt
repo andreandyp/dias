@@ -52,11 +52,11 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.alarmas.adapter = AlarmasAdapter(context, viewModel).apply {
-            listaAlarmas = viewModel.alarmas
+            alarms = viewModel.alarms
         }
 
         binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.obtenerUbicacion(true)
+            viewModel.fetchLocation(true)
             binding.swipeToRefresh.isRefreshing = false
         }
 
@@ -84,7 +84,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpObservers() {
-        viewModel.origenDatos.observe(viewLifecycleOwner) {
+        viewModel.dataOrigin.observe(viewLifecycleOwner) {
             binding.fuente.text = when (it) {
                 Origen.INTERNET -> requireContext().getString(R.string.segun_internet)
                 Origen.BD -> requireContext().getString(R.string.segun_bd)
