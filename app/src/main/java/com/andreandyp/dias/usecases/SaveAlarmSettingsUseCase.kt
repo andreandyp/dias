@@ -2,8 +2,9 @@ package com.andreandyp.dias.usecases
 
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
+import javax.inject.Inject
 
-class SaveAlarmSettingsUseCase(
+class SaveAlarmSettingsUseCase @Inject constructor(
     private val alarmsRepository: AlarmsRepository
 ) {
     operator fun invoke(alarm: Alarm, field: Alarm.Field) {

@@ -1,8 +1,9 @@
 package com.andreandyp.dias.repository.alarms
 
 import com.andreandyp.dias.domain.Alarm
+import javax.inject.Inject
 
-class AlarmsRepository(
+class AlarmsRepository @Inject constructor(
     private val alarmsPreferencesDataSource: AlarmsPreferencesDataSource
 ) {
     fun getAlarmPreferences(id: Int): Alarm {

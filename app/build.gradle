@@ -6,6 +6,8 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+apply plugin: 'dagger.hilt.android.plugin'
+
 android {
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
@@ -97,6 +99,10 @@ dependencies {
     implementation "com.takisoft.preferencex:preferencex-datetimepicker:$preferencex_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipe_version"
     implementation "com.google.android.material:material:$material_version"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // Otros
     implementation "com.google.android.gms:play-services-location:$play_services_location_version"

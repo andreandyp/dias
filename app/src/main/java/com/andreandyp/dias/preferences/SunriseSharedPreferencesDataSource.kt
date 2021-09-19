@@ -8,8 +8,9 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
+import javax.inject.Inject
 
-class SunriseSharedPreferencesDataSource(
+class SunriseSharedPreferencesDataSource @Inject constructor(
     private val preferences: SharedPreferences
 ) : SunrisePreferenceDataSource {
 

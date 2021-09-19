@@ -3,8 +3,10 @@ package com.andreandyp.dias
 import android.app.Application
 import androidx.work.*
 import com.andreandyp.dias.manager.DescargarDatosAmanecerWorker
+import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 
+@HiltAndroidApp
 class DiasApplication : Application() {
     override fun onCreate() {
         super.onCreate()

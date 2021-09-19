@@ -6,8 +6,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import javax.inject.Inject
 
-class SunriseRepository(
+class SunriseRepository @Inject constructor(
     private val sunrisePreferenceDataSource: SunrisePreferenceDataSource,
     private val sunriseLocalDataSource: SunriseLocalDataSource,
     private val sunriseRemoteDataSource: SunriseRemoteDataSource,

@@ -4,8 +4,9 @@ import android.location.Location
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class LocationRepository(
+class LocationRepository @Inject constructor(
     private val locationDataSource: LocationDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {

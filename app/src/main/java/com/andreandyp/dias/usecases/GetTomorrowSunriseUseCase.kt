@@ -5,8 +5,9 @@ import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import java.time.LocalDate
+import javax.inject.Inject
 
-class GetTomorrowSunriseUseCase(
+class GetTomorrowSunriseUseCase @Inject constructor(
     private val sunriseRepository: SunriseRepository
 ) {
     private val tomorrowDate = LocalDate.now().plusDays(1)

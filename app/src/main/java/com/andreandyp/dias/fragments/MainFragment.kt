@@ -1,51 +1,33 @@
 package com.andreandyp.dias.fragments
 
 import android.Manifest
-import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.andreandyp.dias.R
+import com.andreandyp.dias.activities.MainActivity
 import com.andreandyp.dias.adapters.AlarmasAdapter
-import com.andreandyp.dias.bd.DiasDatabase
-import com.andreandyp.dias.bd.SunriseRoomDataSource
 import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.location.GMSLocationDataSource
-import com.andreandyp.dias.network.SunriseRetrofitDataSource
-import com.andreandyp.dias.network.SunriseSunsetAPI
-import com.andreandyp.dias.preferences.AlarmSharedPreferencesDataSource
-import com.andreandyp.dias.preferences.SunriseSharedPreferencesDataSource
 import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.receivers.PosponerReceiver
-import com.andreandyp.dias.repository.alarms.AlarmsRepository
-import com.andreandyp.dias.repository.location.LocationRepository
-import com.andreandyp.dias.repository.sunrise.SunriseRepository
-import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
-import com.andreandyp.dias.usecases.GetLastLocationUseCase
-import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
-import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 import com.andreandyp.dias.utils.Constants
 import com.andreandyp.dias.utils.NotificationUtils
 import com.andreandyp.dias.viewmodels.MainViewModel
-import com.andreandyp.dias.viewmodels.MainViewModelFactory
-import com.google.android.gms.location.LocationServices
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
     private lateinit var binding: MainFragmentBinding
-    private val viewModel: MainViewModel by activityViewModels {
-        createViewModelFactory()
-    }
-
+    private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +44,7 @@ class MainFragment : Fragment() {
         }
 
         binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.fetchLocation(true)
+            viewModel.fetchLocation(isPermissionGranted(), true)
             binding.swipeToRefresh.isRefreshing = false
         }
 
@@ -137,45 +119,5 @@ class MainFragment : Fragment() {
             requireContext(),
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun createViewModelFactory(): MainViewModelFactory {
-        val db = DiasDatabase.getDatabase(requireContext())
-        val preferencias: SharedPreferences = requireContext().getSharedPreferences(
-            getString(R.string.preference_file), Context.MODE_PRIVATE
-        )
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
-        val gmsLocationDataSource = GMSLocationDataSource(fusedLocationClient)
-
-        /* Mientras se hace el cambio a Clean */
-        val locationRepository = LocationRepository(gmsLocationDataSource)
-        val getLastLocationUseCase = GetLastLocationUseCase(locationRepository)
-        val sunriseSharedPreferencesDataSource = SunriseSharedPreferencesDataSource(preferencias)
-        val sunriseRoomDataSource = SunriseRoomDataSource(db)
-        val sunriseRetrofitDataSource = SunriseRetrofitDataSource(
-            SunriseSunsetAPI.sunriseSunsetService
-        )
-        val sunriseRepository = SunriseRepository(
-            sunriseSharedPreferencesDataSource,
-            sunriseRoomDataSource,
-            sunriseRetrofitDataSource
-        )
-        val getTomorrowSunriseUseCase = GetTomorrowSunriseUseCase(sunriseRepository)
-
-        val alarmSharedPreferencesDataSource = AlarmSharedPreferencesDataSource(preferencias)
-        val alarmsRepository = AlarmsRepository(alarmSharedPreferencesDataSource)
-        val saveAlarmSettingsUseCase = SaveAlarmSettingsUseCase(alarmsRepository)
-        val configureAlarmSettingsUseCase = ConfigureAlarmSettingsUseCase(alarmsRepository)
-
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        return MainViewModelFactory(
-            getLastLocationUseCase,
-            getTomorrowSunriseUseCase,
-            saveAlarmSettingsUseCase,
-            configureAlarmSettingsUseCase,
-            isPermissionGranted(),
-            alarmManager
-        )
     }
 }

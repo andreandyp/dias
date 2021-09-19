@@ -5,8 +5,9 @@ import com.andreandyp.dias.bd.entities.asEntity
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunriseLocalDataSource
 import java.time.LocalDate
+import javax.inject.Inject
 
-class SunriseRoomDataSource(diasDatabase: DiasDatabase) : SunriseLocalDataSource {
+class SunriseRoomDataSource @Inject constructor(diasDatabase: DiasDatabase) : SunriseLocalDataSource {
     private val sunriseDao = diasDatabase.sunriseDao()
 
     override suspend fun fetchSunrise(tomorrowDate: LocalDate): Sunrise? {

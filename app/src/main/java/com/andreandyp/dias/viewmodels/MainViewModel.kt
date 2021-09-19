@@ -18,18 +18,20 @@ import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 import com.andreandyp.dias.utils.turnOffAlarm
 import com.andreandyp.dias.utils.turnOnAlarm
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoField
+import javax.inject.Inject
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
-    private val hasLocationPermission: Boolean,
     private val alarmManager: AlarmManager,
 ) : ViewModel() {
     val alarms = mutableListOf<Alarm>()
@@ -52,23 +54,19 @@ class MainViewModel(
             val alarm = setupAlarm(i, nextDay == i)
             alarms.add(alarm)
         }
-
-        fetchLocation(false)
     }
 
-    fun fetchLocation(forceUpdate: Boolean) {
+    fun fetchLocation(isLocationEnabled: Boolean, forceUpdate: Boolean = false) {
         _isLoading.value = true
 
-        if (!hasLocationPermission) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (isLocationEnabled) {
+                val location = getLastLocationUseCase()
+                getNextAlarm(location, forceUpdate)
+            } else {
                 getNextAlarm(null, forceUpdate)
             }
-            return
-        }
 
-        viewModelScope.launch {
-            val location = getLastLocationUseCase()
-            getNextAlarm(location, forceUpdate)
         }
     }
 

@@ -3,8 +3,9 @@ package com.andreandyp.dias.preferences
 import android.content.SharedPreferences
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.repository.alarms.AlarmsPreferencesDataSource
+import javax.inject.Inject
 
-class AlarmSharedPreferencesDataSource(
+class AlarmSharedPreferencesDataSource @Inject constructor(
     private val preferences: SharedPreferences
 ) : AlarmsPreferencesDataSource {
     override fun getAlarmPreferences(id: Int): Alarm {
