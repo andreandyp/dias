@@ -1,6 +1,5 @@
 package com.andreandyp.dias.viewmodels
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.location.Location
 import android.net.Uri
@@ -12,12 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
-import com.andreandyp.dias.usecases.GetLastLocationUseCase
-import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
-import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
-import com.andreandyp.dias.utils.turnOffAlarm
-import com.andreandyp.dias.utils.turnOnAlarm
+import com.andreandyp.dias.usecases.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -32,7 +26,8 @@ class MainViewModel @Inject constructor(
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
-    private val alarmManager: AlarmManager,
+    private val turnOnAlarmUseCase: TurnOnAlarmUseCase,
+    private val turnOffAlarmUseCase: TurnOffAlarmUseCase,
 ) : ViewModel() {
     val alarms = mutableListOf<Alarm>()
 
@@ -56,7 +51,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun fetchLocation(isLocationEnabled: Boolean, forceUpdate: Boolean = false) {
+    fun setupNextAlarm(isLocationEnabled: Boolean, forceUpdate: Boolean = false) {
         _isLoading.value = true
 
         viewModelScope.launch {
@@ -76,11 +71,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun onAlarmOn(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
-        alarmManager.turnOnAlarm(alarmInstant, alarmPendingIntent)
+        turnOnAlarmUseCase(alarmInstant, alarmPendingIntent)
     }
 
     fun onAlarmOff(alarmPendingIntent: PendingIntent, snoozePendingIntent: PendingIntent) {
-        alarmManager.turnOffAlarm(alarmPendingIntent, snoozePendingIntent)
+        turnOffAlarmUseCase(alarmPendingIntent, snoozePendingIntent)
     }
 
     private suspend fun getNextAlarm(location: Location?, forceUpdate: Boolean) {

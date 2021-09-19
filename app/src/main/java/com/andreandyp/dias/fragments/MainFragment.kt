@@ -1,25 +1,19 @@
 package com.andreandyp.dias.fragments
 
 import android.Manifest
-import android.app.PendingIntent
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.andreandyp.dias.R
-import com.andreandyp.dias.activities.MainActivity
 import com.andreandyp.dias.adapters.AlarmasAdapter
 import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.receivers.AlarmaReceiver
-import com.andreandyp.dias.receivers.PosponerReceiver
-import com.andreandyp.dias.utils.Constants
+import com.andreandyp.dias.utils.AlarmUtils
 import com.andreandyp.dias.utils.NotificationUtils
 import com.andreandyp.dias.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +38,7 @@ class MainFragment : Fragment() {
         }
 
         binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.fetchLocation(isPermissionGranted(), true)
+            viewModel.setupNextAlarm(isPermissionGranted(), true)
             binding.swipeToRefresh.isRefreshing = false
         }
 
@@ -81,37 +75,17 @@ class MainFragment : Fragment() {
         }
         viewModel.alarmStatusUpdated.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { alarm ->
-                val alarmPendingIntent = createAlarmPendingIntent(alarm.id)
+                val alarmPendingIntent = AlarmUtils.createAlarmPendingIntent(
+                    requireContext(), alarm.id
+                )
                 if (alarm.on) {
                     viewModel.onAlarmOn(alarm.ringingAt!!.toInstant(), alarmPendingIntent)
                 } else {
-                    val snoozePendingIntent = createSnoozePendingIntent()
+                    val snoozePendingIntent = AlarmUtils.createSnoozePendingIntent(requireContext())
                     viewModel.onAlarmOff(alarmPendingIntent, snoozePendingIntent)
                 }
             }
         }
-    }
-
-    private fun createAlarmPendingIntent(alarmId: Int): PendingIntent {
-        val context = requireContext()
-        val alarmIntent = Intent(context, AlarmaReceiver::class.java)
-        alarmIntent.putExtra(context.getString(R.string.notif_id_intent), alarmId)
-        return PendingIntent.getBroadcast(
-            context,
-            alarmId,
-            alarmIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
-        )
-    }
-
-    private fun createSnoozePendingIntent(): PendingIntent {
-        val snoozeIntent = Intent(context, PosponerReceiver::class.java)
-        return PendingIntent.getBroadcast(
-            context,
-            Constants.SNOOZE_ALARM_CODE,
-            snoozeIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
     }
 
     private fun isPermissionGranted(): Boolean {

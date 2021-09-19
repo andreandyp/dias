@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_LOCATION_PERMISSION
             )
         } else {
-            viewModel.fetchLocation(true)
+            viewModel.setupNextAlarm(true)
         }
     }
 

@@ -1,32 +1,41 @@
 package com.andreandyp.dias
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
-import com.andreandyp.dias.manager.DescargarDatosAmanecerWorker
+import com.andreandyp.dias.workmanagers.DownloadSunriseWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @HiltAndroidApp
-class DiasApplication : Application() {
+class DiasApplication : Application(), Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
     override fun onCreate() {
         super.onCreate()
 
-        val limites = Constraints.Builder()
+        val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .setRequiresBatteryNotLow(true)
             .setRequiresCharging(false)
             .setRequiresDeviceIdle(false)
             .build()
 
-        val repeatingRequest = PeriodicWorkRequestBuilder<DescargarDatosAmanecerWorker>(
+        val repeatingRequest = PeriodicWorkRequestBuilder<DownloadSunriseWorker>(
             1,
             TimeUnit.DAYS
-        ).setConstraints(limites).build()
+        ).setConstraints(constraints).build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            DescargarDatosAmanecerWorker.TAG,
+            DownloadSunriseWorker.TAG,
             ExistingPeriodicWorkPolicy.KEEP,
             repeatingRequest
         )
     }
+
+    override fun getWorkManagerConfiguration() = Configuration.Builder()
+        .setWorkerFactory(workerFactory)
+        .build()
 }
