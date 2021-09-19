@@ -8,8 +8,8 @@ import javax.inject.Inject
 class AlarmSharedPreferencesDataSource @Inject constructor(
     private val preferences: SharedPreferences
 ) : AlarmsPreferencesDataSource {
-    override fun getAlarmPreferences(id: Int): Alarm {
-        return Alarm(id).apply {
+    override fun getAlarmPreferences(id: Int, isNextAlarm: Boolean): Alarm {
+        return Alarm(id, isNextAlarm).apply {
             on = preferences.getBoolean("$id-$ON", false)
             vibration = preferences.getBoolean("$id-$VIBRATION", false)
             tone = preferences.getString("$id-$TONE", null)

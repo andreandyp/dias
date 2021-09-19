@@ -6,8 +6,8 @@ import javax.inject.Inject
 class AlarmsRepository @Inject constructor(
     private val alarmsPreferencesDataSource: AlarmsPreferencesDataSource
 ) {
-    fun getAlarmPreferences(id: Int): Alarm {
-        return alarmsPreferencesDataSource.getAlarmPreferences(id)
+    fun getAlarmPreferences(id: Int, isNextAlarm: Boolean): Alarm {
+        return alarmsPreferencesDataSource.getAlarmPreferences(id, isNextAlarm)
     }
 
     fun saveOnSetting(id: Int, value: Boolean) {

@@ -87,7 +87,7 @@ class MainViewModel @Inject constructor(
         val sunrise = getTomorrowSunriseUseCase(location, forceUpdate)
 
         _dataOrigin.value = sunrise.origin
-        val nextDay = alarms[sunrise.dayOfWeek.minus(1).value]
+        val nextDay: Alarm = alarms.first { it.isNextAlarm }
         nextDay.utcRingingAt = sunrise.dateTimeUTC
         _nextAlarm.value = nextDay
         _isLoading.value = false
@@ -100,9 +100,8 @@ class MainViewModel @Inject constructor(
     }
 
     private fun setupAlarm(idAlarm: Int, isNextAlarm: Boolean): Alarm {
-        val alarm = configureAlarmSettingsUseCase(idAlarm)
+        val alarm = configureAlarmSettingsUseCase(idAlarm, isNextAlarm)
         alarm.day = DayOfWeek.of(alarm.id)
-        alarm.isNextAlarm = isNextAlarm
 
         alarm.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {

@@ -10,10 +10,9 @@ import java.time.format.TextStyle
 import java.util.*
 
 data class Alarm(
-    val id: Int
+    val id: Int,
+    val isNextAlarm: Boolean,
 ) : BaseObservable() {
-    var isNextAlarm: Boolean = false
-
     @get:Bindable
     var on: Boolean = false
         set(value) {

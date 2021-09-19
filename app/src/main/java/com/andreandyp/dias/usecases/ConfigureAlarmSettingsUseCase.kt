@@ -7,7 +7,7 @@ import javax.inject.Inject
 class ConfigureAlarmSettingsUseCase @Inject constructor(
     private val alarmsRepository: AlarmsRepository
 ) {
-    operator fun invoke(alarmId: Int): Alarm {
-        return alarmsRepository.getAlarmPreferences(alarmId)
+    operator fun invoke(alarmId: Int, isNextAlarm: Boolean): Alarm {
+        return alarmsRepository.getAlarmPreferences(alarmId, isNextAlarm)
     }
 }
