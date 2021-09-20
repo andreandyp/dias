@@ -1,5 +1,6 @@
 package com.andreandyp.dias.bd
 
+import com.andreandyp.dias.bd.dao.SunriseDAO
 import com.andreandyp.dias.bd.entities.asDomain
 import com.andreandyp.dias.bd.entities.asEntity
 import com.andreandyp.dias.domain.Sunrise
@@ -7,8 +8,9 @@ import com.andreandyp.dias.repository.sunrise.SunriseLocalDataSource
 import java.time.LocalDate
 import javax.inject.Inject
 
-class SunriseRoomDataSource @Inject constructor(diasDatabase: DiasDatabase) : SunriseLocalDataSource {
-    private val sunriseDao = diasDatabase.sunriseDao()
+class SunriseRoomDataSource @Inject constructor(
+    private val sunriseDao: SunriseDAO
+) : SunriseLocalDataSource {
 
     override suspend fun fetchSunrise(tomorrowDate: LocalDate): Sunrise? {
         return sunriseDao.fetchSunrise(tomorrowDate)?.asDomain()

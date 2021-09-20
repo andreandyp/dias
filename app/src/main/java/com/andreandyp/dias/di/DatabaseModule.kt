@@ -18,4 +18,8 @@ object DatabaseModule {
     fun provideDatabase(@ApplicationContext appContext: Context): DiasDatabase {
         return DiasDatabase.getDatabase(appContext)
     }
+
+    @Provides
+    @Singleton
+    fun provideDao(diasDatabase: DiasDatabase) = diasDatabase.sunriseDao()
 }
