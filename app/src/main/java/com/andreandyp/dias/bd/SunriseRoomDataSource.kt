@@ -1,8 +1,6 @@
 package com.andreandyp.dias.bd
 
 import com.andreandyp.dias.bd.dao.SunriseDAO
-import com.andreandyp.dias.bd.entities.asDomain
-import com.andreandyp.dias.bd.entities.asEntity
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunriseLocalDataSource
 import java.time.LocalDate

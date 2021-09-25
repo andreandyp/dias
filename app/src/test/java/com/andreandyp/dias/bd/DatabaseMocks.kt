@@ -10,12 +10,12 @@ import java.time.ZonedDateTime
 
 object DatabaseMocks {
     val sunriseEntity = SunriseEntity(
-        sunriseDate = LocalDate.parse("2020-01-01"),
+        sunriseDate = LocalDate.parse("2021-01-01"),
         sunriseTime = LocalTime.parse("00:00"),
     )
     val sunrise = Sunrise(
         dayOfWeek = DayOfWeek.MONDAY,
-        dateTimeUTC = ZonedDateTime.parse("2020-01-01T00:00:00+00:00"),
+        dateTimeUTC = ZonedDateTime.parse("2021-01-01T00:00:00+00:00"),
         origin = Origin.INTERNET
     )
 }
