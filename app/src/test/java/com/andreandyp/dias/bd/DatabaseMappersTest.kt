@@ -3,9 +3,7 @@ package com.andreandyp.dias.bd
 import com.andreandyp.dias.bd.entities.SunriseEntity
 import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.hamcrest.core.IsEqual
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -15,27 +13,21 @@ class DatabaseMappersTest {
     fun `transforms database dto to ddo`() {
         val entity = DatabaseMocks.sunriseEntity
         val ddo = entity.asDomain()
-        MatcherAssert.assertThat(ddo, CoreMatchers.isA(Sunrise::class.java))
-        MatcherAssert.assertThat(ddo.origin, IsEqual(Origin.DATABASE))
+        assertThat(ddo).isInstanceOf(Sunrise::class.java)
+        assertThat(ddo.origin).isEqualTo(Origin.DATABASE)
 
         val date = entity.sunriseDate
         val time = entity.sunriseTime
         val dateTimeUTC = ZonedDateTime.of(date, time, ZoneOffset.ofOffset("", ZoneOffset.UTC))
-        MatcherAssert.assertThat(ddo.dateTimeUTC, IsEqual(dateTimeUTC))
-        MatcherAssert.assertThat(ddo.dayOfWeek, IsEqual(dateTimeUTC.dayOfWeek))
+        assertThat(ddo.dateTimeUTC).isEqualTo(dateTimeUTC)
+        assertThat(ddo.dayOfWeek).isEqualTo(dateTimeUTC.dayOfWeek)
     }
 
     @Test
     fun `transforms ddo to database dto`() {
         val dto = DatabaseMocks.sunrise.asEntity()
-        MatcherAssert.assertThat(dto, CoreMatchers.isA(SunriseEntity::class.java))
-        MatcherAssert.assertThat(
-            dto.sunriseDate,
-            IsEqual(DatabaseMocks.sunrise.dateTimeUTC.toLocalDate())
-        )
-        MatcherAssert.assertThat(
-            dto.sunriseTime,
-            IsEqual(DatabaseMocks.sunrise.dateTimeUTC.toLocalTime())
-        )
+        assertThat(dto).isInstanceOf(SunriseEntity::class.java)
+        assertThat(dto.sunriseDate).isEqualTo(DatabaseMocks.sunrise.dateTimeUTC.toLocalDate())
+        assertThat(dto.sunriseTime).isEqualTo(DatabaseMocks.sunrise.dateTimeUTC.toLocalTime())
     }
 }

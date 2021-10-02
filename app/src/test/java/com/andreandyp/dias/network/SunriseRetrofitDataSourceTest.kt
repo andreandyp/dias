@@ -1,10 +1,8 @@
 package com.andreandyp.dias.network
 
 import com.andreandyp.dias.domain.Sunrise
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.CoreMatchers.isA
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -37,7 +35,7 @@ class SunriseRetrofitDataSourceTest {
         val localDate = LocalDate.now().plusDays(1)
         val result = sunriseRetrofitDataSource.fetchSunrise(localDate, "", "")
         Mockito.verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
-        assertThat(result, isA(Sunrise::class.java))
+        assertThat(result).isInstanceOf(Sunrise::class.java)
     }
 
     @Test
@@ -56,7 +54,7 @@ class SunriseRetrofitDataSourceTest {
             e
         }
 
-        assertThat(exception, instanceOf(IOException::class.java))
+        assertThat(exception).isInstanceOf(IOException::class.java)
         Mockito.verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
     }
 }

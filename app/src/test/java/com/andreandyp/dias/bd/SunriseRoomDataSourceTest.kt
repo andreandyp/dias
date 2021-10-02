@@ -2,9 +2,8 @@ package com.andreandyp.dias.bd
 
 import com.andreandyp.dias.bd.dao.SunriseDAO
 import com.andreandyp.dias.domain.Sunrise
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -38,7 +37,7 @@ class SunriseRoomDataSourceTest {
         val localDate = LocalDate.now().plusDays(1)
         val result = sunriseRoomDataSource.fetchSunrise(localDate)
         Mockito.verify(sunriseDao).fetchSunrise(localDate)
-        MatcherAssert.assertThat(result, CoreMatchers.isA(Sunrise::class.java))
+        assertThat(result).isInstanceOf(Sunrise::class.java)
     }
 
     @Test
@@ -55,7 +54,7 @@ class SunriseRoomDataSourceTest {
         }
 
         Mockito.verify(sunriseDao).fetchSunrise(localDate)
-        MatcherAssert.assertThat(exception, CoreMatchers.instanceOf(IOException::class.java))
+        assertThat(exception).isInstanceOf(IOException::class.java)
     }
 
     @Test
