@@ -20,7 +20,7 @@ class SunriseRepositoryTest {
     private lateinit var sunriseRemoteDataSource: SunriseRemoteDataSource
 
     private val repository by lazy {
-        SunriseRepository(
+        SunriseRepositoryImpl(
             sunrisePreferenceDataSource,
             sunriseLocalDataSource,
             sunriseRemoteDataSource
