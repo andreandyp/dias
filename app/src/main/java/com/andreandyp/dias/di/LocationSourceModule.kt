@@ -2,6 +2,8 @@ package com.andreandyp.dias.di
 
 import com.andreandyp.dias.location.GMSLocationDataSource
 import com.andreandyp.dias.repository.location.LocationDataSource
+import com.andreandyp.dias.repository.location.LocationRepository
+import com.andreandyp.dias.repository.location.LocationRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,4 +17,7 @@ abstract class LocationSourceModule {
     @Binds
     abstract fun bindLocationDataSource(impl: GMSLocationDataSource): LocationDataSource
 
+    @Singleton
+    @Binds
+    abstract fun bindLocationRepository(impl: LocationRepositoryImpl): LocationRepository
 }

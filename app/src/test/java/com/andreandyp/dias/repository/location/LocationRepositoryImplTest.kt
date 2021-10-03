@@ -9,7 +9,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class LocationRepositoryTest {
+class LocationRepositoryImplTest {
     private lateinit var locationDataSource: LocationDataSource
 
     private val location = Location("").apply {
@@ -18,7 +18,7 @@ class LocationRepositoryTest {
     }
 
     private val repository by lazy {
-        LocationRepository(locationDataSource)
+        LocationRepositoryImpl(locationDataSource)
     }
 
     @Before

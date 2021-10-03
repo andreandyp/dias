@@ -15,7 +15,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import java.time.LocalDate
 
-class SunriseRepositoryTest {
+class SunriseRepositoryImplTest {
     private lateinit var sunrisePreferenceDataSource: SunrisePreferenceDataSource
     private lateinit var sunriseLocalDataSource: SunriseLocalDataSource
     private lateinit var sunriseRemoteDataSource: SunriseRemoteDataSource
