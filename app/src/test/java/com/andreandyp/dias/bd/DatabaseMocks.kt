@@ -16,6 +16,6 @@ object DatabaseMocks {
     val sunrise = Sunrise(
         dayOfWeek = DayOfWeek.MONDAY,
         dateTimeUTC = ZonedDateTime.parse("2021-01-01T00:00:00+00:00"),
-        origin = Origin.INTERNET
+        origin = Origin.DATABASE
     )
 }

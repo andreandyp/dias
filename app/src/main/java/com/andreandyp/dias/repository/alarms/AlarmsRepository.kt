@@ -23,7 +23,7 @@ class AlarmsRepository @Inject constructor(
     }
 
     fun saveUriToneSetting(id: Int, value: String?) {
-        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.TONE, value ?: "")
+        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.URI_TONE, value ?: "")
     }
 
     fun saveOffsetHoursToneSetting(id: Int, value: Int) {
