@@ -8,16 +8,19 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import java.time.LocalDate
 
 class SunriseRepositoryTest {
     private lateinit var sunrisePreferenceDataSource: SunrisePreferenceDataSource
     private lateinit var sunriseLocalDataSource: SunriseLocalDataSource
     private lateinit var sunriseRemoteDataSource: SunriseRemoteDataSource
+
+    private val tomorrowDate = LocalDate.now().plusDays(1)
 
     private val repository by lazy {
         SunriseRepositoryImpl(
@@ -38,19 +41,29 @@ class SunriseRepositoryTest {
         }
 
         sunriseRemoteDataSource = mock {
-            onBlocking { fetchSunrise(any(), any(), any()) } doReturn NetworkMocks.sunrise
+            onBlocking {
+                fetchSunrise(
+                    any(),
+                    anyString(),
+                    anyString()
+                )
+            } doReturn NetworkMocks.sunrise
         }
     }
 
     @Test
     fun `fetches sunrise from api`() = runBlocking {
-        val sunrise = repository.fetchAPISunrise(LocalDate.now(), "", "")
+        val latitude = ""
+        val longitude = ""
+        val sunrise = repository.fetchAPISunrise(tomorrowDate, latitude, longitude)
+        verify(sunriseRemoteDataSource).fetchSunrise(tomorrowDate, latitude, longitude)
         assertThat(sunrise.origin).isEqualTo(Origin.INTERNET)
     }
 
     @Test
     fun `fetches sunrise from local`() = runBlocking {
-        val sunrise = repository.fetchLocalSunrise(LocalDate.now())
+        val sunrise = repository.fetchLocalSunrise(tomorrowDate)
+        verify(sunriseLocalDataSource).fetchSunrise(tomorrowDate)
         assertThat(sunrise!!.origin).isEqualTo(Origin.DATABASE)
     }
 
@@ -60,13 +73,15 @@ class SunriseRepositoryTest {
             onBlocking { fetchSunrise(any()) } doReturn null
         }
 
-        val sunrise = repository.fetchLocalSunrise(LocalDate.now())
+        val sunrise = repository.fetchLocalSunrise(tomorrowDate)
+        verify(sunriseLocalDataSource).fetchSunrise(tomorrowDate)
         assertThat(sunrise).isNull()
     }
 
     @Test
     fun `fetches sunrise from preferences when there is no internet`() = runBlocking {
         val sunrise = repository.fetchPreferencesSunrise(Origin.NO_INTERNET)
+        verify(sunrisePreferenceDataSource).fetchSunrise(Origin.NO_INTERNET)
         assertThat(sunrise.origin).isEqualTo(Origin.NO_INTERNET)
     }
 
@@ -77,6 +92,7 @@ class SunriseRepositoryTest {
         }
 
         val sunrise = repository.fetchPreferencesSunrise(Origin.NO_LOCATION)
+        verify(sunrisePreferenceDataSource).fetchSunrise(Origin.NO_LOCATION)
         assertThat(sunrise.origin).isEqualTo(Origin.NO_LOCATION)
     }
 
@@ -84,6 +100,6 @@ class SunriseRepositoryTest {
     fun `saves downloaded sunrise in local`() = runBlocking {
         val downloadedSunrise = NetworkMocks.sunrise
         repository.saveDownloadedSunrise(downloadedSunrise)
-        Mockito.verify(sunriseLocalDataSource).saveSunrise(downloadedSunrise)
+        verify(sunriseLocalDataSource).saveSunrise(downloadedSunrise)
     }
 }

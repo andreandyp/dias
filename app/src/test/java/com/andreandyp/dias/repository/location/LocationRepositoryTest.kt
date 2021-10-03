@@ -7,6 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class LocationRepositoryTest {
     private lateinit var locationDataSource: LocationDataSource
@@ -30,6 +31,7 @@ class LocationRepositoryTest {
     @Test
     fun `fetches last location from data source`() = runBlocking {
         val location = repository.fetchLastLocation()
+        verify(locationDataSource).fetchLastLocation()
         assertThat(location).isInstanceOf(Location::class.java)
     }
 }
