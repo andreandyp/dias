@@ -10,13 +10,13 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class AlarmsRepositoryTest {
+class AlarmsRepositoryImplTest {
     private lateinit var alarmsPreferencesDataSource: AlarmsPreferencesDataSource
 
     private val alarmId = 0
 
     private val repository by lazy {
-        AlarmsRepository(alarmsPreferencesDataSource)
+        AlarmsRepositoryImpl(alarmsPreferencesDataSource)
     }
 
     @Before
@@ -78,7 +78,7 @@ class AlarmsRepositoryTest {
     @Test
     fun `saves 'offset hours' setting`() {
         val value = 1
-        repository.saveOffsetHoursToneSetting(alarmId, value)
+        repository.saveOffsetHoursSetting(alarmId, value)
         verify(alarmsPreferencesDataSource).saveAlarmPreference(
             alarmId,
             Alarm.Field.OFFSET_HOURS,

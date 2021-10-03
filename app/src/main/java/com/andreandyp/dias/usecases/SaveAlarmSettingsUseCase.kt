@@ -15,7 +15,7 @@ class SaveAlarmSettingsUseCase @Inject constructor(
             Alarm.Field.TONE -> alarmsRepository.saveToneSetting(id, alarm.tone)
             Alarm.Field.URI_TONE -> alarmsRepository.saveUriToneSetting(id, alarm.uriTone)
             Alarm.Field.OFFSET_HOURS -> {
-                alarmsRepository.saveOffsetHoursToneSetting(id, alarm.offsetHours)
+                alarmsRepository.saveOffsetHoursSetting(id, alarm.offsetHours)
             }
             Alarm.Field.OFFSET_MINUTES -> {
                 alarmsRepository.saveOffsetMinutesSetting(id, alarm.offsetMinutes)
