@@ -7,12 +7,12 @@ import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import java.time.LocalDate
 import javax.inject.Inject
 
-class GetTomorrowSunriseUseCase @Inject constructor(
+open class GetTomorrowSunriseUseCase @Inject constructor(
     private val sunriseRepository: SunriseRepository
 ) {
     private val tomorrowDate = LocalDate.now().plusDays(1)
 
-    suspend operator fun invoke(location: Location?, forceUpdate: Boolean): Sunrise {
+    open suspend operator fun invoke(location: Location?, forceUpdate: Boolean): Sunrise {
         if (!forceUpdate) {
             val localSunrise = sunriseRepository.fetchLocalSunrise(tomorrowDate)
             if (localSunrise != null) {

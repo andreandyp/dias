@@ -5,10 +5,10 @@ import android.app.PendingIntent
 import java.time.Instant
 import javax.inject.Inject
 
-class TurnOnAlarmUseCase @Inject constructor(
+open class TurnOnAlarmUseCase @Inject constructor(
     private val alarmManager: AlarmManager,
 ) {
-    operator fun invoke(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
+    open operator fun invoke(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             alarmInstant.toEpochMilli(),

@@ -28,7 +28,7 @@ class ConfigureAlarmSettingsUseCaseTest {
 
     @Test
     fun `returns alarm preferences`() {
-        val alarmId = 0
+        val alarmId = 1
         val isNextAlarm = true
         val alarm = configureAlarmSettingsUseCase(alarmId, isNextAlarm)
         verify(alarmsRepository).getAlarmPreferences(alarmId, isNextAlarm)

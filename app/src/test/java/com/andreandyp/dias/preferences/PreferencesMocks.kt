@@ -19,7 +19,7 @@ object PreferencesMocks {
         origin = Origin.NO_LOCATION,
     )
 
-    val alarm = Alarm(0, true).apply {
+    val alarm = Alarm(1, true).apply {
         on = true
         vibration = true
         tone = ""

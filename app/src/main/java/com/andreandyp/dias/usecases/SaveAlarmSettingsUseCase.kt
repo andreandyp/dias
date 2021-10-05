@@ -4,10 +4,10 @@ import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import javax.inject.Inject
 
-class SaveAlarmSettingsUseCase @Inject constructor(
+open class SaveAlarmSettingsUseCase @Inject constructor(
     private val alarmsRepository: AlarmsRepository
 ) {
-    operator fun invoke(alarm: Alarm, field: Alarm.Field) {
+    open operator fun invoke(alarm: Alarm, field: Alarm.Field) {
         val (id) = alarm
         when (field) {
             Alarm.Field.ON -> alarmsRepository.saveOnSetting(id, alarm.on)
