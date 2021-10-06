@@ -1,7 +1,9 @@
-package com.andreandyp.dias.network
+package com.andreandyp.dias.mocks
 
 import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
+import com.andreandyp.dias.network.ResultsNetwork
+import com.andreandyp.dias.network.SunriseNetwork
 import java.time.DayOfWeek
 import java.time.ZonedDateTime
 
@@ -21,8 +23,7 @@ object NetworkMocks {
             astronomicalTwilightEnd = "2021-09-19T01:48:34+00:00",
         )
     )
-
-    val sunrise = Sunrise(
+    val sunriseFromNetwork = Sunrise(
         dateTimeUTC = ZonedDateTime.parse("2021-09-18T12:23:09+00:00").withSecond(0),
         dayOfWeek = DayOfWeek.SATURDAY,
         origin = Origin.INTERNET

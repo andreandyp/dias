@@ -1,10 +1,8 @@
 package com.andreandyp.dias.usecases
 
 import android.location.Location
-import com.andreandyp.dias.bd.DatabaseMocks
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.network.NetworkMocks
-import com.andreandyp.dias.preferences.PreferencesMocks
+import com.andreandyp.dias.mocks.*
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -15,17 +13,16 @@ import org.mockito.kotlin.*
 import java.io.IOException
 
 class GetTomorrowSunriseUseCaseTest {
-
-    private val location = Location("")
+    private val location = LocationMocks.fakeLocation
     private var sunriseRepository: SunriseRepository = mock {
-        onBlocking { fetchLocalSunrise(any()) } doReturn DatabaseMocks.sunrise
+        onBlocking { fetchLocalSunrise(any()) } doReturn DomainMocks.sunriseLocal
         onBlocking {
             fetchAPISunrise(
                 any(),
                 anyString(),
                 anyString()
             )
-        } doReturn NetworkMocks.sunrise
+        } doReturn DomainMocks.sunriseNetwork
         on { fetchPreferencesSunrise(Origin.NO_INTERNET) } doReturn PreferencesMocks.sunriseNoInternet
         on { fetchPreferencesSunrise(Origin.NO_LOCATION) } doReturn PreferencesMocks.sunriseNoLocation
     }
@@ -53,7 +50,7 @@ class GetTomorrowSunriseUseCaseTest {
                 any(),
                 any()
             )
-        ) doReturn NetworkMocks.sunrise
+        ) doReturn DomainMocks.sunriseNetwork
 
         val sunrise = getTomorrowSunriseUseCase(location, false)
 
@@ -85,7 +82,7 @@ class GetTomorrowSunriseUseCaseTest {
             whenever(fetchAPISunrise(any(), anyString(), anyString())) doAnswer {
                 throw IOException()
             }
-            whenever(fetchLocalSunrise(any())) doReturn DatabaseMocks.sunrise
+            whenever(fetchLocalSunrise(any())) doReturn DomainMocks.sunriseLocal
         }
 
         val sunrise = getTomorrowSunriseUseCase(location, true)

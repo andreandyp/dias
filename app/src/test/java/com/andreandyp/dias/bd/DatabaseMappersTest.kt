@@ -3,6 +3,7 @@ package com.andreandyp.dias.bd
 import com.andreandyp.dias.bd.entities.SunriseEntity
 import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
+import com.andreandyp.dias.mocks.DatabaseMocks
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.time.ZoneOffset
@@ -27,9 +28,9 @@ class DatabaseMappersTest {
 
     @Test
     fun `transforms ddo to database dto`() {
-        val dto = DatabaseMocks.sunrise.asEntity()
+        val dto = DatabaseMocks.sunriseFromEntity.asEntity()
         assertThat(dto).isInstanceOf(SunriseEntity::class.java)
-        assertThat(dto.sunriseDate).isEqualTo(DatabaseMocks.sunrise.dateTimeUTC.toLocalDate())
-        assertThat(dto.sunriseTime).isEqualTo(DatabaseMocks.sunrise.dateTimeUTC.toLocalTime())
+        assertThat(dto.sunriseDate).isEqualTo(DatabaseMocks.sunriseFromEntity.dateTimeUTC.toLocalDate())
+        assertThat(dto.sunriseTime).isEqualTo(DatabaseMocks.sunriseFromEntity.dateTimeUTC.toLocalTime())
     }
 }

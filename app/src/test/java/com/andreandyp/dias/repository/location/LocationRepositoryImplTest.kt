@@ -1,6 +1,7 @@
 package com.andreandyp.dias.repository.location
 
 import android.location.Location
+import com.andreandyp.dias.mocks.LocationMocks
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -10,10 +11,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class LocationRepositoryImplTest {
-    private val fakeLocation = Location("").apply {
-        latitude = 0.0
-        longitude = 0.0
-    }
+    private val fakeLocation = LocationMocks.fakeLocation
 
     private val locationDataSource: LocationDataSource = mock {
         onBlocking { fetchLastLocation() } doReturn fakeLocation

@@ -1,9 +1,10 @@
 package com.andreandyp.dias.repository.sunrise
 
-import com.andreandyp.dias.bd.DatabaseMocks
+import com.andreandyp.dias.mocks.DatabaseMocks
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.network.NetworkMocks
-import com.andreandyp.dias.preferences.PreferencesMocks
+import com.andreandyp.dias.mocks.LocationMocks
+import com.andreandyp.dias.mocks.NetworkMocks
+import com.andreandyp.dias.mocks.PreferencesMocks
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -17,7 +18,7 @@ class SunriseRepositoryImplTest {
         on { fetchSunrise(any()) } doReturn PreferencesMocks.sunriseNoInternet
     }
     private val sunriseLocalDataSource: SunriseLocalDataSource = mock {
-        onBlocking { fetchSunrise(any()) } doReturn DatabaseMocks.sunrise
+        onBlocking { fetchSunrise(any()) } doReturn DatabaseMocks.sunriseFromEntity
     }
     private val sunriseRemoteDataSource: SunriseRemoteDataSource = mock {
         onBlocking {
@@ -26,10 +27,12 @@ class SunriseRepositoryImplTest {
                 anyString(),
                 anyString()
             )
-        } doReturn NetworkMocks.sunrise
+        } doReturn NetworkMocks.sunriseFromNetwork
     }
 
     private val tomorrowDate = LocalDate.now().plusDays(1)
+    private val fakeLatitude = LocationMocks.fakeLatitude.toString()
+    private val fakeLongitude = LocationMocks.fakeLongitude.toString()
 
     private lateinit var repository: SunriseRepositoryImpl
 
@@ -44,10 +47,8 @@ class SunriseRepositoryImplTest {
 
     @Test
     fun `fetches sunrise from api`() = runBlocking {
-        val latitude = ""
-        val longitude = ""
-        val sunrise = repository.fetchAPISunrise(tomorrowDate, latitude, longitude)
-        verify(sunriseRemoteDataSource).fetchSunrise(tomorrowDate, latitude, longitude)
+        val sunrise = repository.fetchAPISunrise(tomorrowDate, fakeLatitude, fakeLongitude)
+        verify(sunriseRemoteDataSource).fetchSunrise(tomorrowDate, fakeLatitude, fakeLongitude)
         assertThat(sunrise.origin).isEqualTo(Origin.INTERNET)
     }
 
@@ -91,7 +92,7 @@ class SunriseRepositoryImplTest {
 
     @Test
     fun `saves downloaded sunrise in local`() = runBlocking {
-        val downloadedSunrise = NetworkMocks.sunrise
+        val downloadedSunrise = NetworkMocks.sunriseFromNetwork
         repository.saveDownloadedSunrise(downloadedSunrise)
         verify(sunriseLocalDataSource).saveSunrise(downloadedSunrise)
     }

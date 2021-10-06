@@ -1,4 +1,4 @@
-package com.andreandyp.dias.bd
+package com.andreandyp.dias.mocks
 
 import com.andreandyp.dias.bd.entities.SunriseEntity
 import com.andreandyp.dias.domain.Origin
@@ -13,7 +13,7 @@ object DatabaseMocks {
         sunriseDate = LocalDate.parse("2021-01-01"),
         sunriseTime = LocalTime.parse("00:00"),
     )
-    val sunrise = Sunrise(
+    val sunriseFromEntity = Sunrise(
         dayOfWeek = DayOfWeek.MONDAY,
         dateTimeUTC = ZonedDateTime.parse("2021-01-01T00:00:00+00:00"),
         origin = Origin.DATABASE

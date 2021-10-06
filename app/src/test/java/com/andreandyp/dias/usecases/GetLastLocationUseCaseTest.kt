@@ -1,6 +1,7 @@
 package com.andreandyp.dias.usecases
 
 import android.location.Location
+import com.andreandyp.dias.mocks.LocationMocks
 import com.andreandyp.dias.repository.location.LocationRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -11,7 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class GetLastLocationUseCaseTest {
-    private val fakeLocation = Location("")
+    private val fakeLocation = LocationMocks.fakeLocation
 
     private val locationRepository: LocationRepository = mock {
         onBlocking { fetchLastLocation() } doReturn fakeLocation

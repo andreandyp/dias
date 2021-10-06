@@ -1,7 +1,8 @@
 package com.andreandyp.dias.usecases
 
 import com.andreandyp.dias.domain.Alarm
-import com.andreandyp.dias.preferences.PreferencesMocks
+import com.andreandyp.dias.mocks.DomainMocks
+import com.andreandyp.dias.mocks.PreferencesMocks
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +13,7 @@ class SaveAlarmSettingsUseCaseTest {
 
     private val alarmsRepository: AlarmsRepository = mock()
 
-    private val alarm = PreferencesMocks.alarm
+    private val alarm = DomainMocks.alarm
 
     private lateinit var saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase
 

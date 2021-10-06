@@ -1,6 +1,7 @@
 package com.andreandyp.dias.bd
 
 import com.andreandyp.dias.bd.dao.SunriseDAO
+import com.andreandyp.dias.mocks.DatabaseMocks
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -11,7 +12,7 @@ import java.time.LocalDate
 
 class SunriseRoomDataSourceTest {
     private val sunriseEntity = DatabaseMocks.sunriseEntity
-    private val sunrise = DatabaseMocks.sunrise
+    private val sunrise = DatabaseMocks.sunriseFromEntity
     private val sunriseDao: SunriseDAO = mock {
         onBlocking {
             fetchSunrise(any())

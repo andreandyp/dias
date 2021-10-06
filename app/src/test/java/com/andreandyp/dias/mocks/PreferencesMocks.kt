@@ -1,4 +1,4 @@
-package com.andreandyp.dias.preferences
+package com.andreandyp.dias.mocks
 
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.domain.Origin
@@ -9,13 +9,13 @@ import java.time.ZonedDateTime
 object PreferencesMocks {
     val sunriseNoInternet = Sunrise(
         dayOfWeek = LocalDate.now().plusDays(1).dayOfWeek,
-        dateTimeUTC = ZonedDateTime.now().plusHours(1).withSecond(0),
+        dateTimeUTC = ZonedDateTime.now().plusDays(1).withSecond(0),
         origin = Origin.NO_INTERNET,
     )
 
     val sunriseNoLocation = Sunrise(
         dayOfWeek = LocalDate.now().plusDays(1).dayOfWeek,
-        dateTimeUTC = ZonedDateTime.now().plusHours(1).withSecond(0),
+        dateTimeUTC = ZonedDateTime.now().plusDays(1).withSecond(0),
         origin = Origin.NO_LOCATION,
     )
 

@@ -1,6 +1,8 @@
 package com.andreandyp.dias.network
 
 import com.andreandyp.dias.domain.Sunrise
+import com.andreandyp.dias.mocks.LocationMocks
+import com.andreandyp.dias.mocks.NetworkMocks
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -10,6 +12,8 @@ import java.io.IOException
 import java.time.LocalDate
 
 class SunriseRetrofitDataSourceTest {
+    private val fakeLatitude = LocationMocks.fakeLatitude.toString()
+    private val fakeLongitude = LocationMocks.fakeLongitude.toString()
     private val sunriseNetwork = NetworkMocks.sunriseNetwork
     private var sunriseSunsetService: SunriseSunsetService = mock {
         onBlocking {
@@ -27,8 +31,8 @@ class SunriseRetrofitDataSourceTest {
     @Test
     fun `fetches data from service successfully`() = runBlocking {
         val localDate = LocalDate.now().plusDays(1)
-        val result = sunriseRetrofitDataSource.fetchSunrise(localDate, "", "")
-        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
+        val result = sunriseRetrofitDataSource.fetchSunrise(localDate, fakeLatitude, fakeLongitude)
+        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), fakeLatitude, fakeLongitude)
         assertThat(result).isInstanceOf(Sunrise::class.java)
     }
 
@@ -42,13 +46,13 @@ class SunriseRetrofitDataSourceTest {
 
         val localDate = LocalDate.now().plusDays(1)
         val exception = try {
-            sunriseRetrofitDataSource.fetchSunrise(localDate, "", "")
+            sunriseRetrofitDataSource.fetchSunrise(localDate, fakeLatitude, fakeLongitude)
             null
         } catch (e: Exception) {
             e
         }
 
         assertThat(exception).isInstanceOf(IOException::class.java)
-        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
+        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), fakeLatitude, fakeLongitude)
     }
 }

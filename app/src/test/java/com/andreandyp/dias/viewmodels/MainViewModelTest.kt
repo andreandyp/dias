@@ -1,21 +1,17 @@
 package com.andreandyp.dias.viewmodels
 
-import android.app.PendingIntent
-import android.content.Intent
-import android.location.Location
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.andreandyp.dias.DiasApplication
-import com.andreandyp.dias.bd.DatabaseMocks
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.network.NetworkMocks
-import com.andreandyp.dias.preferences.PreferencesMocks
+import com.andreandyp.dias.mocks.ContextMocks
+import com.andreandyp.dias.mocks.DomainMocks
+import com.andreandyp.dias.mocks.LocationMocks
 import com.andreandyp.dias.usecases.*
-import com.andreandyp.dias.utils.Constants
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,16 +33,21 @@ class MainViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val fakeLocation = Location("")
+    private val context = ApplicationProvider.getApplicationContext<DiasApplication>()
+    private val alarmPendingIntent = ContextMocks.getAlarmPendingIntent(context)
+    private val snoozePendingIntent = ContextMocks.getSnoozePendingIntent(context)
+    private val fakeLocation = LocationMocks.fakeLocation
+    private val fakeSunriseLocal = DomainMocks.sunriseLocal
+    private val fakeAlarm = DomainMocks.alarm
 
     private val getLastLocationUseCase: GetLastLocationUseCase = mock {
         onBlocking { invoke() } doReturn fakeLocation
     }
 
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase = mock {
-        onBlocking { invoke(any(), eq(true)) } doReturn NetworkMocks.sunrise
-        onBlocking { invoke(any(), eq(false)) } doReturn DatabaseMocks.sunrise
-        onBlocking { invoke(eq(null), any()) } doReturn DatabaseMocks.sunrise
+        onBlocking { invoke(any(), eq(true)) } doReturn DomainMocks.sunriseNetwork
+        onBlocking { invoke(any(), eq(false)) } doReturn fakeSunriseLocal
+        onBlocking { invoke(eq(null), any()) } doReturn fakeSunriseLocal
     }
 
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase = mock {
@@ -54,7 +55,7 @@ class MainViewModelTest {
     }
 
     private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase = mock {
-        on { invoke(any(), any()) } doReturn PreferencesMocks.alarm
+        on { invoke(any(), any()) } doReturn fakeAlarm
     }
 
     private val turnOnAlarmUseCase: TurnOnAlarmUseCase = mock {
@@ -66,19 +67,6 @@ class MainViewModelTest {
     }
 
     private val testDispatcher = TestCoroutineDispatcher()
-    private val context = ApplicationProvider.getApplicationContext<DiasApplication>()
-    private val alarmPendingIntent = PendingIntent.getBroadcast(
-        context,
-        0,
-        Intent(),
-        PendingIntent.FLAG_CANCEL_CURRENT
-    )
-    private val snoozePendingIntent = PendingIntent.getBroadcast(
-        context,
-        Constants.SNOOZE_ALARM_CODE,
-        Intent(),
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -109,7 +97,7 @@ class MainViewModelTest {
 
         mainViewModel.setupNextAlarm(true)
         val alarmValue = mainViewModel.nextAlarm.value
-        assertThat(alarmValue).isEqualTo(PreferencesMocks.alarm)
+        assertThat(alarmValue).isEqualTo(fakeAlarm)
         assertThat(alarmValue!!.isNextAlarm).isTrue()
 
         mainViewModel.nextAlarm.removeObserver(observerAlarm)

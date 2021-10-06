@@ -44,29 +44,29 @@ class AlarmSharedPreferencesDataSourceTest {
 
     @Test
     fun `saves boolean property successfully`() {
-        val id = 0
+        val id = 1
         val on = true
 
         alarmSharedPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.ON, on)
 
-        verify(editor).putBoolean("0-on", on)
+        verify(editor).putBoolean("1-on", on)
         verify(editor).commit()
     }
 
     @Test
     fun `saves string property successfully`() {
-        val id = 0
+        val id = 1
         val tone = ""
 
         alarmSharedPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.TONE, tone)
 
-        verify(editor).putString("0-tone", tone)
+        verify(editor).putString("1-tone", tone)
         verify(editor).commit()
     }
 
     @Test
     fun `saves int property successfully`() {
-        val id = 0
+        val id = 1
         val offsetHours = 0
 
         alarmSharedPreferencesDataSource.saveAlarmPreference(
@@ -75,7 +75,7 @@ class AlarmSharedPreferencesDataSourceTest {
             offsetHours
         )
 
-        verify(editor).putInt("0-offset_hours", offsetHours)
+        verify(editor).putInt("1-offset_hours", offsetHours)
         verify(editor).commit()
     }
 }

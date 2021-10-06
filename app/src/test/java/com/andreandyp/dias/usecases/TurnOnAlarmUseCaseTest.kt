@@ -7,6 +7,7 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.andreandyp.dias.DiasApplication
+import com.andreandyp.dias.mocks.ContextMocks
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,20 +21,13 @@ class TurnOnAlarmUseCaseTest {
     private val alarmManager: AlarmManager = spy(
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     )
-    private lateinit var alarmPendingIntent: PendingIntent
+    private val alarmPendingIntent = ContextMocks.getAlarmPendingIntent(context)
 
     private lateinit var turnOnAlarmUseCase: TurnOnAlarmUseCase
 
     @Before
     fun setUp() {
         turnOnAlarmUseCase = TurnOnAlarmUseCase(alarmManager)
-
-        alarmPendingIntent = PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(),
-            PendingIntent.FLAG_CANCEL_CURRENT
-        )
     }
 
     @Test
