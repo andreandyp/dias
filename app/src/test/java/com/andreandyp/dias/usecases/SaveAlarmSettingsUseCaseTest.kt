@@ -2,7 +2,6 @@ package com.andreandyp.dias.usecases
 
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.mocks.DomainMocks
-import com.andreandyp.dias.mocks.PreferencesMocks
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import org.junit.Before
 import org.junit.Test

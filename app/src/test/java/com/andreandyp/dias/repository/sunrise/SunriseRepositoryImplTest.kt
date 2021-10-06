@@ -1,7 +1,7 @@
 package com.andreandyp.dias.repository.sunrise
 
-import com.andreandyp.dias.mocks.DatabaseMocks
 import com.andreandyp.dias.domain.Origin
+import com.andreandyp.dias.mocks.DatabaseMocks
 import com.andreandyp.dias.mocks.LocationMocks
 import com.andreandyp.dias.mocks.NetworkMocks
 import com.andreandyp.dias.mocks.PreferencesMocks

@@ -1,6 +1,5 @@
 package com.andreandyp.dias.usecases
 
-import android.location.Location
 import com.andreandyp.dias.mocks.LocationMocks
 import com.andreandyp.dias.repository.location.LocationRepository
 import com.google.common.truth.Truth.assertThat

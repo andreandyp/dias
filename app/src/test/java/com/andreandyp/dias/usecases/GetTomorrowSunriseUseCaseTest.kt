@@ -1,8 +1,9 @@
 package com.andreandyp.dias.usecases
 
-import android.location.Location
 import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.mocks.*
+import com.andreandyp.dias.mocks.DomainMocks
+import com.andreandyp.dias.mocks.LocationMocks
+import com.andreandyp.dias.mocks.PreferencesMocks
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
