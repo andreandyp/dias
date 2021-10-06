@@ -10,22 +10,20 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class LocationRepositoryImplTest {
-    private lateinit var locationDataSource: LocationDataSource
-
-    private val location = Location("").apply {
+    private val fakeLocation = Location("").apply {
         latitude = 0.0
         longitude = 0.0
     }
 
-    private val repository by lazy {
-        LocationRepositoryImpl(locationDataSource)
+    private val locationDataSource: LocationDataSource = mock {
+        onBlocking { fetchLastLocation() } doReturn fakeLocation
     }
+
+    private lateinit var repository: LocationRepositoryImpl
 
     @Before
     fun setUp() {
-        locationDataSource = mock {
-            onBlocking { fetchLastLocation() } doReturn location
-        }
+        repository = LocationRepositoryImpl(locationDataSource)
     }
 
     @Test

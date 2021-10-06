@@ -1,49 +1,43 @@
 package com.andreandyp.dias.bd
 
 import com.andreandyp.dias.bd.dao.SunriseDAO
-import com.andreandyp.dias.domain.Sunrise
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
+import org.mockito.kotlin.*
 import java.io.IOException
 import java.time.LocalDate
 
 class SunriseRoomDataSourceTest {
-    private lateinit var sunriseDao: SunriseDAO
     private val sunriseEntity = DatabaseMocks.sunriseEntity
     private val sunrise = DatabaseMocks.sunrise
-
-    private val sunriseRoomDataSource by lazy {
-        SunriseRoomDataSource(sunriseDao)
+    private val sunriseDao: SunriseDAO = mock {
+        onBlocking {
+            fetchSunrise(any())
+        } doReturn sunriseEntity
     }
+
+    private lateinit var sunriseRoomDataSource: SunriseRoomDataSource
 
     @Before
     fun setup() {
-        sunriseDao = mock {
-            onBlocking {
-                fetchSunrise(any())
-            } doReturn sunriseEntity
-        }
+        sunriseRoomDataSource = SunriseRoomDataSource(sunriseDao)
     }
 
     @Test
     fun `fetches data from database successfully`() = runBlocking {
         val localDate = LocalDate.now().plusDays(1)
-        val result = sunriseRoomDataSource.fetchSunrise(localDate)
-        Mockito.verify(sunriseDao).fetchSunrise(localDate)
-        assertThat(result).isInstanceOf(Sunrise::class.java)
+        sunriseRoomDataSource.fetchSunrise(localDate)
+
+        verify(sunriseDao).fetchSunrise(localDate)
+        Unit
     }
 
     @Test
     fun `throws an exception when fails to fetch`() = runBlocking {
-        sunriseDao = mock {
-            onBlocking { fetchSunrise(any()) } doAnswer { throw IOException() }
+        sunriseDao.apply {
+            whenever(fetchSunrise(any())) doAnswer { throw IOException() }
         }
         val localDate = LocalDate.now().plusDays(1)
         val exception = try {
@@ -53,25 +47,27 @@ class SunriseRoomDataSourceTest {
             e
         }
 
-        Mockito.verify(sunriseDao).fetchSunrise(localDate)
+        verify(sunriseDao).fetchSunrise(localDate)
         assertThat(exception).isInstanceOf(IOException::class.java)
     }
 
     @Test
     fun `saves a sunrise successfully`() = runBlocking {
-        Mockito.`when`(sunriseDao.countSavedSunrises()).thenReturn(0)
-        Mockito.`when`(sunriseDao.fetchSunrise(any())).thenReturn(null)
+        whenever(sunriseDao.countSavedSunrises()) doReturn 0
+        whenever(sunriseDao.fetchSunrise(any())) doReturn null
 
         sunriseRoomDataSource.saveSunrise(sunrise)
-        Mockito.verify(sunriseDao).saveSunrise(sunriseEntity)
+
+        verify(sunriseDao).saveSunrise(sunriseEntity)
     }
 
     @Test
     fun `removes a sunrise when sunrises more 30`() = runBlocking {
-        Mockito.`when`(sunriseDao.countSavedSunrises()).thenReturn(30)
-        Mockito.`when`(sunriseDao.fetchOlderSunrise()).thenReturn(sunriseEntity)
+        whenever(sunriseDao.countSavedSunrises()) doReturn 30
+        whenever(sunriseDao.fetchOlderSunrise()) doReturn sunriseEntity
 
         sunriseRoomDataSource.saveSunrise(sunrise)
-        Mockito.verify(sunriseDao).deleteSunrise(sunriseEntity)
+
+        verify(sunriseDao).deleteSunrise(sunriseEntity)
     }
 }

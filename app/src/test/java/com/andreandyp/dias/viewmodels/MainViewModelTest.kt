@@ -34,19 +34,38 @@ import java.time.Instant
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class MainViewModelTest {
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var getLastLocationUseCase: GetLastLocationUseCase
-    private lateinit var getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase
-    private lateinit var saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase
-    private lateinit var configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase
-    private lateinit var turnOnAlarmUseCase: TurnOnAlarmUseCase
-    private lateinit var turnOffAlarmUseCase: TurnOffAlarmUseCase
+    private val fakeLocation = Location("")
+
+    private val getLastLocationUseCase: GetLastLocationUseCase = mock {
+        onBlocking { invoke() } doReturn fakeLocation
+    }
+
+    private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase = mock {
+        onBlocking { invoke(any(), eq(true)) } doReturn NetworkMocks.sunrise
+        onBlocking { invoke(any(), eq(false)) } doReturn DatabaseMocks.sunrise
+        onBlocking { invoke(eq(null), any()) } doReturn DatabaseMocks.sunrise
+    }
+
+    private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase = mock {
+        on { invoke(any(), any()) } doAnswer {}
+    }
+
+    private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase = mock {
+        on { invoke(any(), any()) } doReturn PreferencesMocks.alarm
+    }
+
+    private val turnOnAlarmUseCase: TurnOnAlarmUseCase = mock {
+        on { invoke(any(), any()) } doAnswer {}
+    }
+
+    private val turnOffAlarmUseCase: TurnOffAlarmUseCase = mock {
+        on { invoke(any(), any()) } doAnswer {}
+    }
 
     private val testDispatcher = TestCoroutineDispatcher()
-    private val fakeLocation = Location("")
     private val context = ApplicationProvider.getApplicationContext<DiasApplication>()
     private val alarmPendingIntent = PendingIntent.getBroadcast(
         context,
@@ -66,26 +85,6 @@ class MainViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        getLastLocationUseCase = mock {
-            onBlocking { invoke() } doReturn fakeLocation
-        }
-        getTomorrowSunriseUseCase = mock {
-            onBlocking { invoke(any(), eq(true)) } doReturn NetworkMocks.sunrise
-            onBlocking { invoke(any(), eq(false)) } doReturn DatabaseMocks.sunrise
-            onBlocking { invoke(eq(null), any()) } doReturn DatabaseMocks.sunrise
-        }
-        saveAlarmSettingsUseCase = mock {
-            on { invoke(any(), any()) } doAnswer {}
-        }
-        configureAlarmSettingsUseCase = mock {
-            on { invoke(any(), any()) } doReturn PreferencesMocks.alarm
-        }
-        turnOnAlarmUseCase = mock {
-            on { invoke(any(), any()) } doAnswer {}
-        }
-        turnOffAlarmUseCase = mock {
-            on { invoke(any(), any()) } doAnswer {}
-        }
 
         mainViewModel = MainViewModel(
             getLastLocationUseCase,

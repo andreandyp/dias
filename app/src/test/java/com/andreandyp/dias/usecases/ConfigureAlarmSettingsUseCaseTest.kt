@@ -13,17 +13,15 @@ import org.mockito.kotlin.verify
 
 class ConfigureAlarmSettingsUseCaseTest {
 
-    private lateinit var alarmsRepository: AlarmsRepository
-
-    private val configureAlarmSettingsUseCase by lazy {
-        ConfigureAlarmSettingsUseCase(alarmsRepository)
+    private val alarmsRepository: AlarmsRepository = mock {
+        on { getAlarmPreferences(anyInt(), anyBoolean()) } doReturn PreferencesMocks.alarm
     }
+
+    private lateinit var configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase
 
     @Before
     fun setUp() {
-        alarmsRepository = mock {
-            on { getAlarmPreferences(anyInt(), anyBoolean()) } doReturn PreferencesMocks.alarm
-        }
+        configureAlarmSettingsUseCase = ConfigureAlarmSettingsUseCase(alarmsRepository)
     }
 
     @Test

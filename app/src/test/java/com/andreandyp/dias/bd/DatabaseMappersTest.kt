@@ -9,16 +9,18 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 class DatabaseMappersTest {
+    private val sunriseEntity = DatabaseMocks.sunriseEntity
+    private val dateTimeUTC = ZonedDateTime.of(
+        sunriseEntity.sunriseDate,
+        sunriseEntity.sunriseTime,
+        ZoneOffset.ofOffset("", ZoneOffset.UTC)
+    )
+
     @Test
     fun `transforms database dto to ddo`() {
-        val entity = DatabaseMocks.sunriseEntity
-        val ddo = entity.asDomain()
+        val ddo = sunriseEntity.asDomain()
         assertThat(ddo).isInstanceOf(Sunrise::class.java)
         assertThat(ddo.origin).isEqualTo(Origin.DATABASE)
-
-        val date = entity.sunriseDate
-        val time = entity.sunriseTime
-        val dateTimeUTC = ZonedDateTime.of(date, time, ZoneOffset.ofOffset("", ZoneOffset.UTC))
         assertThat(ddo.dateTimeUTC).isEqualTo(dateTimeUTC)
         assertThat(ddo.dayOfWeek).isEqualTo(dateTimeUTC.dayOfWeek)
     }

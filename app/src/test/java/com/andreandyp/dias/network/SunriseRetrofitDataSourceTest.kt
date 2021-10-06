@@ -5,43 +5,37 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
+import org.mockito.kotlin.*
 import java.io.IOException
 import java.time.LocalDate
 
 class SunriseRetrofitDataSourceTest {
-    private lateinit var sunriseSunsetService: SunriseSunsetService
     private val sunriseNetwork = NetworkMocks.sunriseNetwork
-
-    private val sunriseRetrofitDataSource by lazy {
-        SunriseRetrofitDataSource(sunriseSunsetService)
+    private var sunriseSunsetService: SunriseSunsetService = mock {
+        onBlocking {
+            fetchSunrise(any(), any(), any())
+        } doReturn sunriseNetwork
     }
+
+    private lateinit var sunriseRetrofitDataSource: SunriseRetrofitDataSource
 
     @Before
     fun setup() {
-        sunriseSunsetService = mock {
-            onBlocking {
-                fetchSunrise(any(), any(), any())
-            } doReturn sunriseNetwork
-        }
+        sunriseRetrofitDataSource = SunriseRetrofitDataSource(sunriseSunsetService)
     }
 
     @Test
     fun `fetches data from service successfully`() = runBlocking {
         val localDate = LocalDate.now().plusDays(1)
         val result = sunriseRetrofitDataSource.fetchSunrise(localDate, "", "")
-        Mockito.verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
+        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
         assertThat(result).isInstanceOf(Sunrise::class.java)
     }
 
     @Test
     fun `throws an exception when fails to fetch`(): Unit = runBlocking {
-        sunriseSunsetService = mock {
-            onBlocking { fetchSunrise(any(), any(), any()) } doAnswer {
+        sunriseSunsetService.apply {
+            whenever(fetchSunrise(any(), any(), any())) doAnswer {
                 throw IOException()
             }
         }
@@ -55,6 +49,6 @@ class SunriseRetrofitDataSourceTest {
         }
 
         assertThat(exception).isInstanceOf(IOException::class.java)
-        Mockito.verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
+        verify(sunriseSunsetService).fetchSunrise(localDate.toString(), "", "")
     }
 }

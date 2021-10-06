@@ -5,27 +5,25 @@ import com.andreandyp.dias.domain.Origin
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
+import org.mockito.kotlin.*
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
 
 class SunriseSharedPreferencesDataSourceTest {
-
-    private lateinit var sharedPreferences: SharedPreferences
     private val hourToReturn = "12:00"
+    private val defaultValue = "07:00"
+    private val sharedPreferences: SharedPreferences = mock {
+        on { getString(any(), eq(defaultValue)) } doReturn hourToReturn
+    }
+
     private val tomorrowDate = ZonedDateTime.now().plusDays(1)
 
-    private val sunriseSharedPreferencesDataSource by lazy {
-        SunriseSharedPreferencesDataSource(sharedPreferences)
-    }
+    private lateinit var sunriseSharedPreferencesDataSource: SunriseSharedPreferencesDataSource
 
     @Before
     fun setUp() {
-        sharedPreferences = mock {
-            on { getString("hora_default", "07:00") } doReturn hourToReturn
-        }
+        sunriseSharedPreferencesDataSource = SunriseSharedPreferencesDataSource(sharedPreferences)
     }
 
     @Test
@@ -38,6 +36,7 @@ class SunriseSharedPreferencesDataSourceTest {
 
         val sunrise = sunriseSharedPreferencesDataSource.fetchSunrise(Origin.DATABASE)
 
+        verify(sharedPreferences).getString(any(), eq(defaultValue))
         assertThat(sunrise.dayOfWeek).isEqualTo(tomorrowDate.dayOfWeek)
         assertThat(sunrise.dateTimeUTC).isEqualTo(dateTimeUTC)
         assertThat(sunrise.origin).isEqualTo(Origin.DATABASE)

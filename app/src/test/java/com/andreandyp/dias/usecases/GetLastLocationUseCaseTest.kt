@@ -11,20 +11,17 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class GetLastLocationUseCaseTest {
-
-    private lateinit var locationRepository: LocationRepository
-
     private val fakeLocation = Location("")
 
-    private val getLastLocationUseCase by lazy {
-        GetLastLocationUseCase(locationRepository)
+    private val locationRepository: LocationRepository = mock {
+        onBlocking { fetchLastLocation() } doReturn fakeLocation
     }
+
+    private lateinit var getLastLocationUseCase: GetLastLocationUseCase
 
     @Before
     fun setUp() {
-        locationRepository = mock {
-            onBlocking { fetchLastLocation() } doReturn fakeLocation
-        }
+        getLastLocationUseCase = GetLastLocationUseCase(locationRepository)
     }
 
     @Test

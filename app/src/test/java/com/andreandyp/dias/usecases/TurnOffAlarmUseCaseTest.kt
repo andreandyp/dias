@@ -16,18 +16,18 @@ import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class TurnOffAlarmUseCaseTest {
-    private lateinit var alarmManager: AlarmManager
+    private val context = ApplicationProvider.getApplicationContext<DiasApplication>()
+    private val alarmManager: AlarmManager = spy(
+        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    )
     private lateinit var alarmPendingIntent: PendingIntent
     private lateinit var snoozePendingIntent: PendingIntent
 
-    private val turnOffAlarmUseCase by lazy {
-        TurnOffAlarmUseCase(alarmManager)
-    }
+    private lateinit var turnOffAlarmUseCase: TurnOffAlarmUseCase
 
     @Before
     fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<DiasApplication>()
-        alarmManager = spy(context.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
+        turnOffAlarmUseCase = TurnOffAlarmUseCase(alarmManager)
 
         alarmPendingIntent = PendingIntent.getBroadcast(
             context,

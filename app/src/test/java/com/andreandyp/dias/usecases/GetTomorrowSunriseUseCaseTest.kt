@@ -16,28 +16,25 @@ import java.io.IOException
 
 class GetTomorrowSunriseUseCaseTest {
 
-    private lateinit var sunriseRepository: SunriseRepository
-
     private val location = Location("")
-
-    private val getTomorrowSunriseUseCase by lazy {
-        GetTomorrowSunriseUseCase(sunriseRepository)
+    private var sunriseRepository: SunriseRepository = mock {
+        onBlocking { fetchLocalSunrise(any()) } doReturn DatabaseMocks.sunrise
+        onBlocking {
+            fetchAPISunrise(
+                any(),
+                anyString(),
+                anyString()
+            )
+        } doReturn NetworkMocks.sunrise
+        on { fetchPreferencesSunrise(Origin.NO_INTERNET) } doReturn PreferencesMocks.sunriseNoInternet
+        on { fetchPreferencesSunrise(Origin.NO_LOCATION) } doReturn PreferencesMocks.sunriseNoLocation
     }
+
+    private lateinit var getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase
 
     @Before
     fun setUp() {
-        sunriseRepository = mock {
-            onBlocking { fetchLocalSunrise(any()) } doReturn DatabaseMocks.sunrise
-            onBlocking {
-                fetchAPISunrise(
-                    any(),
-                    anyString(),
-                    anyString()
-                )
-            } doReturn NetworkMocks.sunrise
-            on { fetchPreferencesSunrise(Origin.NO_INTERNET) } doReturn PreferencesMocks.sunriseNoInternet
-            on { fetchPreferencesSunrise(Origin.NO_LOCATION) } doReturn PreferencesMocks.sunriseNoLocation
-        }
+        getTomorrowSunriseUseCase = GetTomorrowSunriseUseCase(sunriseRepository)
     }
 
     @Test
@@ -49,17 +46,17 @@ class GetTomorrowSunriseUseCaseTest {
 
     @Test
     fun `returns a remote sunrise when there is no local sunrise`() = runBlocking {
-        sunriseRepository = mock {
-            onBlocking { fetchLocalSunrise(any()) } doReturn null
-            onBlocking {
-                fetchAPISunrise(
-                    any(),
-                    anyString(),
-                    anyString()
-                )
-            } doReturn NetworkMocks.sunrise
-        }
+        whenever(sunriseRepository.fetchLocalSunrise(any())) doReturn null
+        whenever(
+            sunriseRepository.fetchAPISunrise(
+                any(),
+                any(),
+                any()
+            )
+        ) doReturn NetworkMocks.sunrise
+
         val sunrise = getTomorrowSunriseUseCase(location, false)
+
         verify(sunriseRepository).fetchLocalSunrise(any())
         verify(sunriseRepository).fetchAPISunrise(any(), anyString(), anyString())
         verify(sunriseRepository).saveDownloadedSunrise(any())
@@ -69,6 +66,7 @@ class GetTomorrowSunriseUseCaseTest {
     @Test
     fun `returns a remote sunrise when update is forced`() = runBlocking {
         val sunrise = getTomorrowSunriseUseCase(location, true)
+
         verify(sunriseRepository).fetchAPISunrise(any(), anyString(), anyString())
         assertThat(sunrise.origin).isEqualTo(Origin.INTERNET)
     }
@@ -76,40 +74,43 @@ class GetTomorrowSunriseUseCaseTest {
     @Test
     fun `saves a remote sunrise when it is downloaded`() = runBlocking {
         getTomorrowSunriseUseCase(location, true)
+
         verify(sunriseRepository).fetchAPISunrise(any(), anyString(), anyString())
         verify(sunriseRepository).saveDownloadedSunrise(any())
     }
 
     @Test
     fun `returns a local sunrise when remote source isn't available`() = runBlocking {
-        sunriseRepository = mock {
-            onBlocking { fetchAPISunrise(any(), anyString(), anyString()) } doAnswer {
+        sunriseRepository.apply {
+            whenever(fetchAPISunrise(any(), anyString(), anyString())) doAnswer {
                 throw IOException()
             }
-            onBlocking { fetchLocalSunrise(any()) } doReturn DatabaseMocks.sunrise
+            whenever(fetchLocalSunrise(any())) doReturn DatabaseMocks.sunrise
         }
+
         val sunrise = getTomorrowSunriseUseCase(location, true)
+
         verify(sunriseRepository).fetchAPISunrise(any(), anyString(), anyString())
         verify(sunriseRepository).fetchLocalSunrise(any())
-
         assertThat(sunrise.origin).isEqualTo(Origin.DATABASE)
     }
 
     @Test
     fun `returns a preference sunrise when remote source isn't available and there is no local sunrise`() =
         runBlocking {
-            sunriseRepository = mock {
-                onBlocking { fetchAPISunrise(any(), anyString(), anyString()) } doAnswer {
+            sunriseRepository.apply {
+                whenever(fetchAPISunrise(any(), any(), any())) doAnswer {
                     throw IOException()
                 }
-                onBlocking { fetchLocalSunrise(any()) } doReturn null
-                on { fetchPreferencesSunrise(Origin.NO_INTERNET) } doReturn PreferencesMocks.sunriseNoInternet
+                whenever(fetchLocalSunrise(any())) doReturn null
+                whenever(fetchPreferencesSunrise(Origin.NO_INTERNET)) doReturn PreferencesMocks.sunriseNoInternet
             }
+
             val sunrise = getTomorrowSunriseUseCase(location, true)
+
             verify(sunriseRepository).fetchAPISunrise(any(), anyString(), anyString())
             verify(sunriseRepository).fetchLocalSunrise(any())
             verify(sunriseRepository).fetchPreferencesSunrise(Origin.NO_INTERNET)
-
             assertThat(sunrise.origin).isEqualTo(Origin.NO_INTERNET)
         }
 
@@ -117,22 +118,22 @@ class GetTomorrowSunriseUseCaseTest {
     fun `returns a preference sunrise when there is no location and an update is forced`() =
         runBlocking {
             val sunrise = getTomorrowSunriseUseCase(null, true)
-            verify(sunriseRepository).fetchPreferencesSunrise(Origin.NO_LOCATION)
 
+            verify(sunriseRepository).fetchPreferencesSunrise(Origin.NO_LOCATION)
             assertThat(sunrise.origin).isEqualTo(Origin.NO_LOCATION)
         }
 
     @Test
     fun `returns a preference sunrise when there is no location, an update isn't forced and there is no local sunrise`() =
         runBlocking {
-            sunriseRepository = mock {
-                onBlocking { fetchLocalSunrise(any()) } doReturn null
-                on { fetchPreferencesSunrise(Origin.NO_LOCATION) } doReturn PreferencesMocks.sunriseNoLocation
+            sunriseRepository.apply {
+                whenever(fetchLocalSunrise(any())) doReturn null
+                whenever(fetchPreferencesSunrise(Origin.NO_LOCATION)) doReturn PreferencesMocks.sunriseNoLocation
             }
-            val sunrise = getTomorrowSunriseUseCase(null, false)
-            verify(sunriseRepository).fetchPreferencesSunrise(Origin.NO_LOCATION)
 
+            val sunrise = getTomorrowSunriseUseCase(null, false)
+
+            verify(sunriseRepository).fetchPreferencesSunrise(Origin.NO_LOCATION)
             assertThat(sunrise.origin).isEqualTo(Origin.NO_LOCATION)
         }
-
 }

@@ -11,24 +11,22 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class AlarmsRepositoryImplTest {
-    private lateinit var alarmsPreferencesDataSource: AlarmsPreferencesDataSource
+    private val alarmsPreferencesDataSource: AlarmsPreferencesDataSource = mock {
+        on {
+            getAlarmPreferences(
+                ArgumentMatchers.anyInt(),
+                ArgumentMatchers.anyBoolean()
+            )
+        } doReturn PreferencesMocks.alarm
+    }
 
     private val alarmId = 0
 
-    private val repository by lazy {
-        AlarmsRepositoryImpl(alarmsPreferencesDataSource)
-    }
+    private lateinit var repository: AlarmsRepositoryImpl
 
     @Before
     fun setUp() {
-        alarmsPreferencesDataSource = mock {
-            on {
-                getAlarmPreferences(
-                    ArgumentMatchers.anyInt(),
-                    ArgumentMatchers.anyBoolean()
-                )
-            } doReturn PreferencesMocks.alarm
-        }
+        repository = AlarmsRepositoryImpl(alarmsPreferencesDataSource)
     }
 
     @Test

@@ -9,46 +9,37 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import java.time.LocalDate
 
 class SunriseRepositoryImplTest {
-    private lateinit var sunrisePreferenceDataSource: SunrisePreferenceDataSource
-    private lateinit var sunriseLocalDataSource: SunriseLocalDataSource
-    private lateinit var sunriseRemoteDataSource: SunriseRemoteDataSource
+    private val sunrisePreferenceDataSource: SunrisePreferenceDataSource = mock {
+        on { fetchSunrise(any()) } doReturn PreferencesMocks.sunriseNoInternet
+    }
+    private val sunriseLocalDataSource: SunriseLocalDataSource = mock {
+        onBlocking { fetchSunrise(any()) } doReturn DatabaseMocks.sunrise
+    }
+    private val sunriseRemoteDataSource: SunriseRemoteDataSource = mock {
+        onBlocking {
+            fetchSunrise(
+                any(),
+                anyString(),
+                anyString()
+            )
+        } doReturn NetworkMocks.sunrise
+    }
 
     private val tomorrowDate = LocalDate.now().plusDays(1)
 
-    private val repository by lazy {
-        SunriseRepositoryImpl(
+    private lateinit var repository: SunriseRepositoryImpl
+
+    @Before
+    fun setUp() {
+        repository = SunriseRepositoryImpl(
             sunrisePreferenceDataSource,
             sunriseLocalDataSource,
             sunriseRemoteDataSource
         )
-    }
-
-    @Before
-    fun setUp() {
-        sunrisePreferenceDataSource = mock {
-            on { fetchSunrise(any()) } doReturn PreferencesMocks.sunriseNoInternet
-        }
-
-        sunriseLocalDataSource = mock {
-            onBlocking { fetchSunrise(any()) } doReturn DatabaseMocks.sunrise
-        }
-
-        sunriseRemoteDataSource = mock {
-            onBlocking {
-                fetchSunrise(
-                    any(),
-                    anyString(),
-                    anyString()
-                )
-            } doReturn NetworkMocks.sunrise
-        }
     }
 
     @Test
@@ -69,11 +60,12 @@ class SunriseRepositoryImplTest {
 
     @Test
     fun `returns null when there is no sunrise in local`() = runBlocking {
-        sunriseLocalDataSource = mock {
-            onBlocking { fetchSunrise(any()) } doReturn null
+        sunriseLocalDataSource.apply {
+            whenever(fetchSunrise(any())) doReturn null
         }
 
         val sunrise = repository.fetchLocalSunrise(tomorrowDate)
+
         verify(sunriseLocalDataSource).fetchSunrise(tomorrowDate)
         assertThat(sunrise).isNull()
     }
@@ -87,11 +79,12 @@ class SunriseRepositoryImplTest {
 
     @Test
     fun `fetches sunrise from preferences when there is no location`() = runBlocking {
-        sunrisePreferenceDataSource = mock {
-            on { fetchSunrise(any()) } doReturn PreferencesMocks.sunriseNoLocation
+        sunrisePreferenceDataSource.apply {
+            whenever(fetchSunrise(any())) doReturn PreferencesMocks.sunriseNoLocation
         }
 
         val sunrise = repository.fetchPreferencesSunrise(Origin.NO_LOCATION)
+
         verify(sunrisePreferenceDataSource).fetchSunrise(Origin.NO_LOCATION)
         assertThat(sunrise.origin).isEqualTo(Origin.NO_LOCATION)
     }

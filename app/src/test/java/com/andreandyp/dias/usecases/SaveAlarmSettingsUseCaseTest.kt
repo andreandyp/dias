@@ -10,17 +10,15 @@ import org.mockito.kotlin.verify
 
 class SaveAlarmSettingsUseCaseTest {
 
-    private lateinit var alarmsRepository: AlarmsRepository
+    private val alarmsRepository: AlarmsRepository = mock()
 
     private val alarm = PreferencesMocks.alarm
 
-    private val saveAlarmSettingsUseCase by lazy {
-        SaveAlarmSettingsUseCase(alarmsRepository)
-    }
+    private lateinit var saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase
 
     @Before
     fun setUp() {
-        alarmsRepository = mock()
+        saveAlarmSettingsUseCase = SaveAlarmSettingsUseCase(alarmsRepository)
     }
 
     @Test

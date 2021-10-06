@@ -16,17 +16,17 @@ import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class TurnOnAlarmUseCaseTest {
-    private lateinit var alarmManager: AlarmManager
+    private val context = ApplicationProvider.getApplicationContext<DiasApplication>()
+    private val alarmManager: AlarmManager = spy(
+        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    )
     private lateinit var alarmPendingIntent: PendingIntent
 
-    private val turnOnAlarmUseCase by lazy {
-        TurnOnAlarmUseCase(alarmManager)
-    }
+    private lateinit var turnOnAlarmUseCase: TurnOnAlarmUseCase
 
     @Before
     fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<DiasApplication>()
-        alarmManager = spy(context.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
+        turnOnAlarmUseCase = TurnOnAlarmUseCase(alarmManager)
 
         alarmPendingIntent = PendingIntent.getBroadcast(
             context,
