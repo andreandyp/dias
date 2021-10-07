@@ -17,7 +17,7 @@ android {
         targetSdkVersion 30
         versionCode 3
         versionName "1.0.0-beta03"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.andreandyp.dias.DiasTestRunner"
     }
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -40,6 +40,17 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
+    }
+    sourceSets {
+        androidTest {
+            java.srcDirs += "src/sharedTest/java"
+        }
+        test {
+            java.srcDirs += "src/sharedTest/java"
+        }
+        debug {
+
+        }
     }
 }
 
@@ -85,6 +96,16 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dex_maker_version"
     androidTestImplementation "androidx.work:work-testing:$work_manager_version"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.38.1"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.38.1"
+
+    debugImplementation("androidx.fragment:fragment-testing:1.3.6") {
+        exclude group: 'androidx.test', module: 'core'
+    }
+    debugImplementation("androidx.fragment:fragment-ktx:1.3.6")
+    debugImplementation("androidx.test:core-ktx:1.4.0")
+    debugImplementation("androidx.test:rules:1.4.0")
+    debugImplementation("androidx.test:runner:1.4.0")
 
     // Componentes de arquitectura
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
