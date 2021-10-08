@@ -1,6 +1,7 @@
-package com.andreandyp.dias.repository.alarms
+package com.andreandyp.dias.fakes.repository.alarms
 
 import com.andreandyp.dias.domain.Alarm
+import com.andreandyp.dias.repository.alarms.AlarmsRepository
 import javax.inject.Inject
 
 class FakeAlarmsRepository @Inject constructor() : AlarmsRepository {

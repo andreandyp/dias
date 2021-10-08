@@ -1,6 +1,6 @@
 package com.andreandyp.dias.di
 
-import com.andreandyp.dias.repository.sunrise.FakeSunriseRepository
+import com.andreandyp.dias.fakes.repository.sunrise.FakeSunriseRepository
 import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import dagger.Binds
 import dagger.Module

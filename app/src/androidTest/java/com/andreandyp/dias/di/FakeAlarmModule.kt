@@ -1,7 +1,7 @@
 package com.andreandyp.dias.di
 
 import com.andreandyp.dias.repository.alarms.AlarmsRepository
-import com.andreandyp.dias.repository.alarms.FakeAlarmsRepository
+import com.andreandyp.dias.fakes.repository.alarms.FakeAlarmsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.components.SingletonComponent

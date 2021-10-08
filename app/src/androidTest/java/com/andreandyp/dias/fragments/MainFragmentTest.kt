@@ -15,7 +15,7 @@ import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.fakes.usecases.FakeGetTomorrowSunriseUseCase
 import com.andreandyp.dias.launchFragmentInHiltContainer
 import com.andreandyp.dias.mocks.PreferencesMocks
-import com.andreandyp.dias.repository.sunrise.FakeSunriseRepository
+import com.andreandyp.dias.fakes.repository.sunrise.FakeSunriseRepository
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.google.common.truth.Truth
 import dagger.hilt.android.testing.BindValue

@@ -1,6 +1,6 @@
 package com.andreandyp.dias.di
 
-import com.andreandyp.dias.repository.location.FakeLocationRepository
+import com.andreandyp.dias.fakes.repository.location.FakeLocationRepository
 import com.andreandyp.dias.repository.location.LocationRepository
 import dagger.Binds
 import dagger.Module

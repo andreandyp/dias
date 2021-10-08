@@ -1,9 +1,10 @@
-package com.andreandyp.dias.repository.sunrise
+package com.andreandyp.dias.fakes.repository.sunrise
 
 import com.andreandyp.dias.domain.Origin
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.mocks.DomainMocks
 import com.andreandyp.dias.mocks.PreferencesMocks
+import com.andreandyp.dias.repository.sunrise.SunriseRepository
 import java.time.LocalDate
 import javax.inject.Inject
 
