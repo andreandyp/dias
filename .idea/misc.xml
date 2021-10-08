@@ -3,11 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/andre/.gradle/caches/transforms-3/f23d8c075bd951299f50c60c673d7621/transformed/jetified-datetimepicker-1.0.2/res/layout/time_picker_dialog.xml" value="0.1" />
         <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/alarma_item.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/hora_dialog.xml" value="0.1" />
         <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/layout/main_fragment.xml" value="0.25" />
-        <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/xml/root_preferences.xml" value="0.1046875" />
+        <entry key="..\:/Users/andre/AndroidStudioProjects/Dias/app/src/main/res/xml/root_preferences.xml" value="0.25" />
       </map>
     </option>
   </component>
