@@ -24,8 +24,9 @@ object PreferencesMocks {
         vibration = true
         tone = ""
         uriTone = ""
-        offsetHours = 1
-        offsetMinutes = 15
-        offsetType = -1
+        offsetHours = 0
+        offsetMinutes = 0
+        offsetType = 0
+        utcRingingAt = ZonedDateTime.now().plusDays(1).withSecond(0).withNano(0)
     }
 }
