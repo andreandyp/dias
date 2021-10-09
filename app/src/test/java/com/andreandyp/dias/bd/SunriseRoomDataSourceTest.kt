@@ -59,7 +59,8 @@ class SunriseRoomDataSourceTest {
 
         sunriseRoomDataSource.saveSunrise(sunrise)
 
-        verify(sunriseDao).saveSunrise(sunriseEntity)
+        verify(sunriseDao).insertSunrise(sunriseEntity)
+        Unit
     }
 
     @Test

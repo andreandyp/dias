@@ -18,7 +18,7 @@ class SunriseRoomDataSource @Inject constructor(
         val sunrises = sunriseDao.countSavedSunrises()
         if (sunrises >= MAX_SUNRISES_ALLOWED) {
             val olderSunrise = sunriseDao.fetchOlderSunrise()
-            sunriseDao.deleteSunrise(olderSunrise)
+            sunriseDao.deleteSunrise(olderSunrise!!)
             return
         }
 
@@ -28,7 +28,7 @@ class SunriseRoomDataSource @Inject constructor(
             return
         }
 
-        sunriseDao.saveSunrise(sunrise.asEntity())
+        sunriseDao.insertSunrise(sunrise.asEntity())
     }
 
     companion object {
