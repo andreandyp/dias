@@ -105,13 +105,14 @@ class MainViewModelTest {
 
     @Test
     fun `changes loading status when setting up next alarm`() = runBlockingTest {
-        val orderLoading = mutableListOf<Boolean>()
-        val observerLoading = Observer<Boolean> { orderLoading.add(it) }
+        val observerLoading = Observer<Boolean> { }
         mainViewModel.isLoading.observeForever(observerLoading)
 
+        testDispatcher.pauseDispatcher()
         mainViewModel.setupNextAlarm(true)
-        assertThat(orderLoading.last()).isEqualTo(false)
-        assertThat(orderLoading.size).isEqualTo(3)
+        assertThat(mainViewModel.isLoading.value).isTrue()
+        testDispatcher.resumeDispatcher()
+        assertThat(mainViewModel.isLoading.value).isFalse()
 
         mainViewModel.isLoading.removeObserver(observerLoading)
     }
@@ -152,9 +153,9 @@ class MainViewModelTest {
     @Test
     fun `sets data origin to database when no forced update`() = runBlockingTest {
         val forceUpdate = false
-        val orderDataOrigin = mutableListOf<Origin>()
-        val observerDataOrigin = Observer<Origin> { orderDataOrigin.add(it) }
+        val observerDataOrigin = Observer<Origin> { }
         mainViewModel.dataOrigin.observeForever(observerDataOrigin)
+
         mainViewModel.setupNextAlarm(
             isLocationEnabled = true,
             forceUpdate = forceUpdate,
