@@ -3,11 +3,10 @@ package com.andreandyp.dias.domain
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.library.baseAdapters.BR
+import com.andreandyp.dias.utils.translateDisplayName
 import java.time.DayOfWeek
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.TextStyle
-import java.util.*
 
 data class Alarm(
     val id: Int,
@@ -122,8 +121,6 @@ data class Alarm(
     @get:Bindable
     val formattedDay: String
         get() {
-            return day?.getDisplayName(TextStyle.FULL, Locale.getDefault())?.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-            } ?: ""
+            return day?.translateDisplayName() ?: ""
         }
 }

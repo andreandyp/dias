@@ -23,6 +23,7 @@ import com.andreandyp.dias.fakes.usecases.FakeGetTomorrowSunriseUseCase
 import com.andreandyp.dias.launchFragmentInHiltContainer
 import com.andreandyp.dias.mocks.PreferencesMocks
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
+import com.andreandyp.dias.utils.translateDisplayName
 import com.google.common.truth.Truth
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -87,7 +88,7 @@ class MainFragmentTest {
                 nextDay.dayOfWeek.value - 1
             )
         )
-        onView(withText(nextDay.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())))
+        onView(withText(nextDay.dayOfWeek.translateDisplayName()))
             .check(matches(hasTextColor(R.color.primaryColor)))
     }
 
@@ -140,7 +141,7 @@ class MainFragmentTest {
             allOf(
                 withId(R.id.switch_encender),
                 hasSibling(
-                    withText(nextDay.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()))
+                    withText(nextDay.dayOfWeek.translateDisplayName())
                 )
             )
         ).perform(click())
@@ -160,7 +161,7 @@ class MainFragmentTest {
             allOf(
                 withId(R.id.tv_hora_antes_despues),
                 hasSibling(
-                    withText(nextDay.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()))
+                    withText(nextDay.dayOfWeek.translateDisplayName())
                 )
             )
         ).perform(click())
