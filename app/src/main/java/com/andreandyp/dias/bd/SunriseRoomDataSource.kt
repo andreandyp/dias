@@ -1,8 +1,10 @@
 package com.andreandyp.dias.bd
 
+import androidx.annotation.VisibleForTesting
 import com.andreandyp.dias.bd.dao.SunriseDAO
 import com.andreandyp.dias.domain.Sunrise
 import com.andreandyp.dias.repository.sunrise.SunriseLocalDataSource
+import java.lang.reflect.Modifier.PRIVATE
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -32,6 +34,7 @@ class SunriseRoomDataSource @Inject constructor(
     }
 
     companion object {
-        private const val MAX_SUNRISES_ALLOWED = 30
+        @VisibleForTesting(otherwise = PRIVATE)
+        const val MAX_SUNRISES_ALLOWED = 30
     }
 }
