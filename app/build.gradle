@@ -15,8 +15,8 @@ android {
         applicationId "com.andreandyp.dias"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 3
-        versionName "1.0.0-beta03"
+        versionCode 4
+        versionName "1.0.0-beta04"
         testInstrumentationRunner "com.andreandyp.dias.DiasTestRunner"
     }
     compileOptions {
