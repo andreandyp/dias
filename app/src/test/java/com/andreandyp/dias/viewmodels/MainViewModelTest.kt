@@ -15,9 +15,9 @@ import com.andreandyp.dias.usecases.*
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -66,7 +66,7 @@ class MainViewModelTest {
         on { invoke(any(), any()) } doAnswer {}
     }
 
-    private val testDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -91,11 +91,12 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `sets next alarm`() = runBlockingTest {
+    fun `sets next alarm`() = runTest {
         val observerAlarm = Observer<Alarm> { }
         mainViewModel.nextAlarm.observeForever(observerAlarm)
 
         mainViewModel.setupNextAlarm(true)
+        testDispatcher.scheduler.runCurrent()
         val alarmValue = mainViewModel.nextAlarm.value
         assertThat(alarmValue).isEqualTo(fakeAlarm)
         assertThat(alarmValue!!.isNextAlarm).isTrue()
@@ -104,39 +105,40 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `changes loading status when setting up next alarm`() = runBlockingTest {
+    fun `changes loading status when setting up next alarm`() = runTest {
         val observerLoading = Observer<Boolean> { }
         mainViewModel.isLoading.observeForever(observerLoading)
 
-        testDispatcher.pauseDispatcher()
         mainViewModel.setupNextAlarm(true)
         assertThat(mainViewModel.isLoading.value).isTrue()
-        testDispatcher.resumeDispatcher()
+        testDispatcher.scheduler.runCurrent()
         assertThat(mainViewModel.isLoading.value).isFalse()
 
         mainViewModel.isLoading.removeObserver(observerLoading)
     }
 
     @Test
-    fun `gets location when permission is enabled`() = runBlockingTest {
+    fun `gets location when permission is enabled`() = runTest {
         mainViewModel.setupNextAlarm(
             isLocationEnabled = true
         )
+        testDispatcher.scheduler.runCurrent()
         verify(getLastLocationUseCase).invoke()
         verify(getTomorrowSunriseUseCase).invoke(fakeLocation, false)
     }
 
     @Test
-    fun `doesn't get location when permission is disabled`() = runBlockingTest {
+    fun `doesn't get location when permission is disabled`() = runTest {
         mainViewModel.setupNextAlarm(
             isLocationEnabled = false
         )
+        testDispatcher.scheduler.runCurrent()
         verifyZeroInteractions(getLastLocationUseCase)
         verify(getTomorrowSunriseUseCase).invoke(null, false)
     }
 
     @Test
-    fun `sets data origin to internet when forced update`() = runBlockingTest {
+    fun `sets data origin to internet when forced update`() = runTest {
         val forceUpdate = true
         val observerDataOrigin = Observer<Origin> {}
         mainViewModel.dataOrigin.observeForever(observerDataOrigin)
@@ -144,6 +146,7 @@ class MainViewModelTest {
             isLocationEnabled = true,
             forceUpdate = forceUpdate,
         )
+        testDispatcher.scheduler.runCurrent()
         verify(getTomorrowSunriseUseCase).invoke(fakeLocation, forceUpdate)
         assertThat(mainViewModel.dataOrigin.value).isEqualTo(Origin.INTERNET)
 
@@ -151,7 +154,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `sets data origin to database when no forced update`() = runBlockingTest {
+    fun `sets data origin to database when no forced update`() = runTest {
         val forceUpdate = false
         val observerDataOrigin = Observer<Origin> { }
         mainViewModel.dataOrigin.observeForever(observerDataOrigin)
@@ -160,6 +163,7 @@ class MainViewModelTest {
             isLocationEnabled = true,
             forceUpdate = forceUpdate,
         )
+        testDispatcher.scheduler.runCurrent()
         verify(getTomorrowSunriseUseCase).invoke(fakeLocation, forceUpdate)
         assertThat(mainViewModel.dataOrigin.value).isEqualTo(Origin.DATABASE)
 
@@ -167,7 +171,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `sets alarm ringtone and uri`() = runBlockingTest {
+    fun `sets alarm ringtone and uri`() = runTest {
         val alarmId = 1
         val uriTone = Uri.parse("content://")
         val ringtone = ""
@@ -179,7 +183,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `turns on alarm`() = runBlockingTest {
+    fun `turns on alarm`() = runTest {
         val instant = Instant.now()
         mainViewModel.onAlarmOn(instant, alarmPendingIntent)
 
@@ -187,7 +191,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `turns off alarm`() = runBlockingTest {
+    fun `turns off alarm`() = runTest {
         mainViewModel.onAlarmOff(alarmPendingIntent, snoozePendingIntent)
 
         verify(turnOffAlarmUseCase).invoke(alarmPendingIntent, snoozePendingIntent)
@@ -197,6 +201,5 @@ class MainViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 }

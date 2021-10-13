@@ -3,7 +3,7 @@ package com.andreandyp.dias
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
-import com.andreandyp.dias.workmanagers.DownloadSunriseWorker
+import com.andreandyp.dias.workers.DownloadSunriseWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

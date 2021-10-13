@@ -1,13 +1,9 @@
-package com.andreandyp.dias.workmanagers
+package com.andreandyp.dias.workers
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.andreandyp.dias.R
-import com.andreandyp.dias.receivers.AlarmaReceiver
 import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.GetLastLocationUseCase
 import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
