@@ -9,22 +9,21 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'dagger.hilt.android.plugin'
 
 android {
-    compileSdkVersion 32
+    compileSdk 34
     defaultConfig {
         applicationId "com.andreandyp.dias"
-        minSdkVersion 23
-        targetSdkVersion 32
+        minSdkVersion 26
+        targetSdk 33
         versionCode 4
         versionName "1.0.0-beta04"
         testInstrumentationRunner "com.andreandyp.dias.DiasTestRunner"
     }
     compileOptions {
-        coreLibraryDesugaringEnabled true
-        targetCompatibility JavaVersion.VERSION_1_8
-        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
     buildTypes {
         release {
@@ -35,18 +34,24 @@ android {
     buildFeatures {
         dataBinding true
         viewBinding true
+        compose true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.8"
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
     }
+    namespace 'com.andreandyp.dias'
 }
 
 dependencies {
     def navigation_version = "2.5.0"
-    def room_version = "2.4.2"
+    def room_version = "2.6.1"
     def lifecycle_version = "2.2.0"
-    def lifecycle_viewmodel_version = "2.5.0"
     def work_manager_version = "2.7.1"
 
     def retrofit_version = "2.9.0"
@@ -71,12 +76,12 @@ dependencies {
     // Tests unitarios
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
-    testImplementation "com.google.truth:truth:1.1.3"
-    testImplementation "androidx.test.ext:junit-ktx:1.1.3"
-    testImplementation "androidx.test:core-ktx:1.4.0"
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-    testImplementation "org.robolectric:robolectric:4.8.1"
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
+    testImplementation "com.google.truth:truth:1.3.0"
+    testImplementation "androidx.test.ext:junit-ktx:1.1.5"
+    testImplementation "androidx.test:core-ktx:1.5.0"
+    testImplementation "androidx.arch.core:core-testing:2.2.0"
+    testImplementation "org.robolectric:robolectric:4.11.1"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     testImplementation "com.squareup.okhttp3:mockwebserver:4.9.2"
 
     // Test instrumentados
@@ -108,10 +113,13 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_viewmodel_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
     implementation "androidx.concurrent:concurrent-futures-ktx:1.1.0"
+
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -137,6 +145,14 @@ dependencies {
     kapt "com.android.databinding:compiler:$data_binding_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$play_services_coroutines_version"
     implementation "androidx.fragment:fragment-ktx:1.5.0"
-    implementation "androidx.activity:activity-ktx:1.5.0"
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6'
+    implementation "androidx.activity:activity-ktx:1.8.2"
+    implementation "androidx.activity:activity-compose:1.8.2"
+
+    // Compose
+    implementation platform("androidx.compose:compose-bom:2023.06.01")
+    implementation "androidx.compose.material3:material3"
+    implementation "androidx.compose.material:material-icons-extended"
+    implementation "androidx.compose.runtime:runtime-livedata"
+    implementation "androidx.compose.ui:ui-tooling-preview"
+    debugImplementation "androidx.compose.ui:ui-tooling"
 }
