@@ -3,6 +3,7 @@ package com.andreandyp.dias.viewmodels
 import android.app.PendingIntent
 import android.location.Location
 import android.net.Uri
+import androidx.compose.runtime.mutableStateListOf
 import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,9 +11,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
-import com.andreandyp.dias.domain.Origin
-import com.andreandyp.dias.usecases.*
+import com.andreandyp.dias.ui.state.AlarmUiState
+import com.andreandyp.dias.ui.state.MainState
+import com.andreandyp.dias.usecases.ConfigureAlarmSettingsUseCase
+import com.andreandyp.dias.usecases.GetLastLocationUseCase
+import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
+import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
+import com.andreandyp.dias.usecases.TurnOffAlarmUseCase
+import com.andreandyp.dias.usecases.TurnOnAlarmUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Instant
@@ -29,30 +39,38 @@ class MainViewModel @Inject constructor(
     private val turnOnAlarmUseCase: TurnOnAlarmUseCase,
     private val turnOffAlarmUseCase: TurnOffAlarmUseCase,
 ) : ViewModel() {
-    val alarms = mutableListOf<Alarm>()
 
     private val _nextAlarm = MutableLiveData<Alarm>()
     val nextAlarm: LiveData<Alarm> = _nextAlarm
 
-    private val _dataOrigin = MutableLiveData<Origin>()
-    val dataOrigin: LiveData<Origin> = _dataOrigin
-
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
-
     private val _alarmStatusUpdated = MutableLiveData<Event<Alarm>>()
     val alarmStatusUpdated: LiveData<Event<Alarm>> = _alarmStatusUpdated
 
+    private val _state = MutableStateFlow(MainState())
+    val state = _state.asStateFlow()
+
+    val alarms = mutableStateListOf<AlarmUiState>()
+
     init {
         val nextDay = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
-        for (i: Int in 1..7) {
-            val alarm = setupAlarm(i, nextDay == i)
-            alarms.add(alarm)
-        }
+        (1..7).map {
+            setupAlarm(it, nextDay == it)
+        }.map {
+            AlarmUiState(
+                it.id,
+                it.formattedDay,
+                it.formattedOffset,
+                it.on,
+                it.vibration,
+                it.tone,
+            )
+        }.onEach(alarms::add)
     }
 
     fun setupNextAlarm(isLocationEnabled: Boolean, forceUpdate: Boolean = false) {
-        _isLoading.value = true
+        _state.update {
+            it.copy(loading = true)
+        }
 
         viewModelScope.launch {
             if (isLocationEnabled) {
@@ -66,8 +84,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onRingtoneSelected(alarmId: Int, uri: Uri?, ringtone: String) {
-        alarms[alarmId].tone = ringtone
-        alarms[alarmId].uriTone = uri.toString()
+        /*alarms[alarmId].tone = ringtone
+        alarms[alarmId].uriTone = uri.toString()*/
     }
 
     fun onAlarmOn(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
@@ -78,14 +96,20 @@ class MainViewModel @Inject constructor(
         turnOffAlarmUseCase(alarmPendingIntent, snoozePendingIntent)
     }
 
+    fun onClickExpand(alarm: AlarmUiState) {
+        val index = alarms.indexOfFirst { it.id == alarm.id }
+        alarms[index] = alarm.copy(isConfigExpanded = alarm.isConfigExpanded.not())
+    }
+
     private suspend fun getNextAlarm(location: Location?, forceUpdate: Boolean) {
         val sunrise = getTomorrowSunriseUseCase(location, forceUpdate)
 
-        _dataOrigin.value = sunrise.origin
-        val nextDay: Alarm = alarms.first { it.isNextAlarm }
-        nextDay.utcRingingAt = sunrise.dateTimeUTC
-        _nextAlarm.value = nextDay
-        _isLoading.value = false
+        _state.update {
+            it.copy(origin = sunrise.origin, loading = false)
+        }
+        // val nextDay: Alarm = alarms.first { it.isNextAlarm }
+        // nextDay.utcRingingAt = sunrise.dateTimeUTC
+        /*_nextAlarm.value = nextDay*/
     }
 
     private fun changeAlarmStatus(alarm: Alarm) {
@@ -106,6 +130,7 @@ class MainViewModel @Inject constructor(
                         changeAlarmStatus(alarm)
                         Alarm.Field.ON
                     }
+
                     BR.vibration -> Alarm.Field.VIBRATION
                     BR.tone -> Alarm.Field.TONE
                     BR.uriTone -> Alarm.Field.URI_TONE
