@@ -9,16 +9,17 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.andreandyp.dias.R
-import com.andreandyp.dias.databinding.MainFragmentBinding
 import com.andreandyp.dias.ui.screens.MainLayout
 import com.andreandyp.dias.ui.theme.DiasTheme
 import com.andreandyp.dias.utils.AlarmUtils
@@ -28,30 +29,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
-    private lateinit var binding: MainFragmentBinding
     private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        setHasOptionsMenu(true)
-        NotificationUtils.crearCanalNotificaciones(requireContext())
-
-        binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.setupNextAlarm(isPermissionGranted(), true)
-            binding.swipeToRefresh.isRefreshing = false
-        }
-
-        binding.vm = viewModel
-
-        setUpObservers()
-
-        return binding.root
-    }
+    ) = ComposeView(requireContext())
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.ajustes_menu, menu)
@@ -71,16 +54,22 @@ class MainFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.alarmas.setContent {
+        setHasOptionsMenu(true)
+        NotificationUtils.crearCanalNotificaciones(requireContext())
+
+        setUpObservers()
+
+        (view as ComposeView).setContent {
             DiasTheme {
                 val alarmsState = viewModel.alarms
                 val state by viewModel.state.collectAsState()
 
-                Surface {
+                Surface(modifier = Modifier.fillMaxSize()) {
                     MainLayout(
                         state = state,
                         alarms = alarmsState,
                         onClickExpand = viewModel::onClickExpand,
+                        onRefresh = { viewModel.setupNextAlarm(isPermissionGranted(), true) }
                     )
                 }
             }

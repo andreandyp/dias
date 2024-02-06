@@ -5,22 +5,31 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.ArrowDropUp
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -39,28 +48,49 @@ import com.andreandyp.dias.ui.state.MainState
 import com.andreandyp.dias.ui.theme.DiasTheme
 import com.andreandyp.dias.ui.utils.ComposeUtils
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainLayout(
     state: MainState,
     alarms: List<AlarmUiState>,
+    onRefresh: () -> Unit,
     onClickExpand: (AlarmUiState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column {
-        Header(state = state)
-        OriginLabel(state)
-        Divider(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-        LazyColumn {
-            items(alarms) {
-                AlarmConfigItem(it, onClickExpand)
+    val pullRefreshState = rememberPullRefreshState(state.loading, onRefresh)
+
+    Scaffold { paddingValues ->
+        Box(
+            modifier = Modifier
+                .pullRefresh(pullRefreshState)
+                .padding(paddingValues),
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Header(state = state)
+                OriginLabel(state)
+                Divider(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                LazyColumn {
+                    items(alarms) {
+                        AlarmConfigItem(it, onClickExpand)
+                    }
+
+                    item {
+                        Text(
+                            text = stringResource(id = R.string.api_credits),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
+
+            PullRefreshIndicator(
+                state.loading,
+                pullRefreshState,
+                Modifier.align(Alignment.TopCenter)
+            )
         }
-        Text(
-            text = stringResource(id = R.string.api_credits),
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
 
@@ -126,7 +156,9 @@ private fun AlarmConfigItem(uiState: AlarmUiState, onClickExpand: (AlarmUiState)
         elevation = CardDefaults.cardElevation(defaultElevation = if (uiState.isConfigExpanded) 4.dp else 1.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(verticalArrangement = Arrangement.SpaceEvenly) {
@@ -183,7 +215,12 @@ private fun ConfigurationSwitches(alarm: AlarmUiState) {
 
 @Composable
 private fun ExpandedConfiguration(isExpanded: Boolean) {
-    AnimatedVisibility(visible = isExpanded, modifier = Modifier.fillMaxWidth()) {
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         TextButton(onClick = { /*TODO*/ }) {
             Text(text = stringResource(id = R.string.choose_song_alarm_config))
         }
@@ -214,8 +251,17 @@ private fun MainLayoutPreview() {
         Surface {
             MainLayout(
                 MainState(),
-                listOf(alarm, alarm.copy(isConfigExpanded = true), alarm),
-                onClickExpand = {}
+                listOf(
+                    alarm,
+                    alarm.copy(isConfigExpanded = true),
+                    alarm,
+                    alarm,
+                    alarm,
+                    alarm.copy(isConfigExpanded = true),
+                    alarm,
+                ),
+                onRefresh = {},
+                onClickExpand = {},
             )
         }
     }
