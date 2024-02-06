@@ -38,7 +38,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.8"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 
     testOptions {
@@ -49,29 +49,29 @@ android {
 }
 
 dependencies {
-    def navigation_version = "2.5.0"
+    def navigation_version = "2.7.6"
     def room_version = "2.6.1"
     def lifecycle_version = "2.7.0"
-    def work_manager_version = "2.7.1"
+    def work_manager_version = "2.8.1"
 
     def retrofit_version = "2.9.0"
-    def moshi_version = "1.12.0"
+    def moshi_version = "1.15.1"
 
     def constraint_version = "2.1.4"
     def preferencex_version = "1.1.0"
     def swipe_version = "1.1.0"
-    def material_version = "1.6.1"
+    def material_version = "1.11.0"
 
-    def play_services_location_version = "20.0.0"
+    def play_services_location_version = "21.1.0"
     def data_binding_version = "3.1.4"
-    def play_services_coroutines_version = "1.4.3"
+    def play_services_coroutines_version = "1.7.3"
 
     def dex_maker_version = '2.12.1'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
 
     // Tests unitarios
     testImplementation 'junit:junit:4.13.2'
@@ -95,8 +95,8 @@ dependencies {
     androidTestImplementation "androidx.work:work-testing:$work_manager_version"
     androidTestImplementation "androidx.room:room-testing:$room_version"
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.38.1"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.40.1"
-    kaptAndroidTest 'androidx.hilt:hilt-compiler:1.0.0'
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+    kaptAndroidTest 'androidx.hilt:hilt-compiler:1.1.0'
 
     debugImplementation("androidx.fragment:fragment-testing:1.5.0") {
         exclude group: 'androidx.test', module: 'core'
@@ -136,19 +136,19 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-    implementation 'androidx.hilt:hilt-work:1.0.0'
-    kapt 'androidx.hilt:hilt-compiler:1.0.0'
+    implementation 'androidx.hilt:hilt-work:1.1.0'
+    kapt 'androidx.hilt:hilt-compiler:1.1.0'
 
     // Otros
     implementation "com.google.android.gms:play-services-location:$play_services_location_version"
     kapt "com.android.databinding:compiler:$data_binding_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$play_services_coroutines_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.0"
+    implementation "androidx.fragment:fragment-ktx:1.6.2"
     implementation "androidx.activity:activity-ktx:1.8.2"
     implementation "androidx.activity:activity-compose:1.8.2"
 
     // Compose
-    implementation platform("androidx.compose:compose-bom:2023.06.01")
+    implementation platform("androidx.compose:compose-bom:2024.01.00")
     implementation "androidx.compose.material3:material3"
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.material:material-icons-extended"

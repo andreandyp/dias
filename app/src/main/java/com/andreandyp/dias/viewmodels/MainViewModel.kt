@@ -101,6 +101,15 @@ class MainViewModel @Inject constructor(
         alarms[index] = alarm.copy(isConfigExpanded = alarm.isConfigExpanded.not())
     }
 
+    fun onChangeAlarmOnOff(isChecked: Boolean, alarm: AlarmUiState) {}
+    fun onChangeVibration(isChecked: Boolean, alarm: AlarmUiState) {}
+
+    fun onClickMenu(isOpen: Boolean) {
+        _state.update {
+            it.copy(isOpenActionsMenu = isOpen)
+        }
+    }
+
     private suspend fun getNextAlarm(location: Location?, forceUpdate: Boolean) {
         val sunrise = getTomorrowSunriseUseCase(location, forceUpdate)
 

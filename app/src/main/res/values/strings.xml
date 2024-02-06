@@ -21,6 +21,7 @@
     <string name="separador_alarma">Separador de alarma</string>
     <string name="title_activity_ajustes">Ajustes</string>
 
+    <string name="settings">Ajustes</string>
     <string name="next_alarm_headline">Próxima alarma</string>
     <string name="no_next_alarm">Ninguna alarma programada.</string>
     <string name="origin_loading">Obteniendo datos de internet…</string>

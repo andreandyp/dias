@@ -4,23 +4,18 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.andreandyp.dias.R
-import com.andreandyp.dias.ui.screens.MainLayout
+import com.andreandyp.dias.ui.screens.MainScreen
 import com.andreandyp.dias.ui.theme.DiasTheme
 import com.andreandyp.dias.utils.AlarmUtils
 import com.andreandyp.dias.utils.NotificationUtils
@@ -36,40 +31,21 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ) = ComposeView(requireContext())
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.ajustes_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.ajustes -> {
-                this.findNavController()
-                    .navigate(MainFragmentDirections.mostrarAjustes())
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.hide()
         NotificationUtils.crearCanalNotificaciones(requireContext())
 
         setUpObservers()
 
         (view as ComposeView).setContent {
             DiasTheme {
-                val alarmsState = viewModel.alarms
-                val state by viewModel.state.collectAsState()
-
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MainLayout(
-                        state = state,
-                        alarms = alarmsState,
-                        onClickExpand = viewModel::onClickExpand,
-                        onRefresh = { viewModel.setupNextAlarm(isPermissionGranted(), true) }
+                    MainScreen(
+                        viewModel = viewModel,
+                        onRefresh = { viewModel.setupNextAlarm(isPermissionGranted(), true) },
+                        onClickSettings = {
+                            findNavController().navigate(MainFragmentDirections.mostrarAjustes())
+                        }
                     )
                 }
             }

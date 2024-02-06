@@ -21,13 +21,21 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.ArrowDropUp
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -35,6 +43,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -47,19 +57,77 @@ import com.andreandyp.dias.ui.state.AlarmUiState
 import com.andreandyp.dias.ui.state.MainState
 import com.andreandyp.dias.ui.theme.DiasTheme
 import com.andreandyp.dias.ui.utils.ComposeUtils
+import com.andreandyp.dias.viewmodels.MainViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainLayout(
+fun MainScreen(viewModel: MainViewModel, onRefresh: () -> Unit, onClickSettings: () -> Unit) {
+    val alarmsState = viewModel.alarms
+    val state by viewModel.state.collectAsState()
+
+    MainLayout(
+        state = state,
+        alarms = alarmsState,
+        onRefresh = onRefresh,
+        onClickMenu = viewModel::onClickMenu,
+        onClickSettings = onClickSettings,
+        onClickExpand = viewModel::onClickExpand,
+        onChangeAlarmOnOff = viewModel::onChangeAlarmOnOff,
+        onChangeVibration = viewModel::onChangeVibration,
+        onChangeRingtone = {},
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun MainLayout(
     state: MainState,
     alarms: List<AlarmUiState>,
     onRefresh: () -> Unit,
+    onClickMenu: (Boolean) -> Unit,
+    onClickSettings: () -> Unit,
     onClickExpand: (AlarmUiState) -> Unit,
+    onChangeAlarmOnOff: (Boolean, AlarmUiState) -> Unit,
+    onChangeVibration: (Boolean, AlarmUiState) -> Unit,
+    onChangeRingtone: (AlarmUiState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val pullRefreshState = rememberPullRefreshState(state.loading, onRefresh)
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = onRefresh) {
+                        Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "")
+                    }
+                    IconButton(onClick = {
+                        onClickMenu(true)
+                    }) {
+                        Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "")
+                    }
+                    DropdownMenu(
+                        expanded = state.isOpenActionsMenu,
+                        onDismissRequest = { onClickMenu(false) }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.settings)) },
+                            onClick = {
+                                onClickMenu(false)
+                                onClickSettings()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Settings,
+                                    contentDescription = stringResource(id = R.string.settings),
+                                )
+                            },
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .pullRefresh(pullRefreshState)
@@ -71,7 +139,13 @@ fun MainLayout(
                 Divider(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 LazyColumn {
                     items(alarms) {
-                        AlarmConfigItem(it, onClickExpand)
+                        AlarmConfigItem(
+                            uiState = it,
+                            onClickExpand = onClickExpand,
+                            onChangeAlarmOnOff = onChangeAlarmOnOff,
+                            onChangeVibration = onChangeVibration,
+                            onChangeRingtone = onChangeRingtone,
+                        )
                     }
 
                     item {
@@ -140,7 +214,13 @@ private fun OriginLabel(state: MainState) {
 }
 
 @Composable
-private fun AlarmConfigItem(uiState: AlarmUiState, onClickExpand: (AlarmUiState) -> Unit) {
+private fun AlarmConfigItem(
+    uiState: AlarmUiState,
+    onClickExpand: (AlarmUiState) -> Unit,
+    onChangeAlarmOnOff: (Boolean, AlarmUiState) -> Unit,
+    onChangeVibration: (Boolean, AlarmUiState) -> Unit,
+    onChangeRingtone: (AlarmUiState) -> Unit,
+) {
     val colors = if (uiState.isConfigExpanded) {
         MaterialTheme.colorScheme.surfaceVariant
     } else {
@@ -168,10 +248,10 @@ private fun AlarmConfigItem(uiState: AlarmUiState, onClickExpand: (AlarmUiState)
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                ConfigurationSwitches(uiState)
+                ConfigurationSwitches(uiState, onChangeAlarmOnOff, onChangeVibration)
             }
         }
-        ExpandedConfiguration(uiState.isConfigExpanded)
+        ExpandedConfiguration(uiState, onChangeRingtone)
     }
 }
 
@@ -194,14 +274,18 @@ private fun DayAndOffset(alarm: AlarmUiState) {
 }
 
 @Composable
-private fun ConfigurationSwitches(alarm: AlarmUiState) {
+private fun ConfigurationSwitches(
+    alarm: AlarmUiState,
+    onChangeAlarmOnOff: (Boolean, AlarmUiState) -> Unit,
+    onChangeVibration: (Boolean, AlarmUiState) -> Unit,
+) {
     Row(
         modifier = Modifier.padding(end = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(text = stringResource(id = R.string.turn_alarm_config))
-        Switch(checked = alarm.isOn, onCheckedChange = {})
+        Switch(checked = alarm.isOn, onCheckedChange = { onChangeAlarmOnOff(it, alarm) })
     }
     Row(
         modifier = Modifier.padding(end = 16.dp),
@@ -209,23 +293,23 @@ private fun ConfigurationSwitches(alarm: AlarmUiState) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(text = stringResource(id = R.string.vibration_alarm_config))
-        Switch(checked = alarm.shouldVibrate, onCheckedChange = {})
+        Switch(checked = alarm.shouldVibrate, onCheckedChange = { onChangeVibration(it, alarm) })
     }
 }
 
 @Composable
-private fun ExpandedConfiguration(isExpanded: Boolean) {
+private fun ExpandedConfiguration(alarm: AlarmUiState, onChangeRingtone: (AlarmUiState) -> Unit) {
     AnimatedVisibility(
-        visible = isExpanded,
+        visible = alarm.isConfigExpanded,
         enter = expandVertically(),
         exit = shrinkVertically(),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        TextButton(onClick = { /*TODO*/ }) {
+        TextButton(onClick = { onChangeRingtone(alarm) }) {
             Text(text = stringResource(id = R.string.choose_song_alarm_config))
         }
     }
-    Crossfade(targetState = isExpanded, label = "Arrow") {
+    Crossfade(targetState = alarm.isConfigExpanded, label = "Arrow") {
         if (it) {
             Icon(
                 imageVector = Icons.Rounded.ArrowDropUp,
@@ -250,7 +334,7 @@ private fun MainLayoutPreview() {
     DiasTheme {
         Surface {
             MainLayout(
-                MainState(),
+                MainState(origin = Origin.DATABASE),
                 listOf(
                     alarm,
                     alarm.copy(isConfigExpanded = true),
@@ -261,7 +345,12 @@ private fun MainLayoutPreview() {
                     alarm,
                 ),
                 onRefresh = {},
+                onClickSettings = {},
+                onClickMenu = {},
                 onClickExpand = {},
+                onChangeAlarmOnOff = { _, _ -> },
+                onChangeVibration = { _, _ -> },
+                onChangeRingtone = {},
             )
         }
     }
