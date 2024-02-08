@@ -59,7 +59,7 @@ class MainFragment : Fragment() {
                     requireContext(), alarm.id
                 )
                 if (alarm.on) {
-                    viewModel.onAlarmOn(alarm.ringingAt!!.toInstant(), alarmPendingIntent)
+                    // viewModel.onAlarmOn(alarm.ringingAt!!.toInstant(), alarmPendingIntent)
                 } else {
                     val snoozePendingIntent = AlarmUtils.createSnoozePendingIntent(requireContext())
                     viewModel.onAlarmOff(alarmPendingIntent, snoozePendingIntent)

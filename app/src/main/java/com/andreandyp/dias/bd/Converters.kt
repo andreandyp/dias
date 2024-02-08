@@ -1,9 +1,11 @@
 package com.andreandyp.dias.bd
 
 import androidx.room.TypeConverter
+import com.andreandyp.dias.domain.OffsetType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.OffsetDateTime
 
 class Converters {
     @TypeConverter
@@ -23,4 +25,16 @@ class Converters {
 
     @TypeConverter
     fun stringToInstant(string: String): Instant = Instant.parse(string)
+
+    @TypeConverter
+    fun offsetTypeToInt(offsetType: OffsetType?): Int? = offsetType?.type
+
+    @TypeConverter
+    fun intToOffsetType(value: Int?): OffsetType? = OffsetType.entries.find { it.type == value }
+
+    @TypeConverter
+    fun offsetDateTimeToString(dateTime: OffsetDateTime?): String? = dateTime?.toString()
+
+    @TypeConverter
+    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { OffsetDateTime.parse(it) }
 }

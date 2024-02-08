@@ -17,19 +17,6 @@
         android:foreground="?android:attr/selectableItemBackgroundBorderless">
 
         <TextView
-            android:id="@+id/tv_dia"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@{alarm.formattedDay}"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textColor="@{alarm.isNextAlarm ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lunes" />
-
-        <TextView
             android:id="@+id/tv_hora_antes_despues"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,30 +28,8 @@
             android:textAppearance="?attr/textAppearanceHeadline6"
             android:textColor="@{alarm.isNextAlarm ? @color/primaryColor : @color/secondary_text_inverse_when_activated_material}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_dia"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="±0:00" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_vibrar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:checked="@={alarm.vibration}"
-            android:text="@string/vibrar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_encender"
-            tools:checked="true" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_encender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:checked="@={alarm.on}"
-            android:text="@string/encendida"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_dia"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_dia" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_tono"
@@ -72,37 +37,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="@{alarm.tone}"
+            android:text="alarm.tone"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_vibrar"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Tusa"
             tools:visibility="visible" />
-
-        <ImageView
-            android:id="@+id/detalles"
-            android:layout_width="0dp"
-            android:layout_height="24dp"
-            android:clickable="true"
-            android:contentDescription="@string/detalles_alarma"
-            android:focusable="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_tono"
-            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
-
-        <ImageView
-            android:id="@+id/separador"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="@string/separador_alarma"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detalles"
-            app:srcCompat="@color/grey" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

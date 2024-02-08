@@ -22,4 +22,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDao(diasDatabase: DiasDatabase) = diasDatabase.sunriseDao()
+
+    @Provides
+    @Singleton
+    fun provideAlarmsDao(diasDatabase: DiasDatabase) = diasDatabase.alarmsDao()
 }

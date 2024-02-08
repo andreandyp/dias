@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
@@ -185,7 +184,6 @@ private fun Header(state: MainState) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun OriginLabel(state: MainState) {
     val textId = when (state.origin) {

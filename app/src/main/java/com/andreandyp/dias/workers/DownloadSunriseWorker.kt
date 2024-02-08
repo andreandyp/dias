@@ -25,14 +25,14 @@ class DownloadSunriseWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val nextDay = LocalDate.now().plusDays(1).dayOfWeek
-        val nextAlarm = configureAlarmSettingsUseCase(nextDay.value, true)
+        // val nextAlarm = configureAlarmSettingsUseCase(nextDay.value, true)
         val lastLocation = getLastLocationUseCase() ?: return Result.failure()
         val sunrise = getTomorrowSunriseUseCase(lastLocation, true)
-        nextAlarm.utcRingingAt = sunrise.dateTimeUTC
+        /*nextAlarm.utcRingingAt = sunrise.dateTimeUTC
         if (nextAlarm.on) {
             val alarmPendingIntent = AlarmUtils.createAlarmPendingIntent(context, nextAlarm.id)
             turnOnAlarmUseCase(nextAlarm.ringingAt!!.toInstant(), alarmPendingIntent)
-        }
+        }*/
         return Result.success()
     }
 

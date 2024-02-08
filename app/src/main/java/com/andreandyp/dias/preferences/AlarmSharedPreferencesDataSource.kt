@@ -9,7 +9,8 @@ class AlarmSharedPreferencesDataSource @Inject constructor(
     private val preferences: SharedPreferences
 ) : AlarmsPreferencesDataSource {
     override fun getAlarmPreferences(id: Int, isNextAlarm: Boolean): Alarm {
-        return Alarm(id, isNextAlarm).apply {
+        TODO()
+        /*return Alarm(id, isNextAlarm).apply {
             on = preferences.getBoolean("$id-$ON", false)
             vibration = preferences.getBoolean("$id-$VIBRATION", false)
             tone = preferences.getString("$id-$TONE", null)
@@ -17,7 +18,7 @@ class AlarmSharedPreferencesDataSource @Inject constructor(
             offsetHours = preferences.getInt("$id-$OFFSET_HOURS", 0)
             offsetMinutes = preferences.getInt("$id-$OFFSET_MINUTES", 0)
             offsetType = preferences.getInt("$id-$OFFSET_TYPE", -1)
-        }
+        }*/
     }
 
     override fun saveAlarmPreference(id: Int, field: Alarm.Field, value: Any) {

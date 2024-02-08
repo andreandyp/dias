@@ -1,21 +1,40 @@
 package com.andreandyp.dias.repository.alarms
 
+import com.andreandyp.dias.data.local.datasources.AlarmsLocalDataSource
 import com.andreandyp.dias.domain.Alarm
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AlarmsRepositoryImpl @Inject constructor(
-    private val alarmsPreferencesDataSource: AlarmsPreferencesDataSource
+    private val alarmsPreferencesDataSource: AlarmsPreferencesDataSource,
+    private val alarmsLocalDataSource: AlarmsLocalDataSource,
 ) : AlarmsRepository {
-    override fun getAlarmPreferences(id: Int, isNextAlarm: Boolean): Alarm {
-        return alarmsPreferencesDataSource.getAlarmPreferences(id, isNextAlarm)
+    override suspend fun getAlarms(): Flow<List<Alarm>> {
+        return alarmsLocalDataSource.getAllAlarms().map { entities ->
+            entities.map {
+                Alarm(
+                    it.id,
+                    it.isNextAlarm,
+                    it.on,
+                    it.shouldVibrate,
+                    it.ringtone,
+                    it.uriTone,
+                    it.offsetHours,
+                    it.offsetMinutes,
+                    it.offsetType,
+                    it.utcRingingAt,
+                )
+            }
+        }
     }
 
-    override fun saveOnSetting(id: Int, value: Boolean) {
-        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.ON, value)
+    override suspend fun saveOnSetting(id: Int, value: Boolean) {
+        alarmsLocalDataSource.saveOnConfig(id, value)
     }
 
-    override fun saveVibrationSetting(id: Int, value: Boolean) {
-        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.VIBRATION, value)
+    override suspend fun saveVibrationSetting(id: Int, value: Boolean) {
+        alarmsLocalDataSource.saveVibrationConfig(id, value)
     }
 
     override fun saveToneSetting(id: Int, value: String?) {

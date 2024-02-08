@@ -4,12 +4,10 @@ import android.app.PendingIntent
 import android.location.Location
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
-import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.andreandyp.dias.BR
 import com.andreandyp.dias.domain.Alarm
 import com.andreandyp.dias.ui.state.AlarmUiState
 import com.andreandyp.dias.ui.state.MainState
@@ -19,15 +17,15 @@ import com.andreandyp.dias.usecases.GetTomorrowSunriseUseCase
 import com.andreandyp.dias.usecases.SaveAlarmSettingsUseCase
 import com.andreandyp.dias.usecases.TurnOffAlarmUseCase
 import com.andreandyp.dias.usecases.TurnOnAlarmUseCase
+import com.andreandyp.dias.utils.translateDisplayName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Instant
-import java.time.LocalDate
-import java.time.temporal.ChronoField
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,7 +33,7 @@ class MainViewModel @Inject constructor(
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val getTomorrowSunriseUseCase: GetTomorrowSunriseUseCase,
     private val saveAlarmSettingsUseCase: SaveAlarmSettingsUseCase,
-    private val configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
+    configureAlarmSettingsUseCase: ConfigureAlarmSettingsUseCase,
     private val turnOnAlarmUseCase: TurnOnAlarmUseCase,
     private val turnOffAlarmUseCase: TurnOffAlarmUseCase,
 ) : ViewModel() {
@@ -52,19 +50,28 @@ class MainViewModel @Inject constructor(
     val alarms = mutableStateListOf<AlarmUiState>()
 
     init {
-        val nextDay = LocalDate.now().plusDays(1)[ChronoField.DAY_OF_WEEK]
-        (1..7).map {
-            setupAlarm(it, nextDay == it)
-        }.map {
-            AlarmUiState(
-                it.id,
-                it.formattedDay,
-                it.formattedOffset,
-                it.on,
-                it.vibration,
-                it.tone,
-            )
-        }.onEach(alarms::add)
+        viewModelScope.launch {
+            configureAlarmSettingsUseCase().map { alarms ->
+                alarms.map {
+                    AlarmUiState(
+                        it.id,
+                        DayOfWeek.of(it.id).translateDisplayName(),
+                        it.formattedOffset,
+                        it.on,
+                        it.vibration,
+                        it.ringtone,
+                    )
+                }
+            }.collect { alarmUiStates ->
+                alarmUiStates.forEachIndexed { index, alarmUiState ->
+                    if (alarms.getOrNull(index) == null) {
+                        alarms.add(index, alarmUiState)
+                    } else {
+                        alarms[index] = alarmUiState
+                    }
+                }
+            }
+        }
     }
 
     fun setupNextAlarm(isLocationEnabled: Boolean, forceUpdate: Boolean = false) {
@@ -101,8 +108,13 @@ class MainViewModel @Inject constructor(
         alarms[index] = alarm.copy(isConfigExpanded = alarm.isConfigExpanded.not())
     }
 
-    fun onChangeAlarmOnOff(isChecked: Boolean, alarm: AlarmUiState) {}
-    fun onChangeVibration(isChecked: Boolean, alarm: AlarmUiState) {}
+    fun onChangeAlarmOnOff(isChecked: Boolean, alarm: AlarmUiState) = viewModelScope.launch {
+        saveAlarmSettingsUseCase(alarm.id, Alarm.Field.ON, isChecked)
+    }
+
+    fun onChangeVibration(isChecked: Boolean, alarm: AlarmUiState) = viewModelScope.launch {
+        saveAlarmSettingsUseCase(alarm.id, Alarm.Field.VIBRATION, isChecked)
+    }
 
     fun onClickMenu(isOpen: Boolean) {
         _state.update {
@@ -122,12 +134,12 @@ class MainViewModel @Inject constructor(
     }
 
     private fun changeAlarmStatus(alarm: Alarm) {
-        if (alarm.ringingAt != null) {
+        /*if (alarm.ringingAt != null) {
             _alarmStatusUpdated.value = Event(alarm)
-        }
+        }*/
     }
 
-    private fun setupAlarm(idAlarm: Int, isNextAlarm: Boolean): Alarm {
+    /*private fun setupAlarm(idAlarm: Int, isNextAlarm: Boolean): Alarm {
         val alarm = configureAlarmSettingsUseCase(idAlarm, isNextAlarm)
         alarm.day = DayOfWeek.of(alarm.id)
 
@@ -155,5 +167,5 @@ class MainViewModel @Inject constructor(
         })
 
         return alarm
-    }
+    }*/
 }

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <NumberPicker
+        <!--<NumberPicker
             android:id="@+id/antes_despues"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,14 +21,14 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:valor="@{alarm.offsetType}" />
+            app:valor="@{alarm.offsetType}" />-->
 
         <NumberPicker
             android:id="@+id/hora"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@+id/minutos"
-            app:layout_constraintStart_toEndOf="@+id/antes_despues"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:valor="@{alarm.offsetHours}" />
 

@@ -5,7 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.andreandyp.dias.bd.dao.AlarmDAO
 import com.andreandyp.dias.bd.dao.SunriseDAO
+import com.andreandyp.dias.bd.entities.AlarmEntity
 import com.andreandyp.dias.bd.entities.AlarmaPospuestaEntity
 import com.andreandyp.dias.bd.entities.SunriseEntity
 
@@ -13,6 +15,7 @@ import com.andreandyp.dias.bd.entities.SunriseEntity
     entities = [
         AlarmaPospuestaEntity::class,
         SunriseEntity::class,
+        AlarmEntity::class,
     ],
     exportSchema = false,
     version = 1
@@ -20,6 +23,7 @@ import com.andreandyp.dias.bd.entities.SunriseEntity
 @TypeConverters(Converters::class)
 abstract class DiasDatabase : RoomDatabase() {
     abstract fun sunriseDao(): SunriseDAO
+    abstract fun alarmsDao(): AlarmDAO
 
     companion object {
         private var INSTANCE: DiasDatabase? = null
