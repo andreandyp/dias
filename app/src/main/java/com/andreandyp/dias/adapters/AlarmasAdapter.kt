@@ -2,13 +2,10 @@ package com.andreandyp.dias.adapters
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.media.RingtoneManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.andreandyp.dias.R
@@ -43,11 +40,6 @@ class AlarmasAdapter(private var context: Context?) :
             /*tvHoraAntesDespues.setOnClickListener {
                 crearDialogHoras(alarm!!).show()
             }*/
-
-            btnTono.setOnClickListener {
-                val tono = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                (context as AppCompatActivity).startActivityForResult(tono, alarm!!.id)
-            }
         }
     }
 

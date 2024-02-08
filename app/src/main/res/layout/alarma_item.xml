@@ -31,19 +31,5 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="±0:00" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_tono"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="alarm.tone"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Tusa"
-            tools:visibility="visible" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

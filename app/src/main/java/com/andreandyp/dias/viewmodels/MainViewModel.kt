@@ -37,6 +37,7 @@ class MainViewModel @Inject constructor(
     private val turnOnAlarmUseCase: TurnOnAlarmUseCase,
     private val turnOffAlarmUseCase: TurnOffAlarmUseCase,
 ) : ViewModel() {
+    private var currentAlarmIdForRingtone: Int? = null
 
     private val _nextAlarm = MutableLiveData<Alarm>()
     val nextAlarm: LiveData<Alarm> = _nextAlarm
@@ -60,6 +61,7 @@ class MainViewModel @Inject constructor(
                         it.on,
                         it.vibration,
                         it.ringtone,
+                        it.uriTone,
                     )
                 }
             }.collect { alarmUiStates ->
@@ -67,7 +69,10 @@ class MainViewModel @Inject constructor(
                     if (alarms.getOrNull(index) == null) {
                         alarms.add(index, alarmUiState)
                     } else {
-                        alarms[index] = alarmUiState
+                        val previousValue = alarms[index]
+                        alarms[index] = alarmUiState.copy(
+                            isConfigExpanded = previousValue.isConfigExpanded,
+                        )
                     }
                 }
             }
@@ -90,9 +95,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onRingtoneSelected(alarmId: Int, uri: Uri?, ringtone: String) {
-        /*alarms[alarmId].tone = ringtone
-        alarms[alarmId].uriTone = uri.toString()*/
+    fun onRingtoneSelected(uriTone: Uri, titleTone: String) = viewModelScope.launch {
+        saveAlarmSettingsUseCase(currentAlarmIdForRingtone!!, Alarm.Field.URI_TONE, uriTone)
+        saveAlarmSettingsUseCase(currentAlarmIdForRingtone!!, Alarm.Field.TONE, titleTone)
     }
 
     fun onAlarmOn(alarmInstant: Instant, alarmPendingIntent: PendingIntent) {
@@ -106,6 +111,10 @@ class MainViewModel @Inject constructor(
     fun onClickExpand(alarm: AlarmUiState) {
         val index = alarms.indexOfFirst { it.id == alarm.id }
         alarms[index] = alarm.copy(isConfigExpanded = alarm.isConfigExpanded.not())
+    }
+
+    fun onChoosingRingtone(alarmId: Int) {
+        currentAlarmIdForRingtone = alarmId
     }
 
     fun onChangeAlarmOnOff(isChecked: Boolean, alarm: AlarmUiState) = viewModelScope.launch {

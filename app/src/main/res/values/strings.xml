@@ -35,6 +35,7 @@
     <string name="alarm_expand_desc">Expandir configuración de alarma</string>
     <string name="alarm_collapse_desc">Colapsar configuración de alarma…</string>
     <string name="api_credits">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
+    <string name="no_ringtone_chosen">No seleccionaste ningún tono</string>
 
     <!-- Preference Titles -->
     <string name="alarmas_header">Alarmas</string>

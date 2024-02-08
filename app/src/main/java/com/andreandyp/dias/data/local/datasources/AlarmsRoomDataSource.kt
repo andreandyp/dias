@@ -1,5 +1,6 @@
 package com.andreandyp.dias.data.local.datasources
 
+import android.net.Uri
 import com.andreandyp.dias.bd.dao.AlarmDAO
 import com.andreandyp.dias.bd.entities.AlarmEntity
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,18 @@ class AlarmsRoomDataSource @Inject constructor(
     override suspend fun saveVibrationConfig(alarmId: Int, shouldVibrate: Boolean) {
         val alarm = alarmDAO.getAlarmById(alarmId)
         val updatedAlarm = alarm.copy(shouldVibrate = shouldVibrate)
+        alarmDAO.updateAlarm(updatedAlarm)
+    }
+
+    override suspend fun saveRingtoneTitle(alarmId: Int, title: String) {
+        val alarm = alarmDAO.getAlarmById(alarmId)
+        val updatedAlarm = alarm.copy(ringtone = title)
+        alarmDAO.updateAlarm(updatedAlarm)
+    }
+
+    override suspend fun saveRingtoneUri(alarmId: Int, uri: Uri) {
+        val alarm = alarmDAO.getAlarmById(alarmId)
+        val updatedAlarm = alarm.copy(uriTone = uri.toString())
         alarmDAO.updateAlarm(updatedAlarm)
     }
 }

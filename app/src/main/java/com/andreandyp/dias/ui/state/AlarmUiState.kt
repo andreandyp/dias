@@ -7,5 +7,6 @@ data class AlarmUiState(
     val isOn: Boolean,
     val shouldVibrate: Boolean,
     val ringtoneName: String?,
+    val ringtoneUri: String?,
     val isConfigExpanded: Boolean = false,
 )

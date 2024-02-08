@@ -11,6 +11,7 @@ class ComposeUtils {
             isOn = true,
             shouldVibrate = false,
             ringtoneName = null,
+            ringtoneUri = null,
         )
     }
 }

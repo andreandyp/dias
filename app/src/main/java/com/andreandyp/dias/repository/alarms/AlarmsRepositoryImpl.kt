@@ -1,5 +1,6 @@
 package com.andreandyp.dias.repository.alarms
 
+import android.net.Uri
 import com.andreandyp.dias.data.local.datasources.AlarmsLocalDataSource
 import com.andreandyp.dias.domain.Alarm
 import kotlinx.coroutines.flow.Flow
@@ -37,12 +38,12 @@ class AlarmsRepositoryImpl @Inject constructor(
         alarmsLocalDataSource.saveVibrationConfig(id, value)
     }
 
-    override fun saveToneSetting(id: Int, value: String?) {
-        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.TONE, value ?: "")
+    override suspend fun saveToneSetting(id: Int, value: String) {
+        alarmsLocalDataSource.saveRingtoneTitle(id, value)
     }
 
-    override fun saveUriToneSetting(id: Int, value: String?) {
-        alarmsPreferencesDataSource.saveAlarmPreference(id, Alarm.Field.URI_TONE, value ?: "")
+    override suspend fun saveUriToneSetting(id: Int, value: Uri) {
+        alarmsLocalDataSource.saveRingtoneUri(id, value)
     }
 
     override fun saveOffsetHoursSetting(id: Int, value: Int) {
