@@ -45,7 +45,8 @@ class MainFragment : Fragment() {
                         onRefresh = { viewModel.setupNextAlarm(isPermissionGranted(), true) },
                         onClickSettings = {
                             findNavController().navigate(MainFragmentDirections.mostrarAjustes())
-                        }
+                        },
+                        onClickOffset = {},
                     )
                 }
             }

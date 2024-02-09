@@ -7,7 +7,9 @@ class ComposeUtils {
         val alarmUiStatePreview = AlarmUiState(
             id = 1,
             formattedDay = "Lunes",
-            formattedOffset = "+/-0:00",
+            offsetHours = 0,
+            offsetMinutes = 0,
+            offsetType = null,
             isOn = true,
             shouldVibrate = false,
             ringtoneName = null,

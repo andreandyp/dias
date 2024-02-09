@@ -3,9 +3,6 @@
     <string name="preference_file" translatable="false">com.andreandyp.dias.PREFERENCE_FILE_KEY</string>
     <string name="channel_id" translatable="false">alarma_channel</string>
 
-    <string name="encendida">¿Encendida?</string>
-    <string name="vibrar">¿Vibrar?</string>
-    <string name="sonido_predeterminado">Sonido predeterminado</string>
     <string name="hora_predeterminada">±0:00</string>
     <string name="channel_nombre">Alarmas</string>
     <string name="channel_descripcion">Recibe una notificación cuando suene la alarma</string>
@@ -18,7 +15,6 @@
     <string name="notif_id_intent">notification_id</string>
     <string name="siguiente_alarma">%d:%d</string>
     <string name="detalles_alarma">Abrir detalles de la alarma</string>
-    <string name="separador_alarma">Separador de alarma</string>
     <string name="title_activity_ajustes">Ajustes</string>
 
     <string name="settings">Ajustes</string>
@@ -36,6 +32,14 @@
     <string name="alarm_collapse_desc">Colapsar configuración de alarma…</string>
     <string name="api_credits">Datos obtenidos con ayuda de https://sunrise-sunset.org/api</string>
     <string name="no_ringtone_chosen">No seleccionaste ningún tono</string>
+    <string name="offset_dialog_title">Escoge el desfase con respecto al amanecer</string>
+    <string name="offset_dialog_hours_label">Horas:</string>
+    <string name="offset_dialog_minutes_label">Minutos:</string>
+    <string name="offset_dialog_before_label">Antes de</string>
+    <string name="offset_dialog_after_label">Después de</string>
+    <string name="offset_dialog_result_label">Desfase configurado: %s%d:%s</string>
+    <string name="offset_format">%s%d:%s</string>
+    <string name="offset_minutes_0">00</string>
 
     <!-- Preference Titles -->
     <string name="alarmas_header">Alarmas</string>

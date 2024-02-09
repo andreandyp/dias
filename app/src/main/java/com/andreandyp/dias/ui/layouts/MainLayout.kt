@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andreandyp.dias.R
 import com.andreandyp.dias.domain.Origin
+import com.andreandyp.dias.domain.asString
 import com.andreandyp.dias.ui.state.AlarmUiState
 import com.andreandyp.dias.ui.state.MainState
 import com.andreandyp.dias.ui.theme.DiasTheme
@@ -67,6 +68,7 @@ fun MainLayout(
     onClickMenu: (Boolean) -> Unit,
     onClickSettings: () -> Unit,
     onClickExpand: (AlarmUiState) -> Unit,
+    onClickOffset: (AlarmUiState) -> Unit,
     onChangeAlarmOnOff: (Boolean, AlarmUiState) -> Unit,
     onChangeVibration: (Boolean, AlarmUiState) -> Unit,
     onChangeRingtone: (AlarmUiState) -> Unit,
@@ -123,6 +125,7 @@ fun MainLayout(
                         AlarmConfigItem(
                             uiState = it,
                             onClickExpand = onClickExpand,
+                            onClickOffset = onClickOffset,
                             onChangeAlarmOnOff = onChangeAlarmOnOff,
                             onChangeVibration = onChangeVibration,
                             onChangeRingtone = onChangeRingtone,
@@ -197,6 +200,7 @@ private fun OriginLabel(state: MainState) {
 private fun AlarmConfigItem(
     uiState: AlarmUiState,
     onClickExpand: (AlarmUiState) -> Unit,
+    onClickOffset: (AlarmUiState) -> Unit,
     onChangeAlarmOnOff: (Boolean, AlarmUiState) -> Unit,
     onChangeVibration: (Boolean, AlarmUiState) -> Unit,
     onChangeRingtone: (AlarmUiState) -> Unit,
@@ -222,7 +226,7 @@ private fun AlarmConfigItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                DayAndOffset(uiState)
+                DayAndOffset(uiState, onClickOffset)
             }
             Column(
                 horizontalAlignment = Alignment.End,
@@ -236,16 +240,27 @@ private fun AlarmConfigItem(
 }
 
 @Composable
-private fun DayAndOffset(alarm: AlarmUiState) {
+private fun DayAndOffset(alarm: AlarmUiState, onClickOffset: (AlarmUiState) -> Unit) {
+    val formattedOffset = stringResource(
+        id = R.string.offset_format,
+        alarm.offsetType.asString,
+        alarm.offsetHours,
+        if (alarm.offsetMinutes == 0) {
+            stringResource(id = R.string.offset_minutes_0)
+        } else {
+            alarm.offsetMinutes.toString()
+        },
+    )
+
     Text(
         text = alarm.formattedDay,
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier.padding(horizontal = 16.dp),
         // si es alarma siguiente, cambiar color
     )
-    TextButton(onClick = {}) {
+    TextButton(onClick = { onClickOffset(alarm) }) {
         Text(
-            text = alarm.formattedOffset,
+            text = formattedOffset,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 8.dp),
             // si es alarma siguiente, cambiar color
@@ -342,6 +357,7 @@ private fun MainLayoutPreview() {
                 onClickSettings = {},
                 onClickMenu = {},
                 onClickExpand = {},
+                onClickOffset = {},
                 onChangeAlarmOnOff = { _, _ -> },
                 onChangeVibration = { _, _ -> },
                 onChangeRingtone = {},

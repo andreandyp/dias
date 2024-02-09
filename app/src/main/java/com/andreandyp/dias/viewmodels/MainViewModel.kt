@@ -57,7 +57,9 @@ class MainViewModel @Inject constructor(
                     AlarmUiState(
                         it.id,
                         DayOfWeek.of(it.id).translateDisplayName(),
-                        it.formattedOffset,
+                        it.offsetHours,
+                        it.offsetMinutes,
+                        it.offsetType,
                         it.on,
                         it.vibration,
                         it.ringtone,

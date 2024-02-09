@@ -15,10 +15,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.andreandyp.dias.R
 import com.andreandyp.dias.ui.layouts.MainLayout
+import com.andreandyp.dias.ui.state.AlarmUiState
 import com.andreandyp.dias.viewmodels.MainViewModel
 
 @Composable
-fun MainScreen(viewModel: MainViewModel, onRefresh: () -> Unit, onClickSettings: () -> Unit) {
+fun MainScreen(
+    viewModel: MainViewModel,
+    onRefresh: () -> Unit,
+    onClickSettings: () -> Unit,
+    onClickOffset: (AlarmUiState) -> Unit,
+) {
     val alarmsState = viewModel.alarms
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -47,6 +53,7 @@ fun MainScreen(viewModel: MainViewModel, onRefresh: () -> Unit, onClickSettings:
         onClickMenu = viewModel::onClickMenu,
         onClickSettings = onClickSettings,
         onClickExpand = viewModel::onClickExpand,
+        onClickOffset = onClickOffset,
         onChangeAlarmOnOff = viewModel::onChangeAlarmOnOff,
         onChangeVibration = viewModel::onChangeVibration,
         onChangeRingtone = { alarm ->
